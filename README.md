@@ -7,7 +7,7 @@
   <tr>
     <td align="center" width="25%">
       <a href="https://github.com/viviamm7-code">
-        <img src="https://github.com/viviamm7-code.png" width="100%">
+        <img src="https://github.com/viviamm7-code.png" width="220" height="220">
       </a>
     </td>
     <td align="center" width="25%">
