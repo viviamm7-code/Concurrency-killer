@@ -13,7 +13,7 @@
     <td align="center"><img width="120" height="120" src=".github/readme/kimminjoun.jpeg"></td>
   </tr>
   <tr>
-    <td align="center"><a href="">김진성</a></td>
+    <td align="center"><a href="https://github.com/viviamm7-code">김진성</a></td>
     <td align="center"><a href="">서성률</a></td>
     <td align="center"><a href="">류호진</a></td>
     <td align="center"><a href="">이연주</a></td>
