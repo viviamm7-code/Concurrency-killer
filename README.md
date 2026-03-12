@@ -10,9 +10,21 @@
         <img src="https://github.com/viviamm7-code.png" width="100%">
       </a>
     </td>
-    <td align="center"><img width="120" height="120" src=".github/readme/"></td>
-    <td align="center"><img width="120" height="120" src=".github/readme/"></td>
-    <td align="center"><img width="120" height="120" src=".github/readme/"></td>
+    <td align="center" width="25%">
+      <a href="https://github.com/">
+        <img src="https://github.com/" width="100%">
+      </a>
+    </td>
+    <td align="center" width="25%">
+      <a href="https://github.com/">
+        <img src="https://github.com/" width="100%">
+      </a>
+    </td>
+    <td align="center" width="25%">
+      <a href="https://github.com/">
+        <img src="https://github.com/" width="100%">
+      </a>
+    </td>
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/viviamm7-code">김진성</a></td>
