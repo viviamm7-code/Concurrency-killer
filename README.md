@@ -13,10 +13,10 @@
     <td align="center"><img width="120" height="120" src=".github/readme/kimminjoun.jpeg"></td>
   </tr>
   <tr>
-    <td align="center"><a href="https://github.com/p-seonggeun">김진성</a></td>
-    <td align="center"><a href="https://github.com/Duhikim">서성률</a></td>
-    <td align="center"><a href="https://github.com/Isonade2">류호진</a></td>
-    <td align="center"><a href="https://github.com/UncleSamsun">이연주</a></td>
+    <td align="center"><a href="">김진성</a></td>
+    <td align="center"><a href="">서성률</a></td>
+    <td align="center"><a href="">류호진</a></td>
+    <td align="center"><a href="">이연주</a></td>
   </tr>
 </table>
 
