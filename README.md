@@ -1,13 +1,13 @@
 # ☁️ Concurrency-Killer
+
+---
+
+# 백앤드 팀원
   <table>
   <tr>
-    <th>Backend Developer</th>
-    <th>Backend Developer</th>
-    <th>Backend Developer</th>
-    <th>Backend Developer</th>
-  </tr>
-  <tr>
-    <td align="center"><img width="120" height="120" src=".github/readme/kimjinsung.jpeg"></td>
+    <td align="center">
+      <img width="120" height="120" src="https://github.com/viviamm7-code.png">
+    </td> 
     <td align="center"><img width="120" height="120" src=".github/readme/"></td>
     <td align="center"><img width="120" height="120" src=".github/readme/"></td>
     <td align="center"><img width="120" height="120" src=".github/readme/"></td>
