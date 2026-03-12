@@ -5,9 +5,11 @@
 # 백앤드 팀원
   <table>
   <tr>
-    <td align="center">
-      <img width="120" height="120" src="https://github.com/viviamm7-code.png">
-    </td> 
+    <td align="center" width="25%">
+      <a href="https://github.com/viviamm7-code">
+        <img src="https://github.com/viviamm7-code.png" width="100%">
+      </a>
+    </td>
     <td align="center"><img width="120" height="120" src=".github/readme/"></td>
     <td align="center"><img width="120" height="120" src=".github/readme/"></td>
     <td align="center"><img width="120" height="120" src=".github/readme/"></td>
