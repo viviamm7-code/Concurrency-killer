@@ -7,10 +7,10 @@
     <th>Backend Developer</th>
   </tr>
   <tr>
-    <td align="center"><img width="120" height="120" src=".github/readme/parkseonggeun.png"></td>
-    <td align="center"><img width="120" height="120" src=".github/readme/kimduhi.jpeg"></td>
-    <td align="center"><img width="120" height="120" src=".github/readme/jeonjunyoung.jpeg"></td>
-    <td align="center"><img width="120" height="120" src=".github/readme/kimminjoun.jpeg"></td>
+    <td align="center"><img width="120" height="120" src=".github/readme/viviamm7-code.png"></td>
+    <td align="center"><img width="120" height="120" src=".github/readme/"></td>
+    <td align="center"><img width="120" height="120" src=".github/readme/"></td>
+    <td align="center"><img width="120" height="120" src=".github/readme/"></td>
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/viviamm7-code">김진성</a></td>
