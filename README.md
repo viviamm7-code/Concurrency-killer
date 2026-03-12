@@ -1,10 +1,10 @@
 # Concurrency-Killer
   <table>
   <tr>
-    <th>Developer</th>
-    <th>Developer</th>
-    <th>Developer</th>
-    <th>Developer</th>
+    <th>Backend Developer</th>
+    <th>Backend Developer</th>
+    <th>Backend Developer</th>
+    <th>Backend Developer</th>
   </tr>
   <tr>
     <td align="center"><img width="120" height="120" src=".github/readme/parkseonggeun.png"></td>
