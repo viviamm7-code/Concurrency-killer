@@ -2,12 +2,12 @@
 
 ---
 
-# 백앤드 팀원
+# ☁️ 백엔드 팀원
   <table>
   <tr>
     <td align="center" width="25%">
       <a href="https://github.com/viviamm7-code">
-        <img src="https://github.com/viviamm7-code.png" width="220" height="220">
+        <img src="https://github.com/viviamm7-code.png" width="100%">
       </a>
     </td>
     <td align="center" width="25%">
@@ -34,7 +34,7 @@
   </tr>
 </table>
 
-## ☁️ 목표
+## ☁️ 프로젝트 목표
 
 
 
