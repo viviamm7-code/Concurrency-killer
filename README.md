@@ -1,4 +1,4 @@
-# Concurrency-Killer
+# ☁️ Concurrency-Killer
   <table>
   <tr>
     <th>Backend Developer</th>
@@ -20,12 +20,12 @@
   </tr>
 </table>
 
-## 💠 목표
+## ☁️ 목표
 
 
 
-## 💠 프로젝트 정보
+## ☁️ 프로젝트 정보
 [프로젝트 노션 페이지](https://www.notion.so/Project-8e5bd34f43e6834097670153af124ece)
 
 
-## 💠 프로젝트 일정관리
+## ☁️ 프로젝트 일정관리
