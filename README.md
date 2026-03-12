@@ -7,7 +7,7 @@
   <tr>
     <td align="center" width="25%">
       <a href="https://github.com/viviamm7-code">
-        <img src="https://github.com/viviamm7-code.png" width="240" height="240" alt="김진성">
+        <img src="https://github.com/viviamm7-code.png" width="100%">
       </a>
     </td>
     <td align="center" width="25%">
