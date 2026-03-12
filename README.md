@@ -25,7 +25,7 @@
 
 
 ## 💠 프로젝트 정보
-[프로젝트 노션 페이지]([https://www.notion.so/goormkdx/1b3c0ff4ce31808daa59cfc0b1bb436e](https://www.notion.so/Project-8e5bd34f43e6834097670153af124ece))
+[프로젝트 노션 페이지](https://www.notion.so/Project-8e5bd34f43e6834097670153af124ece)
 
 
 ## 💠 프로젝트 일정관리
