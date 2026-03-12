@@ -16,7 +16,7 @@
     <td align="center"><a href="https://github.com/viviamm7-code">김진성</a></td>
     <td align="center"><a href="">서성률</a></td>
     <td align="center"><a href="">류호진</a></td>
-    <td align="center"><a href="">이연주</a></td>
+    <td align="center"><a href="https://github.com/Lee-Yeonjoo">이연주</a></td>
   </tr>
 </table>
 
