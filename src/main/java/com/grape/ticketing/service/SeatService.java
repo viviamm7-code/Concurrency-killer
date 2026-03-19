@@ -21,7 +21,7 @@ public class SeatService {
     private final SeatMapper seatMapper;
 
     public List<SeatTO> findAllSeats(Long id) {
-        List<Seat> seats = seatRepository.findAllSeatsByPerformanceId(id);
+        List<Seat> seats = seatRepository.findSeatsByPerformanceId(id);
         List<SeatTO> seatList = seatMapper.toSeatTOList(seats);
         return seatList;
 
