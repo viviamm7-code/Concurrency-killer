@@ -6,5 +6,6 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface PerformanceMapper {
-    public PerformanceTO.PerformanceList toPerformanceTO(Performance performance);
+    public PerformanceTO.PerformanceList toPerformanceListTO(Performance performance);
+    public PerformanceTO.PerformanceRes toPerformanceTO(Performance performance);
 }

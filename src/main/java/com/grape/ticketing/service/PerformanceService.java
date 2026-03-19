@@ -19,8 +19,14 @@ public class PerformanceService {
     //공연 목록 조회
     public List<PerformanceTO.PerformanceList> getPerformanceList() {
         List<PerformanceTO.PerformanceList> performanceList = performanceRepository.findAll().stream()
-                .map(performanceMapper::toPerformanceTO)
+                .map(performanceMapper::toPerformanceListTO)
                 .toList();
         return performanceList;
+    }
+
+    //공연 상세 조회
+    public PerformanceTO.PerformanceRes getPerformance(Long performanceId) {
+        Performance performance = performanceRepository.findById(performanceId).orElseThrow();
+        return performanceMapper.toPerformanceTO(performance);
     }
 }

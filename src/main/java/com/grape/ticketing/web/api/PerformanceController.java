@@ -5,6 +5,7 @@ import com.grape.ticketing.repository.MemberRepository;
 import com.grape.ticketing.service.PerformanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,5 +25,9 @@ public class PerformanceController {
         return performanceService.getPerformanceList();
     }
 
-    
+    //공연 상세 조회
+    @GetMapping("/{performanceId}")
+    public PerformanceTO.PerformanceRes getPerformance(@PathVariable Long performanceId) {
+        return performanceService.getPerformance(performanceId);
+    }
 }
