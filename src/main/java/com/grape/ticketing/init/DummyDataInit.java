@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class DummyDataInit implements CommandLineRunner {
     private final MemberRepository memberRepository;

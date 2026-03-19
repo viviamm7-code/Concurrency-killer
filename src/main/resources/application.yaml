@@ -7,7 +7,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create  # create -> create옵션은 서버 끌 때 테이블 다 삭제되니까 none이나 update로 바꿔서 사용하면 됩니다.
+      ddl-auto: update  # create -> create옵션은 서버 끌 때 테이블 다 삭제되니까 none이나 update로 바꿔서 사용하면 됩니다.
     show-sql: true
     properties:
       hibernate:
