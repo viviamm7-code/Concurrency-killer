@@ -18,6 +18,7 @@ public class Seat extends BaseEntitiy{
 
     private String seatNumber;
 
+    @Enumerated(EnumType.STRING)
     private SeatStatus seatStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)

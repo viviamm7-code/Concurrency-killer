@@ -1,9 +1,20 @@
 package com.grape.ticketing.service;
 
-import com.grape.ticketing.domain.*;
+import com.grape.ticketing.domain.Reservation;
+import com.grape.ticketing.domain.ReservationSeat;
+import com.grape.ticketing.domain.Seat;
+import com.grape.ticketing.domain.status.ReservationStatus;
+import com.grape.ticketing.domain.status.SeatStatus;
+import com.grape.ticketing.dto.CancelPolicyResultDto;
+import com.grape.ticketing.dto.CancelPolicyResultDto;
+import com.grape.ticketing.dto.ReservationCancelDto;
 import com.grape.ticketing.dto.ReservationDetailDto;
 import com.grape.ticketing.dto.ReservationDto;
+import com.grape.ticketing.mapper.ReservationCancelMapper;
+import com.grape.ticketing.mapper.ReservationMapper;
 import com.grape.ticketing.repository.ReservationRepository;
+import com.grape.ticketing.repository.ReservationSeatRepository;
+import com.grape.ticketing.repository.SeatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,24 +25,18 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ReservationService {
+
     private final ReservationRepository reservationRepository;
+    private final ReservationMapper reservationMapper;
+    private final ReservationCancelMapper reservationCancelMapper;
+    private final ReservationCancelPolicyService reservationCancelPolicyService;
+    private final SeatRepository seatRepository;
 
     public List<ReservationDto> getReservationList(Long memberId) {
-        List<Reservation> reservations = reservationRepository.findReservationByMemberId(memberId);
+        List<Reservation> reservations = reservationRepository.findReservationByMemberIdOrderByReservedAtDesc(memberId);
 
         return reservations.stream()
-                .filter(reservation -> !reservation.getReservationSeats().isEmpty()) // 좌석번호없는애는 안넣음
-                .map(reservation -> new ReservationDto(
-                        reservation.getId(),
-                        reservation.getPerformance().getPerformanceName(),
-                        reservation.getPerformance().getVenue(),
-                        reservation.getPerformance().getStartedAt(),
-                        reservation.getReservedAt(),
-                        reservation.getReservationSeats().stream()
-                                .map(reservationSeat -> reservationSeat.getSeat().getSeatNumber())
-                                .toList(),
-                        reservation.getPerformance().getPerformanceStatus().name()
-                ))
+                .map(reservationMapper::toReservationDto)
                 .toList();
     }
 
@@ -40,18 +45,42 @@ public class ReservationService {
                 .findByMemberIdAndId(memberId, reservationId)
                 .orElseThrow(() -> new IllegalArgumentException("예매 내역이 없습니다."));
 
-        return new ReservationDetailDto(
-                reservation.getId(),
-                reservation.getMember().getUsername(),
-                reservation.getPerformance().getPerformanceName(),
-                reservation.getPerformance().getVenue(),
-                reservation.getPerformance().getStartedAt(),
-                reservation.getReservedAt(),
-                reservation.getReservationSeats().stream()
-                        .map(reservationSeat -> reservationSeat.getSeat().getSeatNumber())
-                        .toList(),
-                reservation.getPerformance().getPrice() * reservation.getReservationSeats().size(),
-                reservation.getPerformance().getPerformanceStatus().name()
-        );
+        return reservationMapper.toReservationDetailDto(reservation);
+    }
+
+    @Transactional
+    public ReservationCancelDto cancelReservation(Long memberId, Long reservationId) {
+        Reservation reservation = reservationRepository.findByMemberIdAndId(memberId, reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("예매 내역이 없습니다."));
+
+        CancelPolicyResultDto policyResult = reservationCancelPolicyService.calculate(reservation);
+
+        if (!policyResult.isCancelable()) {
+            throw new IllegalStateException(policyResult.getMessage());
+        }
+
+        List<Seat> seats = reservation.getReservationSeats().stream()
+                .map(ReservationSeat::getSeat)
+                .toList();
+
+        for (Seat seat : seats) {
+            seat.setSeatStatus(SeatStatus.AVAILABLE);
+        }
+
+        seatRepository.saveAll(seats);
+
+        reservation.setReservationStatus(ReservationStatus.CANCELED);
+        reservationRepository.save(reservation);
+
+        return reservationCancelMapper.toReservationCancelDto(reservation, policyResult);
+    }
+
+    public ReservationCancelDto getCancelPreview(Long memberId, Long reservationId) {
+        Reservation reservation = reservationRepository.findByMemberIdAndId(memberId, reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("예매 내역이 없습니다."));
+
+        CancelPolicyResultDto policyResult = reservationCancelPolicyService.calculate(reservation);
+
+        return reservationCancelMapper.toReservationCancelDto(reservation, policyResult);
     }
 }
