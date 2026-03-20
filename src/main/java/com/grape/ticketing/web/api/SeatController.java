@@ -1,4 +1,4 @@
-package com.grape.ticketing.web;
+package com.grape.ticketing.web.api;
 
 import com.grape.ticketing.dto.SeatTO;
 import com.grape.ticketing.service.SeatService;

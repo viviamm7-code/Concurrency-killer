@@ -1,9 +1,8 @@
-package com.grape.ticketing.web;
+package com.grape.ticketing.web.api;
 
 import com.grape.ticketing.dto.RemainingSeatCountTO;
 import com.grape.ticketing.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
