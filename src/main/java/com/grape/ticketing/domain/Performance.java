@@ -24,8 +24,8 @@ public class Performance extends BaseEntitiy {
     private int performanceTime; //공연 소요시간
     private LocalDateTime startedAt; //공연 시작시간 /끝나는시간은 뺐음
 
+    @Enumerated(EnumType.STRING)
     private PerformanceStatus performanceStatus;
-
 
     @OneToMany(mappedBy = "performance")
     private List<Reservation> reservations = new ArrayList<>();

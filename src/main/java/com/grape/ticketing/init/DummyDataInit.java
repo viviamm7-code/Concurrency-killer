@@ -6,9 +6,7 @@ import com.grape.ticketing.domain.status.Role;
 import com.grape.ticketing.domain.Seat;
 import com.grape.ticketing.domain.status.PerformanceStatus;
 import com.grape.ticketing.domain.status.SeatStatus;
-import com.grape.ticketing.repository.MemberRepository;
-import com.grape.ticketing.repository.PerformanceRepository;
-import com.grape.ticketing.repository.SeatRepository;
+import com.grape.ticketing.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -22,6 +20,8 @@ public class DummyDataInit implements CommandLineRunner {
     private final MemberRepository memberRepository;
     private final SeatRepository seatRepository;
     private final PerformanceRepository performanceRepository;
+    private final ReservationRepository reservationRepository;
+    private final ReservationSeatRepository reservationSeatRepository;
 
     @Override
     @Transactional
@@ -54,6 +54,7 @@ public class DummyDataInit implements CommandLineRunner {
             performance.setPerformanceStatus(PerformanceStatus.ON_SALE);
             performance.setStartedAt(LocalDateTime.now().plusDays(i));
             performance.setPerformanceTime(120);
+            performance.setPrice(80000);
 
             performanceRepository.save(performance);
 

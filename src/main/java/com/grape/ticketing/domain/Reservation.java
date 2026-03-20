@@ -1,5 +1,6 @@
 package com.grape.ticketing.domain;
 
+import com.grape.ticketing.domain.status.ReservationStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +23,9 @@ public class Reservation extends BaseEntitiy{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus reservationStatus;
 
     @OneToMany(mappedBy = "reservation")
     private List<ReservationSeat> reservationSeats = new ArrayList<>();
