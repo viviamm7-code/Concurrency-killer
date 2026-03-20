@@ -65,6 +65,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 50px;
+            gap: 20px;
         }
 
         .title {
@@ -76,6 +77,7 @@
             gap: 20px;
             align-items: center;
             font-size: 16px;
+            flex-wrap: wrap;
         }
 
         .legend-item {
@@ -97,7 +99,7 @@
             background: #6f2df5;
         }
 
-        .unavailable-box {
+        .reserved-box {
             background: #bfbfbf;
         }
 
@@ -145,23 +147,38 @@
             cursor: pointer;
             color: white;
             font-size: 12px;
+            transition: transform 0.15s ease;
         }
 
         .seat.available {
             background: #9b74e8;
         }
 
+        .seat.available:hover {
+            transform: scale(1.08);
+        }
+
         .seat.selected {
             background: #6f2df5;
         }
 
-        .seat.unavailable {
+        .seat.selected:hover {
+            transform: scale(1.08);
+        }
+
+        .seat.reserved {
             background: #bfbfbf;
             cursor: not-allowed;
         }
 
         .sidebar-title {
             font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .remaining-info {
+            color: #555;
+            font-size: 16px;
             margin-bottom: 20px;
         }
 
@@ -200,9 +217,35 @@
             cursor: pointer;
         }
 
+        .complete-btn:disabled {
+            background: #c8c8c8;
+            cursor: not-allowed;
+        }
+
         .empty-message {
             color: #666;
             font-size: 18px;
+        }
+
+        @media (max-width: 1200px) {
+            .content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .seat-layout {
+                min-width: auto;
+                width: 100%;
+                overflow-x: auto;
+            }
+
+            .top-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
@@ -231,7 +274,7 @@
                         <span>선택 좌석</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-box unavailable-box"></div>
+                        <div class="legend-box reserved-box"></div>
                         <span>선택 불가</span>
                     </div>
                 </div>
@@ -247,7 +290,9 @@
 
         <aside class="sidebar">
             <div>
-                <div class="sidebar-title">선택 좌석 <span id="selectedCount">0</span></div>
+                <div class="sidebar-title">선택 좌석 <span id="selectedCount">0 / 0</span></div>
+                <div class="remaining-info" id="remainingInfo">남은 예매 가능 좌석 수: 0</div>
+
                 <div id="selectedSeatBox" class="selected-seat-box">
                     <div class="empty-message">선택한 좌석이 없습니다.</div>
                 </div>
@@ -259,24 +304,47 @@
 </div>
 
 <script>
-    const performanceId = 1;
-    let maxSelectableSeats = 1;
+    const performanceId = 2;
+    const memberId = 99; // 실제로는 로그인 사용자 기준
+    let maxSelectableSeats = 0;
     const selectedSeats = new Map();
 
-    async function fetchSeats() {
+    async function initPage() {
         try {
-            const response = await fetch(`/performances/${performanceId}/seats`);
+            const [seatsResponse, remainingResponse] = await Promise.all([
+                fetch(`/performances/${performanceId}/seats`),
+                fetch(`/performances/${performanceId}/remaining-seat-count?memberId=${memberId}`)
+            ]);
 
-            if (!response.ok) {
+            if (!seatsResponse.ok) {
                 throw new Error('좌석 조회 실패');
             }
 
-            const seats = await response.json();
+            if (!remainingResponse.ok) {
+                throw new Error('잔여 예매 가능 좌석 수 조회 실패');
+            }
+
+            const seats = await seatsResponse.json();
+            const remainingData = await remainingResponse.json();
+
+            maxSelectableSeats = remainingData.remainingSeatCount;
+
+            renderRemainingLimitInfo();
             renderSeats(seats);
+            renderSelectedSeats();
+            updateCompleteButtonState();
         } catch (e) {
             console.error(e);
-            alert('좌석 정보를 불러오지 못했습니다.');
+            alert('페이지 정보를 불러오지 못했습니다.');
         }
+    }
+
+    function renderRemainingLimitInfo() {
+        const selectedCount = document.getElementById('selectedCount');
+        const remainingInfo = document.getElementById('remainingInfo');
+
+        selectedCount.textContent = `${selectedSeats.size} / ${maxSelectableSeats}`;
+        remainingInfo.textContent = `남은 예매 가능 좌석 수: ${maxSelectableSeats}`;
     }
 
     function renderSeats(seats) {
@@ -286,9 +354,6 @@
         leftSection.innerHTML = '';
         rightSection.innerHTML = '';
 
-        // seatNumber 예: A1, A2, B10
-        // row = A
-        // number = 1, 2, 10
         const parsedSeats = seats.map(seat => {
             const parsed = parseSeatNumber(seat.seatNumber);
             return {
@@ -309,11 +374,8 @@
             const leftRowSeats = rowSeats.filter(seat => seat.number >= 1 && seat.number <= 5);
             const rightRowSeats = rowSeats.filter(seat => seat.number >= 6 && seat.number <= 11);
 
-            const leftRowDiv = createRowDiv(row, leftRowSeats);
-            const rightRowDiv = createRowDiv(row, rightRowSeats);
-
-            leftSection.appendChild(leftRowDiv);
-            rightSection.appendChild(rightRowDiv);
+            leftSection.appendChild(createRowDiv(row, leftRowSeats));
+            rightSection.appendChild(createRowDiv(row, rightRowSeats));
         });
     }
 
@@ -321,10 +383,7 @@
         const match = seatNumber.match(/^([A-Z]+)(\d+)$/);
 
         if (!match) {
-            return {
-                row: '',
-                number: 0
-            };
+            return { row: '', number: 0 };
         }
 
         return {
@@ -344,11 +403,16 @@
 
         seats.forEach(seat => {
             const button = document.createElement('button');
-            button.className = `seat ${convertSeatStatus(seat.seatStatus)}`;
             button.dataset.seatNumber = seat.seatNumber;
             button.textContent = '';
+            button.type = 'button';
 
-            if (seat.seatStatus !== 'UNAVAILABLE') {
+            const statusClass = convertSeatStatus(seat.seatStatus);
+            button.className = `seat ${statusClass}`;
+
+            if (seat.seatStatus === 'RESERVED') {
+                button.disabled = true;
+            } else {
                 button.addEventListener('click', () => toggleSeatSelection(seat, button));
             }
 
@@ -360,12 +424,16 @@
 
     function convertSeatStatus(seatStatus) {
         if (seatStatus === 'AVAILABLE') return 'available';
-        if (seatStatus === 'UNAVAILABLE') return 'unavailable';
-        if (seatStatus === 'SELECTED') return 'selected';
+        if (seatStatus === 'RESERVED') return 'reserved';
         return 'available';
     }
 
     function toggleSeatSelection(seat, button) {
+        if (maxSelectableSeats <= 0) {
+            alert('이 공연은 더 이상 예매할 수 없습니다. 1인 최대 4좌석까지 가능합니다.');
+            return;
+        }
+
         const seatNumber = seat.seatNumber;
 
         if (selectedSeats.has(seatNumber)) {
@@ -374,7 +442,7 @@
             button.classList.add('available');
         } else {
             if (selectedSeats.size >= maxSelectableSeats) {
-                alert(`최대 ${maxSelectableSeats}개의 좌석만 선택할 수 있습니다.`);
+                alert(`이 공연에서 현재 최대 ${maxSelectableSeats}좌석까지 추가 예매할 수 있습니다.`);
                 return;
             }
 
@@ -383,14 +451,13 @@
             button.classList.add('selected');
         }
 
+        renderRemainingLimitInfo();
         renderSelectedSeats();
+        updateCompleteButtonState();
     }
 
     function renderSelectedSeats() {
         const selectedSeatBox = document.getElementById('selectedSeatBox');
-        const selectedCount = document.getElementById('selectedCount');
-
-        selectedCount.textContent = selectedSeats.size;
         selectedSeatBox.innerHTML = '';
 
         if (selectedSeats.size === 0) {
@@ -416,6 +483,7 @@
 
             const removeBtn = document.createElement('button');
             removeBtn.className = 'remove-btn';
+            removeBtn.type = 'button';
             removeBtn.textContent = 'x';
             removeBtn.addEventListener('click', () => removeSeat(seat.seatNumber));
 
@@ -435,29 +503,50 @@
             targetBtn.classList.add('available');
         }
 
+        renderRemainingLimitInfo();
         renderSelectedSeats();
+        updateCompleteButtonState();
     }
 
-    document.getElementById('completeBtn').addEventListener('click', () => {
+    function updateCompleteButtonState() {
+        const completeBtn = document.getElementById('completeBtn');
+        completeBtn.disabled = selectedSeats.size === 0;
+    }
+
+    document.getElementById('completeBtn').addEventListener('click', async () => {
         if (selectedSeats.size === 0) {
             alert('좌석을 선택해주세요.');
             return;
         }
 
         const seatNumbers = Array.from(selectedSeats.keys());
-        console.log('선택한 좌석:', seatNumbers);
 
-        // 예:
-        // fetch('/reservations', {
-        //   method: 'POST',
-        //   headers: {'Content-Type': 'application/json'},
-        //   body: JSON.stringify({ seatNumbers })
-        // });
+        try {
+            // 1. 선택 좌석을 서버에 임시 저장
+            // const response = await fetch(`/api/performances/${performanceId}/seat-selection?memberId=${memberId}`, {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     },
+            //     body: JSON.stringify({
+            //         seatNumbers: seatNumbers
+            //     })
+            // });
+            //
+            // if (!response.ok) {
+            //     const errorText = await response.text();
+            //     throw new Error(errorText || '선택 좌석 저장 실패');
+            // }
 
-        alert('선택 완료');
+            // 2. 저장 성공 시 다음 페이지 이동
+            window.location.href = '/reservationConfirm.html';
+        } catch (e) {
+            console.error(e);
+            alert(e.message || '다음 페이지로 이동하는 중 오류가 발생했습니다.');
+        }
     });
 
-    fetchSeats();
+    initPage();
 </script>
 </body>
 </html>
