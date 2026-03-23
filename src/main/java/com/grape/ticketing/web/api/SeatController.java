@@ -3,10 +3,7 @@ package com.grape.ticketing.web.api;
 import com.grape.ticketing.dto.SeatTO;
 import com.grape.ticketing.service.SeatService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,8 +13,8 @@ public class SeatController {
     @Autowired
     private SeatService seatService;
 
-    @GetMapping("/{id}/seats")
-    public List<SeatTO> getUserById(@PathVariable Long id) {
-        return seatService.findAllSeats(id);
+    @GetMapping("/{performanceId}/seats")
+    public List<SeatTO> getSeatByPerformanceId(@PathVariable Long performanceId) {
+        return seatService.findAllSeats(performanceId);
     }
 }
