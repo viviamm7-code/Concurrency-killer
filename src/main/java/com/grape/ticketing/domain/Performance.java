@@ -31,9 +31,9 @@ public class Performance extends BaseEntitiy {
     private LocalDate startDate;  //공연 시작날짜
     private LocalDate endDate;    //공연 종료날짜
 
+    @Enumerated(EnumType.STRING)
     private PerformanceStatus performanceStatus;
     private String imageUrl;
-
 
     @OneToMany(mappedBy = "performance")
     private List<Reservation> reservations = new ArrayList<>();
