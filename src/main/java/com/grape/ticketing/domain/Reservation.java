@@ -1,5 +1,6 @@
 package com.grape.ticketing.domain;
 
+import com.grape.ticketing.domain.status.ReservationStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,4 +30,7 @@ public class Reservation extends BaseEntitiy{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "performance_id")
     private Performance performance;
+
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus reservationStatus;
 }

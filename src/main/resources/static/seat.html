@@ -304,13 +304,50 @@
 </div>
 
 <script>
-    const performanceId = 2;
-    const memberId = 99; // 실제로는 로그인 사용자 기준
+    const draftId = new URLSearchParams(window.location.search).get('draftId');
+    let performanceId = null;
+    let memberId = null;
     let maxSelectableSeats = 0;
     const selectedSeats = new Map();
+    let draftCache = null;
+
+    function trace(message, data) {
+        let traceBox = document.getElementById('traceBox');
+        if (!traceBox) {
+            traceBox = document.createElement('pre');
+            traceBox.id = 'traceBox';
+            traceBox.style.marginTop = '24px';
+            traceBox.style.background = '#111';
+            traceBox.style.color = '#aef5c6';
+            traceBox.style.padding = '16px';
+            traceBox.style.borderRadius = '12px';
+            traceBox.style.fontSize = '13px';
+            traceBox.style.whiteSpace = 'pre-wrap';
+            document.querySelector('.main').appendChild(traceBox);
+        }
+        const suffix = data ? `\n${JSON.stringify(data, null, 2)}` : '';
+        traceBox.textContent += `[${new Date().toLocaleTimeString()}] ${message}${suffix}\n\n`;
+    }
 
     async function initPage() {
         try {
+            if (!draftId) {
+                throw new Error('draftId가 없습니다.');
+            }
+
+            trace('seat.html 진입');
+            const draftResponse = await fetch(`/reservation-drafts/${draftId}`);
+            if (!draftResponse.ok) {
+                throw new Error('draft 조회 실패');
+            }
+
+            draftCache = await draftResponse.json();
+            performanceId = draftCache.performanceId;
+            memberId = draftCache.memberId;
+            maxSelectableSeats = draftCache.remainingSeatLimit ?? 0;
+            trace('draft 조회 성공', draftCache);
+            document.querySelector('.title').textContent = `${draftCache.performanceTitle} ${draftCache.performanceDate}`;
+
             const [seatsResponse, remainingResponse] = await Promise.all([
                 fetch(`/performances/${performanceId}/seats`),
                 fetch(`/performances/${performanceId}/remaining-seat-count?memberId=${memberId}`)
@@ -328,15 +365,41 @@
             const remainingData = await remainingResponse.json();
 
             maxSelectableSeats = remainingData.remainingSeatCount;
+            trace('좌석 목록 / 잔여 좌석 조회 성공', {
+                seatsCount: seats.length,
+                remainingSeatCount: maxSelectableSeats
+            });
 
             renderRemainingLimitInfo();
             renderSeats(seats);
+
+            if (draftCache.selectedSeats) {
+                draftCache.selectedSeats.forEach(seatNumber => {
+                    const seat = seats.find(item => item.seatNumber === seatNumber);
+                    if (seat) {
+                        selectedSeats.set(seatNumber, seat);
+                    }
+                });
+                syncSelectedSeatButtons();
+                trace('기존 draft 좌석 복원 완료', { selectedSeats: Array.from(selectedSeats.keys()) });
+            }
+
             renderSelectedSeats();
             updateCompleteButtonState();
         } catch (e) {
             console.error(e);
             alert('페이지 정보를 불러오지 못했습니다.');
         }
+    }
+
+    function syncSelectedSeatButtons() {
+        selectedSeats.forEach((seat, seatNumber) => {
+            const button = document.querySelector(`.seat[data-seat-number="${seatNumber}"]`);
+            if (button) {
+                button.classList.remove('available');
+                button.classList.add('selected');
+            }
+        });
     }
 
     function renderRemainingLimitInfo() {
@@ -476,7 +539,7 @@
             seatName.textContent = `${seat.seatNumber}석`;
 
             const price = document.createElement('span');
-            price.textContent = `80,000원`;
+            price.textContent = `${(draftCache?.performancePrice ?? 0).toLocaleString()}원`;
 
             left.appendChild(seatName);
             left.appendChild(price);
@@ -522,24 +585,28 @@
         const seatNumbers = Array.from(selectedSeats.keys());
 
         try {
-            // 1. 선택 좌석을 서버에 임시 저장
-            // const response = await fetch(`/api/performances/${performanceId}/seat-selection?memberId=${memberId}`, {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     },
-            //     body: JSON.stringify({
-            //         seatNumbers: seatNumbers
-            //     })
-            // });
-            //
-            // if (!response.ok) {
-            //     const errorText = await response.text();
-            //     throw new Error(errorText || '선택 좌석 저장 실패');
-            // }
+            const totalPrice = selectedSeats.size * (draftCache?.performancePrice ?? 0);
+            trace('draft 업데이트 요청 시작', { draftId, seatNumbers, totalPrice });
 
-            // 2. 저장 성공 시 다음 페이지 이동
-            window.location.href = '/reservationConfirm.html';
+            const response = await fetch(`/reservation-drafts/${draftId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    selectedSeats: seatNumbers,
+                    totalPrice: totalPrice
+                })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || '선택 좌석 저장 실패');
+            }
+
+            const updatedDraft = await response.json();
+            trace('draft 업데이트 성공, reservationConfirm.html로 이동', updatedDraft);
+            window.location.href = `/reservationConfirm.html?draftId=${draftId}`;
         } catch (e) {
             console.error(e);
             alert(e.message || '다음 페이지로 이동하는 중 오류가 발생했습니다.');
