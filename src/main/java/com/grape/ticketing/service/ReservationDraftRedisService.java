@@ -5,6 +5,7 @@ import com.grape.ticketing.domain.Performance;
 import com.grape.ticketing.domain.Reservation;
 import com.grape.ticketing.domain.ReservationSeat;
 import com.grape.ticketing.domain.Seat;
+import com.grape.ticketing.domain.status.ReservationStatus;
 import com.grape.ticketing.domain.status.SeatStatus;
 import com.grape.ticketing.dto.ReservationConfirmResponse;
 import com.grape.ticketing.dto.ReservationDraftCacheDto;
@@ -109,7 +110,7 @@ public class ReservationDraftRedisService {
         reservation.setMember(member);
         reservation.setPerformance(performance);
         reservation.setReservedAt(LocalDateTime.now());
-        reservation.setReservationStatus("RESERVED");
+        reservation.setReservationStatus(ReservationStatus.RESERVED);
         Reservation savedReservation = reservationRepository.save(reservation);
 
         for (String seatNumber : selectedSeats) {
