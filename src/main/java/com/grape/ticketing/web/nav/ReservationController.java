@@ -19,4 +19,9 @@ public class ReservationController {
     public String nextReservation() {
         return "reservation/detailReservation";
     }
+
+    @GetMapping("reservation/{reservationId}/confirm")
+    public String ReservationCheck() {
+        return "reservationConfirm2";
+    }
 }

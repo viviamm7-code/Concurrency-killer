@@ -10,6 +10,8 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class ReservationDetailDto {
+    private Long memberId;
+    private Long performanceId;
     private Long reservationId;
     private String reservationName;
     private String performanceName;
@@ -19,4 +21,5 @@ public class ReservationDetailDto {
     private List<String> seatNumbers;
     private int price;
     private String reservationStatus;
+    private String performanceStatus;
 }
