@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <script type="text/javascript">
+    window.onload = function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('error') === 'true') {
+        alert('아이디 또는 비밀번호가 올바르지 않습니다.');
+      }
+      document.getElementById('lbtn').onclick = function () {
+          if(document.lfrm.username.value.trim() == '') {
+              alert('아이디를 입력해주세요')
+              return false;
+          }
+          if(document.lfrm.password.value.trim() == '') {
+              alert('비밀번호를 입력해주세요')
+              return false;
+          }
+
+          document.lfrm.submit();
+      }
+    }
+  </script>
+  <link rel="stylesheet" type="text/css" href="/css/header.css">
+  <style type="text/css">
+    body{
+      background: #121726;
+    }
+    div.loginBox {
+      width: 800px;
+      height: 500px;
+      background: #252938;
+      position: absolute;
+      top: 30%;
+      left: 30%;
+      border-radius: 30px;
+    }
+    h1 {
+      position: absolute;
+      top: 20%;
+      left: 30%;
+      margin-left: 260px;
+      color: white;
+      font-weight: bold;
+    }
+    form {
+      position: absolute;
+      width: 400px;
+      left: 25%;
+      top: 35%;
+      /*border: 1px solid #000000;*/
+    }
+    input {
+      width: 200px;
+      height: 35px;
+      margin-left: 21%;
+      border-radius: 10px;
+    }
+    button {
+      width: 180px;
+      height: 40px;
+      margin-top: 60px;
+      margin-left: 25%;
+      background: linear-gradient(to right, #DD534B, #E87836);
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 10px;
+    }
+    button:hover {
+        border: solid 1px #1a1d20;
+        cursor: pointer;           /* 커서 모양을 손가락 모양으로 변경 */
+    }
+    #nologin{
+      position: absolute;
+      right: 5%;
+      bottom: 5%;
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+    }
+  </style>
+  <script src="../js/common.js" defer></script>
+</head>
+<body>
+<h1>포도알 사수 작전</h1>
+
+<!--<div th:replace="~{fragments :: header}"></div>-->
+<!--<div id="loginButton"></div>-->
+
+<div class="loginBox">
+  <form action="./members/login" method="post" name="lfrm">
+    <input type="text" id="username" name="username" placeholder="username"/> <br/><br/>
+    <input type="password" id="password" name="password" placeholder="PW"/> <br/>
+    <button id="lbtn">로그인</button>
+  </form>
+  <a id="nologin" href="/performance-list">비 로그인으로 접속하기</a>
+</div>
+</body>
+</html>
