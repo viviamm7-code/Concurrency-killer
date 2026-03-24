@@ -61,15 +61,16 @@
             gap: 12px;
         }
 
-        .header-pill {
-            padding: 12px 24px;
-            border-radius: 10px;
-            background: var(--bg3);
-            border: 1px solid var(--border);
-            color: var(--text);
-            font-size: 14px;
-            font-weight: 500;
-        }
+.header-pill {
+    padding: 12px 24px;
+    border-radius: 10px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+}
 
         .page {
             position: relative;
