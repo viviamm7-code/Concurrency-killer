@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>공연 상세</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f3f3f3; }
+        .page { max-width: 920px; margin: 32px auto; background: #fff; padding: 32px; border-radius: 16px; }
+        .title { font-size: 28px; margin-bottom: 20px; }
+        .card { border: 1px solid #ddd; border-radius: 12px; padding: 20px; margin-bottom: 20px; background: #fafafa; }
+        .row { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; border-bottom: 1px solid #ececec; }
+        .row:last-child { border-bottom: none; }
+        .label { color: #666; }
+        .value { font-weight: 700; }
+        .trace { margin-top: 24px; background: #111; color: #aef5c6; padding: 16px; min-height: 180px; white-space: pre-wrap; font-size: 13px; border-radius: 12px; }
+        button { width: 100%; height: 56px; border: none; border-radius: 10px; background: #6f2df5; color: #fff; font-size: 18px; cursor: pointer; }
+        button:disabled { background: #bbb; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="title">공연 상세 페이지</div>
+    <div class="card" id="performanceInfo">공연 정보를 불러오는 중...</div>
+    <button id="goSeatBtn" disabled>좌석 선택으로 이동</button>
+    <div class="trace" id="traceLog"></div>
+</div>
+
+<script>
+    const performanceId = 2;
+    const memberId = 2;
+    let performanceSummary = null;
+
+    function trace(message, data) {
+        const traceLog = document.getElementById('traceLog');
+        const suffix = data ? `\n${JSON.stringify(data, null, 2)}` : '';
+        traceLog.textContent += `[${new Date().toLocaleTimeString()}] ${message}${suffix}\n\n`;
+    }
+
+    async function initPage() {
+        trace('performance.html 진입');
+        const response = await fetch(`/api/performances/${performanceId}/summary?memberId=${memberId}`);
+        if (!response.ok) {
+            throw new Error('공연 상세 조회 실패');
+        }
+        performanceSummary = await response.json();
+        trace('공연 상세 조회 성공', performanceSummary);
+        renderPerformanceInfo(performanceSummary);
+        document.getElementById('goSeatBtn').disabled = false;
+    }
+
+    function renderPerformanceInfo(data) {
+        document.getElementById('performanceInfo').innerHTML = `
+            <div class="row"><div class="label">공연 제목</div><div class="value">${data.performanceTitle}</div></div>
+            <div class="row"><div class="label">공연 일시</div><div class="value">${data.performanceDate}</div></div>
+            <div class="row"><div class="label">공연 장소</div><div class="value">${data.performanceVenue}</div></div>
+            <div class="row"><div class="label">공연 가격</div><div class="value">${data.performancePrice?.toLocaleString()}원</div></div>
+            <div class="row"><div class="label">예매 가능 좌석 수</div><div class="value">${data.remainingSeatLimit}</div></div>
+            <div class="row"><div class="label">공연 URL</div><div class="value">${data.performanceUrl}</div></div>
+        `;
+    }
+
+    document.getElementById('goSeatBtn').addEventListener('click', async () => {
+        try {
+            trace('draft 생성 요청 시작');
+            const response = await fetch('/reservation-drafts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    memberId,
+                    performanceId: performanceSummary.performanceId,
+                    performanceDate: performanceSummary.performanceDate,
+                    performanceTitle: performanceSummary.performanceTitle,
+                    performancePrice: performanceSummary.performancePrice,
+                    performanceVenue: performanceSummary.performanceVenue,
+                    remainingSeatLimit: performanceSummary.remainingSeatLimit,
+                    performanceUrl: performanceSummary.performanceUrl
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('draft 생성 실패');
+            }
+
+            const draft = await response.json();
+            trace('draft 생성 성공, seat.html로 이동', draft);
+            window.location.href = `/seat.html?draftId=${draft.draftId}`;
+        } catch (error) {
+            trace('오류 발생', { message: error.message });
+            alert(error.message);
+        }
+    });
+
+    initPage().catch(error => {
+        trace('초기화 실패', { message: error.message });
+        alert(error.message);
+    });
+</script>
+</body>
+</html>
