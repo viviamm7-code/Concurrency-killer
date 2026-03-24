@@ -2,17 +2,20 @@ package com.grape.ticketing.service;
 
 import com.grape.ticketing.domain.Performance;
 import com.grape.ticketing.dto.PerformanceSummaryResponse;
+import com.grape.ticketing.domain.mapper.PerformanceMapper;
+import com.grape.ticketing.dto.PerformanceTO;
 import com.grape.ticketing.repository.PerformanceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class PerformanceService {
+
     private final PerformanceRepository performanceRepository;
 
     public PerformanceSummaryResponse getPerformanceSummary(Long performanceId, Long remainingSeatLimit) {
@@ -27,6 +30,20 @@ public class PerformanceService {
                 performance.getVenue(),
                 remainingSeatLimit == null ? 0 : remainingSeatLimit.intValue(),
                 "/performances/" + performance.getId()
-        );
+        );}
+    private final PerformanceMapper performanceMapper;
+
+    //공연 목록 조회
+    public List<PerformanceTO.PerformanceList> getPerformanceList() {
+        List<PerformanceTO.PerformanceList> performanceList = performanceRepository.findAll().stream()
+                .map(performanceMapper::toPerformanceListTO)
+                .toList();
+        return performanceList;
+    }
+
+    //공연 상세 조회
+    public PerformanceTO.PerformanceRes getPerformance(Long performanceId) {
+        Performance performance = performanceRepository.findById(performanceId).orElseThrow();
+        return performanceMapper.toPerformanceTO(performance);
     }
 }

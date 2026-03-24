@@ -24,6 +24,9 @@ public class Reservation extends BaseEntitiy{
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus reservationStatus;
+
     @OneToMany(mappedBy = "reservation")
     private List<ReservationSeat> reservationSeats = new ArrayList<>();
 

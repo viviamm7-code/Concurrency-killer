@@ -1,0 +1,98 @@
+insert into reservation
+(created_date, last_modified_date, member_id, performance_id, reserved_at, reservation_status)
+values
+(now(), now(), 2, 1, now(), 'RESERVED');
+
+set @r1 = last_insert_id();
+
+insert into reservation_seat
+(created_date, last_modified_date, reservation_id, seat_id)
+select now(), now(), @r1, s.seat_id
+from seat s
+where s.performance_id = 1
+  and s.seat_number in ('A4', 'A7');
+
+update seat
+set seat_status = 'RESERVED'
+where performance_id = 1
+  and seat_number in ('A4', 'A7');
+
+insert into reservation
+(created_date, last_modified_date, member_id, performance_id, reserved_at, reservation_status)
+values
+(now(), now(), 2, 1, now(), 'RESERVED');
+
+set @r2 = last_insert_id();
+
+insert into reservation_seat
+(created_date, last_modified_date, reservation_id, seat_id)
+select now(), now(), @r2, s.seat_id
+from seat s
+where s.performance_id = 1
+  and s.seat_number in ('E9', 'B9');
+
+update seat
+set seat_status = 'RESERVED'
+where performance_id = 1
+  and seat_number in ('E9', 'B9');
+
+insert into reservation
+(created_date, last_modified_date, member_id, performance_id, reserved_at, reservation_status)
+values
+(now(), now(), 2, 4, now(), 'RESERVED');
+
+set @r3 = last_insert_id();
+
+insert into reservation_seat
+(created_date, last_modified_date, reservation_id, seat_id)
+select now(), now(), @r3, s.seat_id
+from seat s
+where s.performance_id = 4
+  and s.seat_number in ('C8', 'G4');
+
+update seat
+set seat_status = 'RESERVED'
+where performance_id = 4
+  and seat_number in ('C8', 'G4');
+
+insert into reservation
+(created_date, last_modified_date, member_id, performance_id, reserved_at, reservation_status)
+values
+(now(), now(), 55, 3, now(), 'RESERVED');
+
+set @r4 = last_insert_id();
+
+insert into reservation_seat
+(created_date, last_modified_date, reservation_id, seat_id)
+select now(), now(), @r4, s.seat_id
+from seat s
+where s.performance_id = 3
+  and s.seat_number in ('A10', 'B10', 'C10', 'D10');
+
+update seat
+set seat_status = 'RESERVED'
+where performance_id = 3
+  and seat_number in ('A10', 'B10', 'C10', 'D10');
+
+
+
+
+
+insert into reservation
+(created_date, last_modified_date, member_id, performance_id, reserved_at, reservation_status)
+values
+(now(), now(), 2, 2, now(), 'RESERVED');
+
+set @r3 = last_insert_id();
+
+insert into reservation_seat
+(created_date, last_modified_date, reservation_id, seat_id)
+select now(), now(), @r3, s.seat_id
+from seat s
+where s.performance_id = 2
+  and s.seat_number in ('C5', 'G5');
+
+update seat
+set seat_status = 'RESERVED'
+where performance_id = 2
+  and seat_number in ('C5', 'G5');

@@ -18,4 +18,6 @@ public interface ReservationSeatRepository extends JpaRepository<ReservationSeat
       and r.performance.id = :performanceId
     """)
     long countReservedSeatsByMemberIdAndPerformanceId(@Param("memberId") Long memberId, @Param("performanceId") Long performanceId);
+    
+    void deleteAllByReservationId(Long reservationId);
 }
