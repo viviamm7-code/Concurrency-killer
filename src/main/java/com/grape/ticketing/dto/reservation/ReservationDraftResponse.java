@@ -1,11 +1,15 @@
-package com.grape.ticketing.dto;
+package com.grape.ticketing.dto.reservation;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
+
+import java.util.List;
+import java.util.UUID;
 
 @Getter
-@Setter
-public class ReservationDraftCreateRequest {
+@AllArgsConstructor
+public class ReservationDraftResponse {
+    private UUID draftId;
     private Long memberId;
     private Long performanceId;
     private String performanceDate;
@@ -14,4 +18,7 @@ public class ReservationDraftCreateRequest {
     private String performanceVenue;
     private Integer remainingSeatLimit;
     private String performanceUrl;
+    private List<String> selectedSeats;
+    private Integer totalPrice;
+    private boolean confirmed;
 }

@@ -1,7 +1,7 @@
 package com.grape.ticketing.domain.mapper;
 
 import com.grape.ticketing.domain.Performance;
-import com.grape.ticketing.dto.PerformanceTO;
+import com.grape.ticketing.dto.performance.PerformanceTO;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

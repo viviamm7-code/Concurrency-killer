@@ -1,10 +1,9 @@
 package com.grape.ticketing.web.api;
 
-import com.grape.ticketing.dto.ReservationCancelDto;
-import com.grape.ticketing.dto.ReservationDetailDto;
-import com.grape.ticketing.dto.ReservationDto;
+import com.grape.ticketing.dto.reservation.ReservationCancelDto;
+import com.grape.ticketing.dto.reservation.ReservationDetailDto;
+import com.grape.ticketing.dto.reservation.ReservationDto;
 import com.grape.ticketing.service.ReservationService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

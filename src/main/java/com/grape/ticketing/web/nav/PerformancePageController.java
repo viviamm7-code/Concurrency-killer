@@ -7,15 +7,28 @@ import org.springframework.web.bind.annotation.PathVariable;
 @Controller
 public class PerformancePageController {
 
-    //공연 목록 화면
     @GetMapping("/performance-list")
     public String performanceListPage() {
         return "performance-list";
     }
 
-    //공연 상세 화면
     @GetMapping("/performances/{performanceId}")
     public String performanceDetailPage(@PathVariable Long performanceId) {
         return "performance";
+    }
+
+    @GetMapping("/performance2")
+    public String performance2Page() {
+        return "performance2";
+    }
+
+    @GetMapping("/seat")
+    public String seatPage() {
+        return "seat";
+    }
+
+    @GetMapping("/reservationConfirm")
+    public String reservationConfirmPage() {
+        return "reservationConfirm";
     }
 }

@@ -1,8 +1,8 @@
 package com.grape.ticketing.web.api;
 import java.util.List;
-import com.grape.ticketing.dto.PerformanceSummaryResponse;
+import com.grape.ticketing.dto.performance.PerformanceSummaryResponse;
 import com.grape.ticketing.service.ReservationService;
-import com.grape.ticketing.dto.PerformanceTO;
+import com.grape.ticketing.dto.performance.PerformanceTO;
 import com.grape.ticketing.repository.MemberRepository;
 import com.grape.ticketing.service.PerformanceService;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.grape.ticketing.dto;
+package com.grape.ticketing.dto.seat;
 
 import lombok.Getter;
 import lombok.Setter;

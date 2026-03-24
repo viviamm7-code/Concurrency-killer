@@ -2,7 +2,7 @@ package com.grape.ticketing.service;
 
 import com.grape.ticketing.domain.Seat;
 import com.grape.ticketing.domain.mapper.SeatMapper;
-import com.grape.ticketing.dto.SeatTO;
+import com.grape.ticketing.dto.seat.SeatTO;
 import com.grape.ticketing.repository.SeatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

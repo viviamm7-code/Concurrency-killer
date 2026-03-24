@@ -1,9 +1,9 @@
 package com.grape.ticketing.service;
 
 import com.grape.ticketing.domain.Performance;
-import com.grape.ticketing.dto.PerformanceSummaryResponse;
+import com.grape.ticketing.dto.performance.PerformanceSummaryResponse;
 import com.grape.ticketing.domain.mapper.PerformanceMapper;
-import com.grape.ticketing.dto.PerformanceTO;
+import com.grape.ticketing.dto.performance.PerformanceTO;
 import com.grape.ticketing.repository.PerformanceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

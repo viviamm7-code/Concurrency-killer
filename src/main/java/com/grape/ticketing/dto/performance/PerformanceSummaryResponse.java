@@ -1,4 +1,4 @@
-package com.grape.ticketing.dto;
+package com.grape.ticketing.dto.performance;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

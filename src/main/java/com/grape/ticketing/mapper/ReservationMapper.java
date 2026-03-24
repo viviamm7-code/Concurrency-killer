@@ -2,9 +2,8 @@ package com.grape.ticketing.mapper;
 
 import com.grape.ticketing.domain.Reservation;
 import com.grape.ticketing.domain.ReservationSeat;
-import com.grape.ticketing.dto.ReservationCancelDto;
-import com.grape.ticketing.dto.ReservationDetailDto;
-import com.grape.ticketing.dto.ReservationDto;
+import com.grape.ticketing.dto.reservation.ReservationDetailDto;
+import com.grape.ticketing.dto.reservation.ReservationDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
