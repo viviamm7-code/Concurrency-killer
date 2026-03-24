@@ -33,7 +33,4 @@ public class Reservation extends BaseEntitiy{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "performance_id")
     private Performance performance;
-
-    @Enumerated(EnumType.STRING)
-    private ReservationStatus reservationStatus;
 }

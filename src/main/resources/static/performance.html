@@ -27,8 +27,8 @@
 </div>
 
 <script>
-    const performanceId = 3;
-    const memberId = 99;
+    const performanceId = 2;
+    const memberId = 2;
     let performanceSummary = null;
 
     function trace(message, data) {
@@ -39,7 +39,7 @@
 
     async function initPage() {
         trace('performance.html 진입');
-        const response = await fetch(`/performances/${performanceId}/summary?memberId=${memberId}`);
+        const response = await fetch(`/api/performances/${performanceId}/summary?memberId=${memberId}`);
         if (!response.ok) {
             throw new Error('공연 상세 조회 실패');
         }
