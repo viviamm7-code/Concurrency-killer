@@ -33,7 +33,6 @@ public class PerformanceController {
     //공연 목록 조회
     @GetMapping
     public List<PerformanceTO.PerformanceList> getPerformanceList() {
-        //Member member = memberRepository.findById(memberId).orElseThrow();
         return performanceService.getPerformanceList();
     }
 
