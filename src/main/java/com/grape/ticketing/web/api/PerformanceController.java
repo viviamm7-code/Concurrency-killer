@@ -16,12 +16,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PerformanceController {
     private final PerformanceService performanceService;
-    private final MemberRepository memberRepository;
 
     //공연 목록 조회
     @GetMapping
     public List<PerformanceTO.PerformanceList> getPerformanceList() {
-        //Member member = memberRepository.findById(memberId).orElseThrow();
         return performanceService.getPerformanceList();
     }
 
