@@ -19,5 +19,4 @@ public class ReservationSeat extends BaseEntitiy{
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;
 
-
 }

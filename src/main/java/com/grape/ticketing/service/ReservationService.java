@@ -1,5 +1,9 @@
 package com.grape.ticketing.service;
 
+import com.grape.ticketing.domain.ReservationSeat;
+import com.grape.ticketing.repository.ReservationRepository;
+import com.grape.ticketing.repository.ReservationSeatRepository;
+import jakarta.xml.bind.SchemaOutputResolver;
 import com.grape.ticketing.domain.Reservation;
 import com.grape.ticketing.domain.ReservationSeat;
 import com.grape.ticketing.domain.Seat;
@@ -12,12 +16,12 @@ import com.grape.ticketing.dto.ReservationDetailDto;
 import com.grape.ticketing.dto.ReservationDto;
 import com.grape.ticketing.mapper.ReservationCancelMapper;
 import com.grape.ticketing.mapper.ReservationMapper;
-import com.grape.ticketing.repository.ReservationRepository;
-import com.grape.ticketing.repository.ReservationSeatRepository;
 import com.grape.ticketing.repository.SeatRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.List;
 
@@ -25,12 +29,26 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ReservationService {
-
+    private static final long MAX_SEATS_PER_MEMBER = 4;
     private final ReservationRepository reservationRepository;
+    private final ReservationSeatRepository reservationSeatRepository;
     private final ReservationMapper reservationMapper;
     private final ReservationCancelMapper reservationCancelMapper;
     private final ReservationCancelPolicyService reservationCancelPolicyService;
     private final SeatRepository seatRepository;
+
+    public long getReservedSeatCount(Long memberId, Long performanceId) {
+        long reservedSeatCnt = reservationSeatRepository.countReservedSeatsByMemberIdAndPerformanceId(memberId, performanceId);
+        
+        return reservedSeatCnt;
+    }
+
+    public long getRemainingSeatCount(Long memberId, Long performanceId) {
+        long reservedSeatCount = getReservedSeatCount(memberId, performanceId);
+        long remainingSeatCount = MAX_SEATS_PER_MEMBER - reservedSeatCount;
+        // 시스템상 오류로 잔여 수가 마이너스일 것을 대비해서 max 함수 사용
+        return Math.max(remainingSeatCount, 0);
+    }
 
     public List<ReservationDto> getReservationList(Long memberId) {
         List<Reservation> reservations = reservationRepository.findReservationByMemberIdOrderByReservedAtDesc(memberId);

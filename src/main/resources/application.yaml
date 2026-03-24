@@ -13,6 +13,10 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MariaDBDialect
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
   # 선택 (SQL 로그 더 자세히 보고 싶을 때)
 logging:
