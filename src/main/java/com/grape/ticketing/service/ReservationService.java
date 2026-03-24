@@ -4,7 +4,10 @@ import com.grape.ticketing.domain.*;
 import com.grape.ticketing.domain.status.ReservationStatus;
 import com.grape.ticketing.domain.status.SeatStatus;
 import com.grape.ticketing.dto.*;
-import com.grape.ticketing.dto.CancelPolicyResultDto;
+import com.grape.ticketing.dto.reservation.CancelPolicyResultDto;
+import com.grape.ticketing.dto.reservation.ReservationCancelDto;
+import com.grape.ticketing.dto.reservation.ReservationDetailDto;
+import com.grape.ticketing.dto.reservation.ReservationDto;
 import com.grape.ticketing.mapper.ReservationCancelMapper;
 import com.grape.ticketing.mapper.ReservationMapper;
 import com.grape.ticketing.repository.*;
@@ -20,15 +23,28 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ReservationService {
-
+    private static final long MAX_SEATS_PER_MEMBER = 4;
     private final ReservationRepository reservationRepository;
+    private final ReservationSeatRepository reservationSeatRepository;
     private final ReservationMapper reservationMapper;
     private final ReservationCancelMapper reservationCancelMapper;
     private final ReservationCancelPolicyService reservationCancelPolicyService;
     private final SeatRepository seatRepository;
-    private final ReservationSeatRepository reservationSeatRepository;
     private final MemberRepository memberRepository;
     private final PerformanceRepository performanceRepository;
+
+    public long getReservedSeatCount(Long memberId, Long performanceId) {
+        long reservedSeatCnt = reservationSeatRepository.countReservedSeatsByMemberIdAndPerformanceId(memberId, performanceId);
+        
+        return reservedSeatCnt;
+    }
+
+    public long getRemainingSeatCount(Long memberId, Long performanceId) {
+        long reservedSeatCount = getReservedSeatCount(memberId, performanceId);
+        long remainingSeatCount = MAX_SEATS_PER_MEMBER - reservedSeatCount;
+        // 시스템상 오류로 잔여 수가 마이너스일 것을 대비해서 max 함수 사용
+        return Math.max(remainingSeatCount, 0);
+    }
 
     public List<ReservationDto> getReservationList(Long memberId) {
         List<Reservation> reservations = reservationRepository.findReservationByMemberIdOrderByReservedAtDesc(memberId);

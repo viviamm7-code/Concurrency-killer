@@ -1,8 +1,8 @@
 package com.grape.ticketing.mapper;
 
 import com.grape.ticketing.domain.Reservation;
-import com.grape.ticketing.dto.CancelPolicyResultDto;
-import com.grape.ticketing.dto.ReservationCancelDto;
+import com.grape.ticketing.dto.reservation.CancelPolicyResultDto;
+import com.grape.ticketing.dto.reservation.ReservationCancelDto;
 import org.springframework.stereotype.Component;
 
 @Component
