@@ -311,23 +311,7 @@
     const selectedSeats = new Map();
     let draftCache = null;
 
-    function trace(message, data) {
-        let traceBox = document.getElementById('traceBox');
-        if (!traceBox) {
-            traceBox = document.createElement('pre');
-            traceBox.id = 'traceBox';
-            traceBox.style.marginTop = '24px';
-            traceBox.style.background = '#111';
-            traceBox.style.color = '#aef5c6';
-            traceBox.style.padding = '16px';
-            traceBox.style.borderRadius = '12px';
-            traceBox.style.fontSize = '13px';
-            traceBox.style.whiteSpace = 'pre-wrap';
-            document.querySelector('.main').appendChild(traceBox);
-        }
-        const suffix = data ? `\n${JSON.stringify(data, null, 2)}` : '';
-        traceBox.textContent += `[${new Date().toLocaleTimeString()}] ${message}${suffix}\n\n`;
-    }
+
 
     async function initPage() {
         try {
@@ -335,7 +319,6 @@
                 throw new Error('draftId가 없습니다.');
             }
 
-            trace('seat.html 진입');
             const draftResponse = await fetch(`/reservation-drafts/${draftId}`);
             if (!draftResponse.ok) {
                 throw new Error('draft 조회 실패');
@@ -345,7 +328,6 @@
             performanceId = draftCache.performanceId;
             memberId = draftCache.memberId;
             maxSelectableSeats = draftCache.remainingSeatLimit ?? 0;
-            trace('draft 조회 성공', draftCache);
             document.querySelector('.title').textContent = `${draftCache.performanceTitle} ${draftCache.performanceDate}`;
 
             const [seatsResponse, remainingResponse] = await Promise.all([
@@ -365,10 +347,6 @@
             const remainingData = await remainingResponse.json();
 
             maxSelectableSeats = remainingData.remainingSeatCount;
-            trace('좌석 목록 / 잔여 좌석 조회 성공', {
-                seatsCount: seats.length,
-                remainingSeatCount: maxSelectableSeats
-            });
 
             renderRemainingLimitInfo();
             renderSeats(seats);
@@ -381,7 +359,6 @@
                     }
                 });
                 syncSelectedSeatButtons();
-                trace('기존 draft 좌석 복원 완료', { selectedSeats: Array.from(selectedSeats.keys()) });
             }
 
             renderSelectedSeats();
@@ -586,7 +563,6 @@
 
         try {
             const totalPrice = selectedSeats.size * (draftCache?.performancePrice ?? 0);
-            trace('draft 업데이트 요청 시작', { draftId, seatNumbers, totalPrice });
 
             const response = await fetch(`/reservation-drafts/${draftId}`, {
                 method: 'PUT',
@@ -605,8 +581,7 @@
             }
 
             const updatedDraft = await response.json();
-            trace('draft 업데이트 성공, reservationConfirm.html로 이동', updatedDraft);
-            window.location.href = `/reservationConfirm.html?draftId=${draftId}`;
+            window.location.href = `/reservationConfirm?draftId=${draftId}`;
         } catch (e) {
             console.error(e);
             alert(e.message || '다음 페이지로 이동하는 중 오류가 발생했습니다.');

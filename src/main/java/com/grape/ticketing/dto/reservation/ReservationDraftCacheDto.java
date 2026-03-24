@@ -1,14 +1,16 @@
-package com.grape.ticketing.dto;
+package com.grape.ticketing.dto.reservation;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
-@AllArgsConstructor
-public class ReservationDraftResponse {
+@Setter
+public class ReservationDraftCacheDto implements Serializable {
     private UUID draftId;
     private Long memberId;
     private Long performanceId;
@@ -18,7 +20,7 @@ public class ReservationDraftResponse {
     private String performanceVenue;
     private Integer remainingSeatLimit;
     private String performanceUrl;
-    private List<String> selectedSeats;
+    private List<String> selectedSeats = new ArrayList<>();
     private Integer totalPrice;
     private boolean confirmed;
 }

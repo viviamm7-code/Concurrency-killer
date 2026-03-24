@@ -84,7 +84,7 @@
 
             const draft = await response.json();
             trace('draft 생성 성공, seat.html로 이동', draft);
-            window.location.href = `/seat.html?draftId=${draft.draftId}`;
+            window.location.href = `/seat?draftId=${draft.draftId}`;
         } catch (error) {
             trace('오류 발생', { message: error.message });
             alert(error.message);

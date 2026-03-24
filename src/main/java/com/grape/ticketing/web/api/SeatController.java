@@ -1,6 +1,6 @@
 package com.grape.ticketing.web.api;
 
-import com.grape.ticketing.dto.SeatTO;
+import com.grape.ticketing.dto.seat.SeatTO;
 import com.grape.ticketing.service.SeatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

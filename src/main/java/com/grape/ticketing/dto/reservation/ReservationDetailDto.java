@@ -1,8 +1,7 @@
-package com.grape.ticketing.dto;
+package com.grape.ticketing.dto.reservation;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,6 +9,8 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class ReservationDetailDto {
+    private Long memberId;
+    private Long performanceId;
     private Long reservationId;
     private String reservationName;
     private String performanceName;
@@ -19,4 +20,5 @@ public class ReservationDetailDto {
     private List<String> seatNumbers;
     private int price;
     private String reservationStatus;
+    private String performanceStatus;
 }

@@ -6,9 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-
 @Repository
 public interface SeatRepository extends JpaRepository<Seat,Long> {
     List<Seat> findSeatsByPerformanceId(Long performanceId);
+    List<Seat> findAllByPerformanceIdAndSeatNumberIn(Long performanceId, List<String> seatNumbers);
     Optional<Seat> findByPerformanceIdAndSeatNumber(Long performanceId, String seatNumber);
 }

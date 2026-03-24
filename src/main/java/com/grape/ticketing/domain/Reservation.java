@@ -19,7 +19,6 @@ public class Reservation extends BaseEntitiy{
 
     private LocalDateTime reservedAt;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
