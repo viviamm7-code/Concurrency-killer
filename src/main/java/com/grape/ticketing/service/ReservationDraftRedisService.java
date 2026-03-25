@@ -12,6 +12,7 @@ import com.grape.ticketing.dto.reservation.ReservationDraftCacheDto;
 import com.grape.ticketing.dto.reservation.ReservationDraftCreateRequest;
 import com.grape.ticketing.dto.reservation.ReservationDraftResponse;
 import com.grape.ticketing.dto.reservation.ReservationDraftUpdateRequest;
+import com.grape.ticketing.exception.SeatHoldConflictException;
 import com.grape.ticketing.repository.MemberRepository;
 import com.grape.ticketing.repository.PerformanceRepository;
 import com.grape.ticketing.repository.ReservationRepository;
@@ -25,7 +26,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -34,7 +39,9 @@ import java.util.UUID;
 public class ReservationDraftRedisService {
 
     private static final String KEY_PREFIX = "reservation:draft:";
-    private static final Duration TTL = Duration.ofMinutes(30);
+    private static final String SEAT_HOLD_KEY_PREFIX = "seat:hold:";
+    private static final Duration DRAFT_TTL = Duration.ofMinutes(30);
+    private static final Duration SEAT_HOLD_TTL = Duration.ofMinutes(5);
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final MemberRepository memberRepository;
@@ -76,8 +83,12 @@ public class ReservationDraftRedisService {
         if (request.getPerformanceVenue() != null) draft.setPerformanceVenue(request.getPerformanceVenue());
         if (request.getRemainingSeatLimit() != null) draft.setRemainingSeatLimit(request.getRemainingSeatLimit());
         if (request.getPerformanceUrl() != null) draft.setPerformanceUrl(request.getPerformanceUrl());
-        if (request.getSelectedSeats() != null) draft.setSelectedSeats(request.getSelectedSeats());
         if (request.getTotalPrice() != null) draft.setTotalPrice(request.getTotalPrice());
+
+        if (request.getSelectedSeats() != null) {
+            synchronizeSeatHolds(draft, request.getSelectedSeats());
+            draft.setSelectedSeats(new ArrayList<>(request.getSelectedSeats()));
+        }
 
         writeDraft(draft);
         log.info("Draft updated. draftId={}, selectedSeats={}, totalPrice={}", draftId, draft.getSelectedSeats(), draft.getTotalPrice());
@@ -106,6 +117,8 @@ public class ReservationDraftRedisService {
             throw new IllegalArgumentException("선택된 좌석이 없습니다.");
         }
 
+        validateSeatHolds(draft.getDraftId(), draft.getPerformanceId(), selectedSeats);
+
         Reservation reservation = new Reservation();
         reservation.setMember(member);
         reservation.setPerformance(performance);
@@ -124,17 +137,138 @@ public class ReservationDraftRedisService {
             reservationSeatRepository.save(reservationSeat);
         }
 
+        releaseSeatHolds(draft.getDraftId(), draft.getPerformanceId(), selectedSeats);
         redisTemplate.delete(generateKey(draftId));
         log.info("Draft confirmed and removed. draftId={}, reservationId={}", draftId, savedReservation.getId());
         return new ReservationConfirmResponse(savedReservation.getId(), "최종 예매가 완료되었습니다.");
     }
 
+    private void synchronizeSeatHolds(ReservationDraftCacheDto draft, List<String> requestedSeats) {
+        List<String> currentSeats = draft.getSelectedSeats() == null
+                ? new ArrayList<>()
+                : new ArrayList<>(draft.getSelectedSeats());
+        List<String> targetSeats = new ArrayList<>(requestedSeats);
+
+        Set<String> currentSet = new HashSet<>(currentSeats);
+        Set<String> targetSet = new HashSet<>(targetSeats);
+
+        List<String> toRelease = currentSeats.stream()
+                .filter(seatNumber -> !targetSet.contains(seatNumber))
+                .toList();
+
+        List<String> toAcquire = targetSeats.stream()
+                .filter(seatNumber -> !currentSet.contains(seatNumber))
+                .toList();
+
+        List<String> acquired = new ArrayList<>();
+
+        List<String> conflictedSeats = findConflictedSeats(draft.getDraftId(), draft.getPerformanceId(), toAcquire);
+        if (!conflictedSeats.isEmpty()) {
+            throw new SeatHoldConflictException(conflictedSeats);
+        }
+
+        try {
+            for (String seatNumber : toAcquire) {
+                acquireSeatHold(draft.getDraftId(), draft.getPerformanceId(), seatNumber);
+                acquired.add(seatNumber);
+            }
+
+            for (String seatNumber : currentSeats) {
+                if (targetSet.contains(seatNumber)) {
+                    refreshSeatHoldTtl(draft.getDraftId(), draft.getPerformanceId(), seatNumber);
+                }
+            }
+
+            releaseSeatHolds(draft.getDraftId(), draft.getPerformanceId(), toRelease);
+        } catch (RuntimeException ex) {
+            releaseSeatHolds(draft.getDraftId(), draft.getPerformanceId(), acquired);
+            throw ex;
+        }
+    }
+
+    private List<String> findConflictedSeats(UUID draftId, Long performanceId, List<String> seatNumbers) {
+        List<String> conflictedSeats = new ArrayList<>();
+
+        for (String seatNumber : seatNumbers) {
+            Seat seat = seatRepository.findByPerformanceIdAndSeatNumber(performanceId, seatNumber)
+                    .orElseThrow(() -> new IllegalArgumentException("좌석이 없습니다: " + seatNumber));
+
+            if (seat.getSeatStatus() == SeatStatus.RESERVED) {
+                conflictedSeats.add(seatNumber);
+                continue;
+            }
+
+            String key = generateSeatHoldKey(performanceId, seatNumber);
+            Object owner = redisTemplate.opsForValue().get(key);
+
+            if (owner != null && !Objects.equals(draftId.toString(), owner.toString())) {
+                conflictedSeats.add(seatNumber);
+            }
+        }
+
+        return conflictedSeats;
+    }
+
+    private void acquireSeatHold(UUID draftId, Long performanceId, String seatNumber) {
+        Seat seat = seatRepository.findByPerformanceIdAndSeatNumber(performanceId, seatNumber)
+                .orElseThrow(() -> new IllegalArgumentException("좌석이 없습니다: " + seatNumber));
+
+        if (seat.getSeatStatus() == SeatStatus.RESERVED) {
+            throw new IllegalStateException("이미 예매가 완료된 좌석입니다: " + seatNumber);
+        }
+
+        String key = generateSeatHoldKey(performanceId, seatNumber);
+        String owner = String.valueOf(redisTemplate.opsForValue().get(key));
+
+        if (Objects.equals(owner, draftId.toString())) {
+            redisTemplate.expire(key, SEAT_HOLD_TTL);
+            return;
+        }
+
+        Boolean acquired = redisTemplate.opsForValue().setIfAbsent(key, draftId.toString(), SEAT_HOLD_TTL);
+        if (!Boolean.TRUE.equals(acquired)) {
+            throw new IllegalStateException("다른 사용자가 이미 선점한 좌석입니다: " + seatNumber);
+        }
+    }
+
+    private void validateSeatHolds(UUID draftId, Long performanceId, List<String> seatNumbers) {
+        for (String seatNumber : seatNumbers) {
+            String key = generateSeatHoldKey(performanceId, seatNumber);
+            Object owner = redisTemplate.opsForValue().get(key);
+            if (!Objects.equals(draftId.toString(), owner == null ? null : owner.toString())) {
+                throw new IllegalStateException("좌석 선점이 만료되었거나 다른 사용자가 점유했습니다: " + seatNumber);
+            }
+        }
+    }
+
+    private void refreshSeatHoldTtl(UUID draftId, Long performanceId, String seatNumber) {
+        String key = generateSeatHoldKey(performanceId, seatNumber);
+        Object owner = redisTemplate.opsForValue().get(key);
+        if (Objects.equals(draftId.toString(), owner == null ? null : owner.toString())) {
+            redisTemplate.expire(key, SEAT_HOLD_TTL);
+        }
+    }
+
+    private void releaseSeatHolds(UUID draftId, Long performanceId, List<String> seatNumbers) {
+        for (String seatNumber : seatNumbers) {
+            String key = generateSeatHoldKey(performanceId, seatNumber);
+            Object owner = redisTemplate.opsForValue().get(key);
+            if (Objects.equals(draftId.toString(), owner == null ? null : owner.toString())) {
+                redisTemplate.delete(key);
+            }
+        }
+    }
+
     private void writeDraft(ReservationDraftCacheDto draft) {
-        redisTemplate.opsForValue().set(generateKey(draft.getDraftId()), draft, TTL);
+        redisTemplate.opsForValue().set(generateKey(draft.getDraftId()), draft, DRAFT_TTL);
     }
 
     private String generateKey(UUID draftId) {
         return KEY_PREFIX + draftId;
+    }
+
+    private String generateSeatHoldKey(Long performanceId, String seatNumber) {
+        return SEAT_HOLD_KEY_PREFIX + performanceId + ":" + seatNumber;
     }
 
     private ReservationDraftResponse toResponse(ReservationDraftCacheDto draft) {

@@ -473,7 +473,7 @@
 </div>
 
 <script>
-    const memberId = 11;
+    let memberId = null;
     let data = null;
 
     const pathParts = location.pathname.split('/');
@@ -527,8 +527,23 @@
         return formatDraftDate(data);
     }
 
+    async function loadAuthStatus() {
+        const response = await fetch('/api/auth/status');
+        if (!response.ok) {
+            throw new Error('로그인 상태를 확인하지 못했습니다.');
+        }
+
+        const auth = await response.json();
+        if (!auth.isLoggedIn || auth.memberId == null) {
+            throw new Error('로그인이 필요합니다.');
+        }
+
+        memberId = Number(auth.memberId);
+    }
+
     async function loadPerformance() {
         try {
+            await loadAuthStatus();
             const res = await fetch(`/api/performances/${performanceId}`);
             if (!res.ok) {
                 throw new Error('공연 정보를 불러오지 못했습니다.');
@@ -682,6 +697,10 @@
         }, 3000);
 
         try {
+            if (memberId == null) {
+                throw new Error('로그인이 필요합니다.');
+            }
+
             const response = await fetch('/reservation-drafts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -704,6 +723,10 @@
             const draft = await response.json();
             window.location.href = `/seat?draftId=${draft.draftId}`;
         } catch (error) {
+            if (error.message === '로그인이 필요합니다.') {
+                window.location.href = '/login';
+                return;
+            }
             alert(error.message);
         }
     });

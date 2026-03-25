@@ -59,8 +59,10 @@ public class MemberController {
 
         if (loginMemberId != null) {
             status.put("isLoggedIn", true);
+            status.put("memberId", loginMemberId);
         } else {
             status.put("isLoggedIn", false);
+            status.put("memberId", null);
         }
         return status;
     }

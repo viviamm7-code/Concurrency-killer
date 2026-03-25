@@ -245,6 +245,11 @@
         completeBtn.disabled = selectedSeats.size === 0;
     }
 
+    async function reloadSeatPageState() {
+        selectedSeats.clear();
+        await initPage();
+    }
+
     document.getElementById('completeBtn').addEventListener('click', async () => {
         if (selectedSeats.size === 0) {
             alert('좌석을 선택해주세요.');
@@ -268,8 +273,21 @@
             });
 
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || '선택 좌석 저장 실패');
+                let errorPayload = null;
+                try {
+                    errorPayload = await response.json();
+                } catch (jsonError) {
+                    errorPayload = null;
+                }
+
+                if (response.status === 409 && errorPayload?.conflictedSeats?.length) {
+                    const conflictedSeats = errorPayload.conflictedSeats.join(', ');
+                    alert(`이미 다른 사용자가 선점한 좌석이 있습니다.\n충돌 좌석: ${conflictedSeats}`);
+                    await reloadSeatPageState();
+                    return;
+                }
+
+                throw new Error(errorPayload?.message || '선택 좌석 저장 실패');
             }
 
             await response.json();
