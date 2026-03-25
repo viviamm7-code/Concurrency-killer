@@ -487,8 +487,8 @@
         <p>아래 내용으로 예매를 진행할까요?</p>
         <div class="modal-detail-row"><span>공연명</span><span id="modalTitle"></span></div>
         <div class="modal-detail-row"><span>장소</span><span id="modalVenue"></span></div>
-        <div class="modal-detail-row"><span>날짜</span><span id="modalStartTime"></span></div>
-        <div class="modal-detail-row"><span>시작</span><span>18:00</span></div>
+        <div class="modal-detail-row"><span>날짜</span><span id="modalStartDate"></span></div>
+        <div class="modal-detail-row"><span>시작</span><span id="modalStartTime"></span></div>
         <div class="modal-detail-row"><span>가격</span><span id="modalPrice"></span></div>
         <div class="modal-actions">
             <button class="modal-cancel" id="modalCancel">취소</button>
@@ -522,12 +522,9 @@
             return value;
         }
 
-        const yyyy = date.getFullYear();
-        const mm = String(date.getMonth() + 1).padStart(2, '0');
-        const dd = String(date.getDate()).padStart(2, '0');
         const hh = String(date.getHours()).padStart(2, '0');
         const min = String(date.getMinutes()).padStart(2, '0');
-        return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+        return `${hh}:${min}`;
     }
 
     function formatDraftDate(performance) {
@@ -559,9 +556,9 @@
         }
 
         const auth = await response.json();
-        if (!auth.isLoggedIn || auth.memberId == null) {
-            throw new Error('로그인이 필요합니다.');
-        }
+        // if (!auth.isLoggedIn || auth.memberId == null) {
+        //     throw new Error('로그인이 필요합니다.');
+        // }
 
         memberId = Number(auth.memberId);
     }
@@ -598,7 +595,7 @@
 
         document.getElementById('modalTitle').textContent = performance.performanceName;
         document.getElementById('modalVenue').textContent = performance.venue || '-';
-        document.getElementById('modalStartTime').textContent = formatDraftDate(performance);
+        document.getElementById('modalStartTime').textContent = formatDateTime(performance.startedAt);
         document.getElementById('modalPrice').textContent = `${(performance.price ?? 0).toLocaleString()}원`;
 
         if (performance.remainingSeatLimit != null) {
@@ -672,6 +669,7 @@
 
             grid.appendChild(el);
         }
+        document.getElementById('modalStartDate').textContent = getSelectedPerformanceDate();
     }
 
     document.getElementById('prevMonth').addEventListener('click', () => {
@@ -694,9 +692,11 @@
 
     const overlay = document.getElementById('modalOverlay');
     document.getElementById('btnBook').addEventListener('click', () => {
-        const dateStr = getSelectedPerformanceDate();
-        document.getElementById('modalStartTime').textContent = dateStr;
-        overlay.classList.add('active');
+        if (selectedDay === null) {
+            alert("날짜를 선택해주세요.")
+        } else {
+            overlay.classList.add('active');
+        }
     });
 
     document.getElementById('modalCancel').addEventListener('click', () => {
@@ -723,7 +723,7 @@
         }, 3000);
 
         try {
-            if (memberId == null) {
+            if (memberId === 0) {
                 throw new Error('로그인이 필요합니다.');
             }
             const response = await fetch('/reservation-drafts', {
@@ -750,10 +750,10 @@
             window.location.href = `/seat?draftId=${draft.draftId}`;
         } catch (error) {
             if (error.message === '로그인이 필요합니다.') {
+                alert(error.message);
                 window.location.href = '/login';
                 return;
             }
-            alert(error.message);
         }
     });
 
