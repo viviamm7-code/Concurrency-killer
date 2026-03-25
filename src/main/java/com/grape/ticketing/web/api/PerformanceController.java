@@ -28,7 +28,6 @@ public class PerformanceController {
         long remainingSeatCount = reservationService.getRemainingSeatCount(memberId, performanceId);
         return performanceService.getPerformanceSummary(performanceId, remainingSeatCount);
     }
-        private final MemberRepository memberRepository;
 
     //공연 목록 조회
     @GetMapping

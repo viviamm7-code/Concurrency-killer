@@ -27,7 +27,7 @@ public class DummyDataInit implements CommandLineRunner {
     @Transactional
     public void run(String... args) {
         createMembers();
-        createPerformancesAndSeats();
+        //createPerformancesAndSeats();
     }
 
     private void createMembers() {
@@ -46,21 +46,21 @@ public class DummyDataInit implements CommandLineRunner {
         }
     }
 
-    private void createPerformancesAndSeats() {
-        for (int i = 1; i <= 4; i++) {
-            Performance performance = new Performance();
-            performance.setPerformanceName("공연 " + i);
-            performance.setVenue("공연장 " + i);
-            performance.setPerformanceStatus(PerformanceStatus.ON_SALE);
-            performance.setStartedAt(LocalDateTime.now().plusDays(i));
-            performance.setPerformanceTime(120);
-            performance.setPrice(80000);
-
-            performanceRepository.save(performance);
-
-            createSeatsForPerformance(performance);
-        }
-    }
+//    private void createPerformancesAndSeats() {
+//        for (int i = 1; i <= 4; i++) {
+//            Performance performance = new Performance();
+//            performance.setPerformanceName("공연 " + i);
+//            performance.setVenue("공연장 " + i);
+//            performance.setPerformanceStatus(PerformanceStatus.ON_SALE);
+//            performance.setStartedAt(LocalDateTime.now().plusDays(i));
+//            performance.setPerformanceTime(120);
+//            performance.setPrice(80000);
+//
+//            performanceRepository.save(performance);
+//
+//            createSeatsForPerformance(performance);
+//        }
+//    }
 
     private void createSeatsForPerformance(Performance performance) {
         for (char row = 'A'; row <= 'J'; row++) {

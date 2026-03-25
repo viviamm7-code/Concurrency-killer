@@ -9,26 +9,26 @@ public class PerformancePageController {
 
     @GetMapping("/performance-list")
     public String performanceListPage() {
-        return "performance-list";
+        return "/performances/performance-list";
     }
 
     @GetMapping("/performances/{performanceId}")
     public String performanceDetailPage(@PathVariable Long performanceId) {
-        return "performance";
+        return "/performances/performance";
     }
 
     @GetMapping("/performance2")
     public String performance2Page() {
-        return "performance2";
+        return "/performances/performance2";
     }
 
     @GetMapping("/seat")
     public String seatPage() {
-        return "seat";
+        return "/seats/seat";
     }
 
     @GetMapping("/reservationConfirm")
     public String reservationConfirmPage() {
-        return "reservationConfirm";
+        return "/reservation/reservationConfirm";
     }
 }

@@ -22,6 +22,6 @@ public class ReservationController {
 
     @GetMapping("reservation/{reservationId}/confirm")
     public String ReservationCheck() {
-        return "reservationConfirm2";
+        return "reservation/reservationConfirm2";
     }
 }

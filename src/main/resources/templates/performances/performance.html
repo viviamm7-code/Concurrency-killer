@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>뮤지컬 긴긴밤</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    <div id="loginButton">
+        <script src="/js/common.js" defer></script>
+    </div>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -22,6 +25,32 @@
             --highlight: #e8612a;
             --radius: 14px;
             --radius-sm: 8px;
+        }
+
+        @charset "utf-8";
+        #loginButton {
+            position: absolute;
+            display: flex;
+            top: 3%;
+            right: 3%;
+            gap: 50px;
+        }
+        #loginButton a{
+            width: 150px;
+            height: 60px;
+            background: linear-gradient(to right, #423047, #333252);
+            display: flex;
+            justify-content: center; /* 가로 중앙 */
+            align-items: center;     /* 세로 중앙 */
+            border-radius: 15px;
+            color: #C7CFDA;
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        #loginButton a:hover{
+            color: white;
         }
 
         body {
@@ -389,10 +418,7 @@
 
 <header>
     <button class="btn-back" onclick="history.back()">←</button>
-    <div class="header-actions">
-        <button class="btn-header btn-login">로그인</button>
-        <button class="btn-header btn-mybook">내 예매</button>
-    </div>
+    <script src="/js/common.js" defer></script>
 </header>
 
 <main>
@@ -404,9 +430,9 @@
         <div class="poster-wrap">
             <div class="poster-svg-wrap">
                 <!--이미지-->
-<!--                <img class="poster" src="/images/250829114242_25012652.gif.jpeg" alt="${performance.performanceName}" />-->
+<!--                <img class="poster" src="/images/1.jpeg" alt="${performance.performanceName}" />-->
                 <!-- 포스터 -->
-                <img class="poster-img" id="posterImg" src="/images/250829114242_25012652.gif.jpeg" alt="기본 이미지" />
+                <img class="poster-img" id="posterImg" src="/images/1.jpeg" alt="기본 이미지" />
             </div>
         </div>
 
