@@ -19,7 +19,7 @@ public class MemberController {
 
     @RequestMapping("/login")
     public String login(){
-        return "login";
+        return "members/login";
     }
     @RequestMapping("/logout")
     public String logout(HttpSession session){

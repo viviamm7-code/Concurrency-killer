@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>예매한 공연 조회</title>
   <link rel="stylesheet" href="/css/reservationList.css" />
+  <div id="loginButton">
+    <script src="/js/common.js" defer></script>
+  </div>
 </head>
 <body>
 <div class="wrap">
@@ -17,7 +20,6 @@
   <div class="toolbar">
     <div class="count-box">총 <span id="count">0</span>건의 예매 내역</div>
     <div class="action-bar">
-      <button type="button" class="filter-btn" onclick="goReservationConfirm()">임시 예매 확인</button>
       <div class="filter-wrap">
         <button type="button" class="filter-btn" id="currentFilterLabel">전체 ▾</button>
 
