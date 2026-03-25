@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,10 +19,12 @@ public class ReservationDraftCacheDto implements Serializable {
     private String performanceTitle;
     private Integer performancePrice;
     private String performanceVenue;
+    private String StartedAt;
     private Integer remainingSeatLimit;
     private String performanceUrl;
     private String imageUrl;
     private List<String> selectedSeats = new ArrayList<>();
     private Integer totalPrice;
     private boolean confirmed;
+    private Date reservedDate;
 }

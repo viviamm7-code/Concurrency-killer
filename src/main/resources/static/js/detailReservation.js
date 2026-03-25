@@ -26,6 +26,33 @@ function formatDateTime(value) {
     });
 }
 
+function formatDate(value) {
+    if (!value) return "-";
+
+    const date = new Date(value);
+    if (!isNaN(date)) {
+        return date.toLocaleDateString("ko-KR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        });
+    }
+
+    const match = String(value).match(/^\d{4}-\d{2}-\d{2}/);
+    return match ? match[0] : String(value);
+}
+
+function formatTime(value) {
+    if (!value) return "-";
+
+    if (/^\d{2}:\d{2}$/.test(String(value))) {
+        return String(value);
+    }
+
+    const match = String(value).match(/(\d{2}:\d{2})/);
+    return match ? match[1] : "-";
+}
+
 function formatPrice(price) {
     if (price == null) return "-";
     return Number(price).toLocaleString("ko-KR") + "원";
@@ -94,7 +121,7 @@ function renderDetail(data) {
                     </div>
                     <div class="info-item">
                         <div class="info-label">공연일시</div>
-                        <div class="info-value">${formatDateTime(data.startedAt)}</div>
+                        <div class="info-value">${formatDate(data.reservedDate)} ${formatTime(data.startedAt)}</div>
                     </div>
                     <div class="info-item">
                         <div class="info-label">예매일시</div>
