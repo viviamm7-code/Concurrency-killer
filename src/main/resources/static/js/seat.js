@@ -291,7 +291,7 @@
             }
 
             await response.json();
-            window.location.href = `/reservationConfirm?draftId=${draftId}`;
+            window.location.href = `/reservationConfirm2?draftId=${draftId}`;
         } catch (e) {
             console.error(e);
             alert(e.message || '다음 페이지로 이동하는 중 오류가 발생했습니다.');

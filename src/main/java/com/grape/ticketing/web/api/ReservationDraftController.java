@@ -52,6 +52,11 @@ public class ReservationDraftController {
         return reservationDraftRedisService.confirmDraft(draftId);
     }
 
+    @PostMapping("/{draftId}/release-seats")
+    public ReservationDraftResponse releaseSelectedSeats(@PathVariable UUID draftId) {
+        return reservationDraftRedisService.releaseSelectedSeats(draftId);
+    }
+
     @ExceptionHandler(SeatHoldConflictException.class)
     public ResponseEntity<Map<String, Object>> handleSeatHoldConflict(SeatHoldConflictException ex) {
         Map<String, Object> body = new HashMap<>();

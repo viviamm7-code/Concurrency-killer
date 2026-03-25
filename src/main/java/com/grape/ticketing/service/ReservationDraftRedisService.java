@@ -41,7 +41,7 @@ public class ReservationDraftRedisService {
     private static final String KEY_PREFIX = "reservation:draft:";
     private static final String SEAT_HOLD_KEY_PREFIX = "seat:hold:";
     private static final Duration DRAFT_TTL = Duration.ofMinutes(30);
-    private static final Duration SEAT_HOLD_TTL = Duration.ofMinutes(5);
+    private static final Duration SEAT_HOLD_TTL = Duration.ofMinutes(3);
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final MemberRepository memberRepository;
@@ -97,12 +97,14 @@ public class ReservationDraftRedisService {
 
     public ReservationDraftCacheDto getDraftEntity(UUID draftId) {
         Object value = redisTemplate.opsForValue().get(generateKey(draftId));
+        System.out.println(" 드래프트 아이디 : " + draftId + " draft: " + value);
         if (value == null) {
             throw new IllegalArgumentException("임시 예매 정보가 없습니다.");
         }
         return (ReservationDraftCacheDto) value;
     }
 
+    //reservation, reservation_seat, seat 테이블을 동시에 업데이트 되어야하기때문에 @Transactional 사용
     @Transactional
     public ReservationConfirmResponse confirmDraft(UUID draftId) {
         ReservationDraftCacheDto draft = getDraftEntity(draftId);
@@ -119,6 +121,7 @@ public class ReservationDraftRedisService {
 
         validateSeatHolds(draft.getDraftId(), draft.getPerformanceId(), selectedSeats);
 
+        // 예매 데이터 저장
         Reservation reservation = new Reservation();
         reservation.setMember(member);
         reservation.setPerformance(performance);
@@ -126,10 +129,14 @@ public class ReservationDraftRedisService {
         reservation.setReservationStatus(ReservationStatus.RESERVED);
         Reservation savedReservation = reservationRepository.save(reservation);
 
+        // 예매 좌석 데이터 저장
         for (String seatNumber : selectedSeats) {
             Seat seat = seatRepository.findByPerformanceIdAndSeatNumber(draft.getPerformanceId(), seatNumber)
                     .orElseThrow(() -> new IllegalArgumentException("좌석이 없습니다: " + seatNumber));
             seat.setSeatStatus(SeatStatus.RESERVED);
+//            seatRepository.save(seat);
+            System.out.println(seat.toString());
+
 
             ReservationSeat reservationSeat = new ReservationSeat();
             reservationSeat.setReservation(savedReservation);
@@ -139,10 +146,26 @@ public class ReservationDraftRedisService {
 
         releaseSeatHolds(draft.getDraftId(), draft.getPerformanceId(), selectedSeats);
         redisTemplate.delete(generateKey(draftId));
-        log.info("Draft confirmed and removed. draftId={}, reservationId={}", draftId, savedReservation.getId());
+//        log.info("Draft confirmed and removed. draftId={}, reservationId={}", draftId, savedReservation.getId());
         return new ReservationConfirmResponse(savedReservation.getId(), "최종 예매가 완료되었습니다.");
     }
 
+    @Transactional
+    public ReservationDraftResponse releaseSelectedSeats(UUID draftId) {
+        ReservationDraftCacheDto draft = getDraftEntity(draftId);
+
+        List<String> selectedSeats = draft.getSelectedSeats();
+        if (selectedSeats != null && !selectedSeats.isEmpty()) {
+            releaseSeatHolds(draft.getDraftId(), draft.getPerformanceId(), selectedSeats);
+        }
+
+        draft.setSelectedSeats(new ArrayList<>());
+        draft.setTotalPrice(0);
+
+        redisTemplate.opsForValue().set(generateKey(draftId), draft, DRAFT_TTL);
+
+        return toResponse(draft);
+    }
     private void synchronizeSeatHolds(ReservationDraftCacheDto draft, List<String> requestedSeats) {
         List<String> currentSeats = draft.getSelectedSeats() == null
                 ? new ArrayList<>()

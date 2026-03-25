@@ -31,4 +31,9 @@ public class PerformancePageController {
     public String reservationConfirmPage() {
         return "reservationConfirm";
     }
+
+    @GetMapping("/reservationConfirm2")
+    public String reservationConfirm2Page() {
+        return "reservation/reservationConfirm2";
+    }
 }
