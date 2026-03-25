@@ -21,4 +21,5 @@ public class ReservationDetailDto {
     private int price;
     private String reservationStatus;
     private String performanceStatus;
+    private String imageUrl;
 }

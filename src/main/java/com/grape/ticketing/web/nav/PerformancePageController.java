@@ -17,11 +17,6 @@ public class PerformancePageController {
         return "/performances/performance";
     }
 
-    @GetMapping("/performance2")
-    public String performance2Page() {
-        return "/performances/performance2";
-    }
-
     @GetMapping("/seat")
     public String seatPage() {
         return "/seats/seat";

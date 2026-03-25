@@ -586,7 +586,7 @@
         document.title = performance.performanceName;
 
         const img = document.getElementById('posterImg');
-        img.src = `/images/${performance.imageUrl}`;
+        img.src = performance.imageUrl || "/images/1.jpeg";
         img.alt = performance.performanceName;
 
         document.getElementById('infoVenue').textContent = performance.venue || '-';

@@ -17,4 +17,5 @@ public class ReservationDto {
     private List<String> seatNumbers;
     private String reservationStatus;
     private String performanceStatus;
+    private String imageUrl;
 }

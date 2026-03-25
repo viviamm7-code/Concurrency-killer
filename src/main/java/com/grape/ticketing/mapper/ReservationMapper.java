@@ -16,6 +16,7 @@ public interface ReservationMapper {
     @Mapping(target = "reservationId", source = "id")
     @Mapping(target = "performanceName", source = "performance.performanceName")
     @Mapping(target = "venue", source = "performance.venue")
+    @Mapping(target = "imageUrl", source = "performance.imageUrl")
     @Mapping(target = "startedAt", source = "performance.startedAt")
     @Mapping(target = "reservedAt", source = "reservedAt")
     @Mapping(target = "seatNumbers", expression = "java(toSeatNumbers(reservation.getReservationSeats()))")
@@ -33,6 +34,7 @@ public interface ReservationMapper {
     @Mapping(target = "reservedAt", source = "reservedAt")
     @Mapping(target = "seatNumbers", expression = "java(toSeatNumbers(reservation.getReservationSeats()))")
     @Mapping(target = "price", expression = "java(calculateTotalPrice(reservation))")
+    @Mapping(target = "imageUrl", source = "performance.imageUrl")
     @Mapping(target = "reservationStatus", expression = "java(reservation.getReservationStatus().name())")
     @Mapping(target = "performanceStatus", expression = "java(reservation.getPerformance().getPerformanceStatus().name())")
     ReservationDetailDto toReservationDetailDto(Reservation reservation);
