@@ -19,7 +19,7 @@ public class MemberController {
 
     @RequestMapping("/login")
     public String login(){
-        return "login";
+        return "members/login";
     }
     @RequestMapping("/logout")
     public String logout(HttpSession session){
@@ -59,8 +59,10 @@ public class MemberController {
 
         if (loginMemberId != null) {
             status.put("isLoggedIn", true);
+            status.put("memberId", loginMemberId);
         } else {
             status.put("isLoggedIn", false);
+            status.put("memberId", null);
         }
         return status;
     }

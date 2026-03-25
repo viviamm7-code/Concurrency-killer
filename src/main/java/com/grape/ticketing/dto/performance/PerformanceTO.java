@@ -1,4 +1,4 @@
-package com.grape.ticketing.dto;
+package com.grape.ticketing.dto.performance;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,6 +37,7 @@ public class PerformanceTO {
         private int performanceTime;
         private LocalDateTime startedAt;
         private int price;
+        private Integer remainingSeatLimit;
 
     }
 }

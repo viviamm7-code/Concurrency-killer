@@ -1,7 +1,7 @@
 package com.grape.ticketing.service;
 
 import com.grape.ticketing.domain.Reservation;
-import com.grape.ticketing.dto.CancelPolicyResultDto;
+import com.grape.ticketing.dto.reservation.CancelPolicyResultDto;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

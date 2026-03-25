@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", async function() {
                 // 로그인 된 상태 -> 로그아웃 버튼과 내 예매 버튼
                 headerContainer.innerHTML = `
                     <a href="/logout" class="loginGradientBtn logout-style">로그아웃</a>
-                    <a href="/ticketing" class="myPage">내 예매</a>
+                    <a href="/reservation" class="myPage">내 예매</a>
                 `;
             } else {
                 // 로그인 안 된 상태 -> 로그인 버튼과 내 예매 버튼(클릭 시 컨트롤러에서 튕김)

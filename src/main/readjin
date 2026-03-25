@@ -81,7 +81,7 @@ where performance_id = 3
 insert into reservation
 (created_date, last_modified_date, member_id, performance_id, reserved_at, reservation_status)
 values
-(now(), now(), 2, 2, now(), 'RESERVED');
+(now(), now(), 2, 4, now(), 'RESERVED');
 
 set @r3 = last_insert_id();
 
@@ -89,10 +89,10 @@ insert into reservation_seat
 (created_date, last_modified_date, reservation_id, seat_id)
 select now(), now(), @r3, s.seat_id
 from seat s
-where s.performance_id = 2
+where s.performance_id = 4
   and s.seat_number in ('C5', 'G5');
 
 update seat
 set seat_status = 'RESERVED'
-where performance_id = 2
+where performance_id = 4
   and seat_number in ('C5', 'G5');

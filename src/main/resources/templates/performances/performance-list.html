@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>뮤지컬 공연</title>
     <link rel="stylesheet" type="text/css" href="/css/header.css">
-    <script src="../js/common.js" defer></script>
+    <script src="/js/common.js" defer></script>
     <style>
         * {
             margin: 0;
@@ -227,7 +227,7 @@
     }
 
     function createCard(performance) {
-        const imageUrl = performance.imageUrl ? `/images/${performance.imageUrl}` : "/images/260128010721_26001001.gif.jpeg";
+        const imageUrl = performance.imageUrl || "";
 
         return `
   <div class="card" onclick="goToDetail(${performance.id})" style="cursor:pointer;">

@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>뮤지컬 긴긴밤</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0f1623;
+            --bg2: #161f30;
+            --bg3: #1e2a3d;
+            --card: #1a2436;
+            --border: rgba(255,255,255,0.07);
+            --accent: #e8612a;
+            --accent2: #f07a44;
+            --text: #e8edf5;
+            --text-muted: #7a8ba0;
+            --text-dim: #4a5a6e;
+            --highlight: #e8612a;
+            --radius: 14px;
+            --radius-sm: 8px;
+        }
+
+        @charset "utf-8";
+        #loginButton {
+            position: absolute;
+            display: flex;
+            top: 3%;
+            right: 3%;
+            gap: 50px;
+        }
+        #loginButton a{
+            width: 150px;
+            height: 60px;
+            background: linear-gradient(to right, #423047, #333252);
+            display: flex;
+            justify-content: center; /* 가로 중앙 */
+            align-items: center;     /* 세로 중앙 */
+            border-radius: 15px;
+            color: #C7CFDA;
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        #loginButton a:hover{
+            color: white;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Noto Sans KR', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background atmosphere */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                    radial-gradient(ellipse 60% 40% at 10% 80%, rgba(232,97,42,0.06) 0%, transparent 70%),
+                    radial-gradient(ellipse 50% 50% at 90% 20%, rgba(100,130,200,0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Header ── */
+        header {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 40px;
+        }
+
+        .btn-back {
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background .2s, transform .2s;
+        }
+        .btn-back:hover { background: var(--bg2); transform: scale(1.05); }
+
+        .header-actions { display: flex; gap: 12px; }
+
+        .btn-header {
+            padding: 12px 28px;
+            border-radius: 10px;
+            border: none;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all .2s;
+            letter-spacing: -0.3px;
+        }
+        .btn-login {
+            background: #2a3650;
+            color: var(--text);
+        }
+        .btn-login:hover { background: #344260; }
+        .btn-mybook {
+            background: #3a3050;
+            color: var(--text);
+        }
+        .btn-mybook:hover { background: #46385e; }
+
+        /* ── Main layout ── */
+        main {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px 40px 60px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 32px;
+            color: var(--text);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* ── Poster ── */
+        .poster-wrap {
+            width: 260px;
+            flex-shrink: 0;
+        }
+
+        .poster-img {
+            width: 100%;
+            border-radius: var(--radius);
+            display: block;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+            transition: transform .3s;
+        }
+        .poster-img:hover { transform: translateY(-4px); }
+
+        /* ── Info section ── */
+        .info-section {
+            padding-top: 4px;
+        }
+
+        .info-table {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0;
+            width: 100%;
+        }
+
+        .info-row {
+            display: contents;
+        }
+
+        .info-label, .info-value {
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .info-label {
+            color: var(--text-muted);
+            font-weight: 400;
+            padding-right: 40px;
+            white-space: nowrap;
+        }
+
+        .info-value {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .info-row:last-child .info-label,
+        .info-row:last-child .info-value {
+            border-bottom: none;
+        }
+
+        .cancellation-note {
+            margin-top: 28px;
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .cancellation-note::before {
+            content: '·';
+            color: var(--accent);
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        /* ── Calendar ── */
+        .calendar-section {
+            width: 260px;
+            flex-shrink: 0;
+        }
+
+        .calendar-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .cal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .cal-month {
+            font-size: 17px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--text);
+        }
+
+        .cal-nav {
+            display: flex; gap: 4px;
+        }
+
+        .cal-nav-btn {
+            width: 28px; height: 28px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-muted);
+            font-size: 12px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all .15s;
+        }
+        .cal-nav-btn:hover { color: var(--text); background: var(--bg2); }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 4px;
+            text-align: center;
+        }
+
+        .cal-dow {
+            font-size: 11px;
+            color: var(--text-dim);
+            font-weight: 500;
+            padding: 4px 0 8px;
+            letter-spacing: 0.3px;
+        }
+        .cal-dow:first-child { color: #e05050; }
+        .cal-dow:last-child { color: #5080e0; }
+
+        .cal-day {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 400;
+            cursor: pointer;
+            color: var(--text);
+            transition: background .15s, color .15s;
+            position: relative;
+            margin: 0;
+        }
+        .cal-day:hover:not(.disabled):not(.today) {
+            background: rgba(255,255,255,0.08);
+        }
+        .cal-day.disabled {
+            color: var(--text-dim);
+            cursor: default;
+        }
+        .cal-day.today {
+            background: var(--accent);
+            color: #fff;
+            font-weight: 700;
+        }
+        .cal-day.selected:not(.today) {
+            background: rgba(232,97,42,0.25);
+            color: var(--accent2);
+            font-weight: 600;
+        }
+        .cal-day.sun { color: #e05050; }
+        .cal-day.sat { color: #5080e0; }
+        .cal-day.sun.disabled, .cal-day.sat.disabled { color: var(--text-dim); }
+
+        /* ── Book button ── */
+        .btn-book {
+            margin-top: 16px;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+            border: none;
+            border-radius: var(--radius-sm);
+            color: #fff;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all .2s;
+            box-shadow: 0 4px 20px rgba(232,97,42,0.4);
+        }
+        .btn-book:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(232,97,42,0.5);
+        }
+        .btn-book:active { transform: translateY(0); }
+
+        /* ── Poster fallback (SVG-based) ── */
+        .poster-svg-wrap {
+            width: 100%;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+            transition: transform .3s;
+        }
+        .poster-svg-wrap:hover { transform: translateY(-4px); }
+        .poster-svg-wrap svg { display: block; width: 100%; height: auto; }
+
+        /* ── Modal overlay ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity .25s;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+        .modal {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 36px 40px;
+            width: 380px;
+            max-width: 90vw;
+            transform: translateY(16px) scale(0.97);
+            transition: transform .25s;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+        }
+        .modal-overlay.active .modal { transform: translateY(0) scale(1); }
+
+        .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+        .modal p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+
+        .modal-detail-row {
+            display: flex; justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        .modal-detail-row:last-of-type { border-bottom: none; }
+        .modal-detail-row span:first-child { color: var(--text-muted); }
+        .modal-detail-row span:last-child { font-weight: 500; }
+
+        .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+        .modal-cancel {
+            flex: 1; padding: 13px;
+            background: var(--bg3); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); color: var(--text-muted);
+            font-family: 'Noto Sans KR', sans-serif; font-size: 15px;
+            cursor: pointer; transition: all .15s;
+        }
+        .modal-cancel:hover { color: var(--text); }
+        .modal-confirm {
+            flex: 2; padding: 13px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border: none; border-radius: var(--radius-sm);
+            color: #fff; font-family: 'Noto Sans KR', sans-serif;
+            font-size: 15px; font-weight: 700;
+            cursor: pointer; transition: all .15s;
+            box-shadow: 0 4px 16px rgba(232,97,42,0.35);
+        }
+        .modal-confirm:hover { transform: translateY(-1px); }
+
+        @media (max-width: 860px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            .poster-wrap, .calendar-section { width: 100%; max-width: 320px; }
+            main { padding: 10px 20px 60px; }
+            header { padding: 16px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <button class="btn-back" onclick="history.back()">←</button>
+    <div id="loginButton">
+        <script src="/js/common.js" defer></script>
+    </div>
+</header>
+
+<main>
+    <!-- 제목 -->
+    <h1 id="performanceTitle"></h1>
+
+    <div class="content-grid">
+        <!-- Poster -->
+        <div class="poster-wrap">
+            <div class="poster-svg-wrap">
+                <!--이미지-->
+<!--                <img class="poster" src="/images/1.jpeg" alt="${performance.performanceName}" />-->
+                <!-- 포스터 -->
+                <img class="poster-img" id="posterImg" src="/images/1.jpeg" alt="기본 이미지" />
+            </div>
+        </div>
+
+        <!-- Info -->
+        <div class="info-section">
+            <div class="info-table">
+                <div class="info-row">
+                    <div class="info-label">장소</div>
+                    <div class="info-value" id="infoVenue"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">공연 기간</div>
+                    <div class="info-value" id="infoPeriod"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">공연 시간</div>
+                    <div class="info-value" id="infoDuration"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">공연 시작 시간</div>
+                    <div class="info-value" id="infoStartTime"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">가격</div>
+                    <div class="info-value" id="infoPrice"></div>
+                </div>
+            </div>
+
+            <p class="cancellation-note">공연 취소 기한 : 예매 후 7일 이내 수수료 없음</p>
+        </div>
+
+        <!-- Calendar + Book -->
+        <div class="calendar-section">
+            <div class="calendar-card">
+                <div class="cal-header">
+                    <span class="cal-month" id="calMonth">2026-01</span>
+                    <div class="cal-nav">
+                        <button class="cal-nav-btn" id="prevMonth">&#8249;</button>
+                        <button class="cal-nav-btn" id="nextMonth">&#8250;</button>
+                    </div>
+                </div>
+                <div class="cal-grid" id="calGrid"></div>
+            </div>
+            <button class="btn-book" id="btnBook">예매하기</button>
+        </div>
+    </div>
+</main>
+
+<!-- Booking Modal -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <h2>예매 확인</h2>
+        <p>아래 내용으로 예매를 진행할까요?</p>
+        <div class="modal-detail-row"><span>공연명</span><span id="modalTitle"></span></div>
+        <div class="modal-detail-row"><span>장소</span><span id="modalVenue"></span></div>
+        <div class="modal-detail-row"><span>날짜</span><span id="modalStartTime"></span></div>
+        <div class="modal-detail-row"><span>시작</span><span>18:00</span></div>
+        <div class="modal-detail-row"><span>가격</span><span id="modalPrice"></span></div>
+        <div class="modal-actions">
+            <button class="modal-cancel" id="modalCancel">취소</button>
+            <button class="modal-confirm" id="modalConfirm">예매 완료</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let memberId = null;
+    let data = null;
+
+    const pathParts = location.pathname.split('/');
+    const performanceId = pathParts[pathParts.length - 1];
+
+    let SHOW_START = new Date(2026, 0, 1);
+    let SHOW_END = new Date(2026, 1, 2);
+
+    let currentYear = 2026;
+    let currentMonth = 0;
+    let selectedDay = 25;
+
+
+    function formatDateTime(value) {
+        if (!value) {
+            return '-';
+        }
+
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) {
+            return value;
+        }
+
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        const hh = String(date.getHours()).padStart(2, '0');
+        const min = String(date.getMinutes()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+    }
+
+    function formatDraftDate(performance) {
+        if (performance.startedAt) {
+            return formatDateTime(performance.startedAt);
+        }
+        if (performance.startDate && performance.endDate) {
+            return `${performance.startDate} ~ ${performance.endDate}`;
+        }
+        return performance.startDate || '-';
+    }
+
+    function getSelectedPerformanceDate() {
+        if (!data) {
+            return '-';
+        }
+
+        if (selectedDay) {
+            return `${currentYear}-${MONTHS[currentMonth]}-${String(selectedDay).padStart(2, '0')}`;
+        }
+
+        return formatDraftDate(data);
+    }
+
+    async function loadAuthStatus() {
+        const response = await fetch('/api/auth/status');
+        if (!response.ok) {
+            throw new Error('로그인 상태를 확인하지 못했습니다.');
+        }
+
+        const auth = await response.json();
+        if (!auth.isLoggedIn || auth.memberId == null) {
+            throw new Error('로그인이 필요합니다.');
+        }
+
+        memberId = Number(auth.memberId);
+    }
+
+    async function loadPerformance() {
+        try {
+            await loadAuthStatus();
+            const res = await fetch(`/api/performances/${performanceId}`);
+            if (!res.ok) {
+                throw new Error('공연 정보를 불러오지 못했습니다.');
+            }
+            data = await res.json();
+            renderPerformance(data);
+        } catch (err) {
+            console.error(err);
+            alert('공연 정보를 불러오는 데 실패했습니다.');
+        }
+    }
+
+    function renderPerformance(performance) {
+        document.getElementById('performanceTitle').textContent = performance.performanceName;
+        document.title = performance.performanceName;
+
+        const img = document.getElementById('posterImg');
+        img.src = performance.imageUrl || "/images/1.jpeg";
+        // console.log(img.src);
+        img.alt = performance.performanceName;
+
+        document.getElementById('infoVenue').textContent = performance.venue || '-';
+        document.getElementById('infoPeriod').textContent = `${performance.startDate || '-'} ~ ${performance.endDate || '-'}`;
+        document.getElementById('infoDuration').textContent = `${performance.performanceTime ?? '-'}분`;
+        document.getElementById('infoStartTime').textContent = formatDateTime(performance.startedAt);
+        document.getElementById('infoPrice').textContent = `${(performance.price ?? 0).toLocaleString()}원`;
+
+        document.getElementById('modalTitle').textContent = performance.performanceName;
+        document.getElementById('modalVenue').textContent = performance.venue || '-';
+        document.getElementById('modalStartTime').textContent = formatDraftDate(performance);
+        document.getElementById('modalPrice').textContent = `${(performance.price ?? 0).toLocaleString()}원`;
+
+        if (performance.remainingSeatLimit != null) {
+            const note = document.querySelector('.cancellation-note');
+            if (note) {
+                note.textContent = `1인당 예매 가능 좌석 : ${performance.remainingSeatLimit}석`;
+            }
+        }
+
+        if (performance.startDate && performance.endDate) {
+            const [sy, sm, sd] = performance.startDate.split('-').map(Number);
+            const [ey, em, ed] = performance.endDate.split('-').map(Number);
+            SHOW_START = new Date(sy, sm - 1, sd);
+            SHOW_END = new Date(ey, em - 1, ed);
+            currentYear = sy;
+            currentMonth = sm - 1;
+            selectedDay = null;
+        }
+
+        renderCalendar();
+    }
+
+    const DOW = ['일', '월', '화', '수', '목', '금', '토'];
+    const MONTHS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+
+    function renderCalendar() {
+        const grid = document.getElementById('calGrid');
+        document.getElementById('calMonth').textContent = `${currentYear}-${MONTHS[currentMonth]}`;
+        grid.innerHTML = '';
+
+        DOW.forEach(d => {
+            const el = document.createElement('div');
+            el.className = 'cal-dow';
+            el.textContent = d;
+            grid.appendChild(el);
+        });
+
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i++) {
+            grid.appendChild(document.createElement('div'));
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const date = new Date(currentYear, currentMonth, d);
+            const el = document.createElement('div');
+            el.className = 'cal-day';
+            el.textContent = d;
+
+            const dow = date.getDay();
+            if (dow === 0) el.classList.add('sun');
+            if (dow === 6) el.classList.add('sat');
+
+            const inRange = date >= SHOW_START && date <= SHOW_END;
+            if (!inRange) {
+                el.classList.add('disabled');
+            } else {
+                if (currentYear === 2026 && currentMonth === 0 && d === selectedDay) {
+                    el.classList.add('today');
+                }
+                el.addEventListener('click', () => {
+                    selectedDay = d;
+                    renderCalendar();
+                });
+            }
+
+            if (inRange && d === selectedDay && !(currentYear === 2026 && currentMonth === 0)) {
+                el.classList.add('selected');
+            }
+
+            grid.appendChild(el);
+        }
+    }
+
+    document.getElementById('prevMonth').addEventListener('click', () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        renderCalendar();
+    });
+
+    document.getElementById('nextMonth').addEventListener('click', () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        renderCalendar();
+    });
+
+    const overlay = document.getElementById('modalOverlay');
+    document.getElementById('btnBook').addEventListener('click', () => {
+        const dateStr = getSelectedPerformanceDate();
+        document.getElementById('modalStartTime').textContent = dateStr;
+        overlay.classList.add('active');
+    });
+
+    document.getElementById('modalCancel').addEventListener('click', () => {
+        overlay.classList.remove('active');
+    });
+
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            overlay.classList.remove('active');
+        }
+    });
+
+    document.getElementById('modalConfirm').addEventListener('click', async () => {
+        overlay.classList.remove('active');
+
+        const btn = document.getElementById('btnBook');
+        btn.textContent = '✓ 예매 완료';
+        btn.style.background = 'linear-gradient(135deg, #2a9060, #38b070)';
+        btn.style.boxShadow = '0 4px 20px rgba(42,144,96,0.4)';
+        setTimeout(() => {
+            btn.textContent = '예매하기';
+            btn.style.background = '';
+            btn.style.boxShadow = '';
+        }, 3000);
+
+        try {
+            if (memberId == null) {
+                throw new Error('로그인이 필요합니다.');
+            }
+            const response = await fetch('/reservation-drafts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    memberId,
+                    performanceId: data.id,
+                    performanceDate: getSelectedPerformanceDate(),
+                    performanceTitle: data.performanceName,
+                    performancePrice: data.price,
+                    performanceVenue: data.venue,
+                    remainingSeatLimit: data.remainingSeatLimit ?? 0,
+                    performanceUrl: window.location.pathname,
+                    imageUrl: data.imageUrl
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('draft 생성 실패');
+            }
+
+            const draft = await response.json();
+            window.location.href = `/seat?draftId=${draft.draftId}`;
+        } catch (error) {
+            if (error.message === '로그인이 필요합니다.') {
+                window.location.href = '/login';
+                return;
+            }
+            alert(error.message);
+        }
+    });
+
+    loadPerformance();
+</script>
+</body>
+</html>
