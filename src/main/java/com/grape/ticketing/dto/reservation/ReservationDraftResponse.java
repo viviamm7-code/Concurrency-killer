@@ -18,6 +18,7 @@ public class ReservationDraftResponse {
     private String performanceVenue;
     private Integer remainingSeatLimit;
     private String performanceUrl;
+    private String imageUrl;
     private List<String> selectedSeats;
     private Integer totalPrice;
     private boolean confirmed;

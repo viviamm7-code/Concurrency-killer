@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>좌석 선택</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/seat.css">
+</head>
+<body>
+<header>
+    <div class="brand">포도알 사수작전</div>
+    <div class="header-right">
+        <a href="/logout" class="header-pill">로그아웃</a>
+        <a href="/reservation" class="header-pill">내 예매</a>
+    </div>
+</header>
+
+<div class="page">
+    <div class="content">
+        <main class="main-card">
+            <div class="top-info">
+                <div class="title-wrap">
+                    <div class="eyebrow">Seat Selection</div>
+                    <div class="title">공연 제목 2026-04-01</div>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-box available-box"></div>
+                        <span>선택 가능</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box selected-box"></div>
+                        <span>선택 좌석</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box reserved-box"></div>
+                        <span>선택 불가</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="seat-layout-wrapper">
+                <div class="screen">STAGE</div>
+                <div class="seat-layout">
+                    <div id="leftSection" class="seat-section"></div>
+                    <div id="rightSection" class="seat-section"></div>
+                </div>
+            </div>
+        </main>
+
+        <aside class="sidebar">
+            <div>
+                <div class="sidebar-head">
+                    <div class="sidebar-title">선택 좌석 <span id="selectedCount">0 / 0</span></div>
+                    <div class="remaining-info" id="remainingInfo">남은 예매 가능 좌석 수: 0</div>
+                </div>
+
+                <div id="selectedSeatBox" class="selected-seat-box">
+                    <div class="empty-message">선택한 좌석이 없습니다.</div>
+                </div>
+            </div>
+
+            <button id="completeBtn" class="complete-btn">선택 완료</button>
+        </aside>
+    </div>
+</div>
+
+<script src="/js/seat.js"></script>
+</body>
+</html>

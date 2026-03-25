@@ -24,6 +24,32 @@
             --radius-sm: 8px;
         }
 
+        @charset "utf-8";
+        #loginButton {
+            position: absolute;
+            display: flex;
+            top: 3%;
+            right: 3%;
+            gap: 50px;
+        }
+        #loginButton a{
+            width: 150px;
+            height: 60px;
+            background: linear-gradient(to right, #423047, #333252);
+            display: flex;
+            justify-content: center; /* 가로 중앙 */
+            align-items: center;     /* 세로 중앙 */
+            border-radius: 15px;
+            color: #C7CFDA;
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        #loginButton a:hover{
+            color: white;
+        }
+
         body {
             background: var(--bg);
             color: var(--text);
@@ -389,9 +415,8 @@
 
 <header>
     <button class="btn-back" onclick="history.back()">←</button>
-    <div class="header-actions">
-        <button class="btn-header btn-login">로그인</button>
-        <button class="btn-header btn-mybook">내 예매</button>
+    <div id="loginButton">
+        <script src="/js/common.js" defer></script>
     </div>
 </header>
 
@@ -404,9 +429,9 @@
         <div class="poster-wrap">
             <div class="poster-svg-wrap">
                 <!--이미지-->
-<!--                <img class="poster" src="/images/250829114242_25012652.gif.jpeg" alt="${performance.performanceName}" />-->
+<!--                <img class="poster" src="/images/1.jpeg" alt="${performance.performanceName}" />-->
                 <!-- 포스터 -->
-                <img class="poster-img" id="posterImg" src="/images/250829114242_25012652.gif.jpeg" alt="기본 이미지" />
+                <img class="poster-img" id="posterImg" src="/images/1.jpeg" alt="기본 이미지" />
             </div>
         </div>
 
@@ -473,7 +498,7 @@
 </div>
 
 <script>
-    const memberId = 11;
+    let memberId = null;
     let data = null;
 
     const pathParts = location.pathname.split('/');
@@ -527,8 +552,23 @@
         return formatDraftDate(data);
     }
 
+    async function loadAuthStatus() {
+        const response = await fetch('/api/auth/status');
+        if (!response.ok) {
+            throw new Error('로그인 상태를 확인하지 못했습니다.');
+        }
+
+        const auth = await response.json();
+        if (!auth.isLoggedIn || auth.memberId == null) {
+            throw new Error('로그인이 필요합니다.');
+        }
+
+        memberId = Number(auth.memberId);
+    }
+
     async function loadPerformance() {
         try {
+            await loadAuthStatus();
             const res = await fetch(`/api/performances/${performanceId}`);
             if (!res.ok) {
                 throw new Error('공연 정보를 불러오지 못했습니다.');
@@ -546,7 +586,8 @@
         document.title = performance.performanceName;
 
         const img = document.getElementById('posterImg');
-        img.src = `/images/${performance.imageUrl}`;
+        img.src = performance.imageUrl || "/images/1.jpeg";
+        // console.log(img.src);
         img.alt = performance.performanceName;
 
         document.getElementById('infoVenue').textContent = performance.venue || '-';
@@ -682,6 +723,9 @@
         }, 3000);
 
         try {
+            if (memberId == null) {
+                throw new Error('로그인이 필요합니다.');
+            }
             const response = await fetch('/reservation-drafts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -693,7 +737,8 @@
                     performancePrice: data.price,
                     performanceVenue: data.venue,
                     remainingSeatLimit: data.remainingSeatLimit ?? 0,
-                    performanceUrl: window.location.pathname
+                    performanceUrl: window.location.pathname,
+                    imageUrl: data.imageUrl
                 })
             });
 
@@ -704,6 +749,10 @@
             const draft = await response.json();
             window.location.href = `/seat?draftId=${draft.draftId}`;
         } catch (error) {
+            if (error.message === '로그인이 필요합니다.') {
+                window.location.href = '/login';
+                return;
+            }
             alert(error.message);
         }
     });

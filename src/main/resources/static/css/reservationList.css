@@ -11,6 +11,32 @@ body {
     min-height: 100vh;
 }
 
+@charset "utf-8";
+#loginButton {
+    position: absolute;
+    display: flex;
+    top: 3%;
+    right: 3%;
+    gap: 50px;
+}
+#loginButton a{
+    width: 150px;
+    height: 60px;
+    background: linear-gradient(to right, #423047, #333252);
+    display: flex;
+    justify-content: center; /* 가로 중앙 */
+    align-items: center;     /* 세로 중앙 */
+    border-radius: 15px;
+    color: #C7CFDA;
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#loginButton a:hover{
+    color: white;
+}
+
 .wrap {
     width: 100%;
     max-width: 1440px;

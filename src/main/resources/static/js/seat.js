@@ -1,317 +1,9 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>좌석 선택</title>
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #d9d9d9;
-        }
-
-        .page {
-            width: 95%;
-            margin: 20px auto;
-            min-height: 90vh;
-            background: #f5f5f5;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header {
-            height: 90px;
-            background: #cfcfcf;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 30px;
-            font-size: 24px;
-        }
-
-        .header-right {
-            display: flex;
-            gap: 30px;
-        }
-
-        .content {
-            display: flex;
-            flex: 1;
-        }
-
-        .main {
-            flex: 1;
-            padding: 30px;
-            background: #f7f7f7;
-        }
-
-        .sidebar {
-            width: 380px;
-            background: #efefef;
-            border-left: 1px solid #ddd;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .top-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 50px;
-            gap: 20px;
-        }
-
-        .title {
-            font-size: 28px;
-        }
-
-        .legend {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            font-size: 16px;
-            flex-wrap: wrap;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .legend-box {
-            width: 26px;
-            height: 26px;
-        }
-
-        .available-box {
-            background: #9b74e8;
-        }
-
-        .selected-box {
-            background: #6f2df5;
-        }
-
-        .reserved-box {
-            background: #bfbfbf;
-        }
-
-        .seat-layout-wrapper {
-            display: flex;
-            justify-content: center;
-            margin-top: 40px;
-        }
-
-        .seat-layout {
-            background: #efefef;
-            padding: 25px 35px;
-            display: flex;
-            gap: 90px;
-            min-width: 760px;
-        }
-
-        .seat-section {
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .seat-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-height: 42px;
-        }
-
-        .row-label {
-            width: 38px;
-            height: 32px;
-            line-height: 32px;
-            text-align: center;
-            background: #9b74e8;
-            color: white;
-            font-size: 18px;
-        }
-
-        .seat {
-            width: 32px;
-            height: 32px;
-            border: none;
-            cursor: pointer;
-            color: white;
-            font-size: 12px;
-            transition: transform 0.15s ease;
-        }
-
-        .seat.available {
-            background: #9b74e8;
-        }
-
-        .seat.available:hover {
-            transform: scale(1.08);
-        }
-
-        .seat.selected {
-            background: #6f2df5;
-        }
-
-        .seat.selected:hover {
-            transform: scale(1.08);
-        }
-
-        .seat.reserved {
-            background: #bfbfbf;
-            cursor: not-allowed;
-        }
-
-        .sidebar-title {
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-
-        .remaining-info {
-            color: #555;
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-
-        .selected-seat-box {
-            background: #d9d9d9;
-            min-height: 420px;
-            padding: 20px;
-        }
-
-        .selected-seat-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 22px;
-            margin-bottom: 18px;
-        }
-
-        .selected-seat-left {
-            display: flex;
-            gap: 20px;
-        }
-
-        .remove-btn {
-            border: none;
-            background: transparent;
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .complete-btn {
-            width: 100%;
-            height: 90px;
-            background: #96e28c;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-        }
-
-        .complete-btn:disabled {
-            background: #c8c8c8;
-            cursor: not-allowed;
-        }
-
-        .empty-message {
-            color: #666;
-            font-size: 18px;
-        }
-
-        @media (max-width: 1200px) {
-            .content {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-            }
-
-            .seat-layout {
-                min-width: auto;
-                width: 100%;
-                overflow-x: auto;
-            }
-
-            .top-info {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-    </style>
-</head>
-<body>
-<div class="page">
-    <header class="header">
-        <div>포도알 사수작전</div>
-        <div class="header-right">
-            <div>로그아웃</div>
-            <div>내 예매</div>
-        </div>
-    </header>
-
-    <div class="content">
-        <main class="main">
-            <div class="top-info">
-                <div class="title">공연 제목 2026-04-01(수) 8:00PM</div>
-
-                <div class="legend">
-                    <div class="legend-item">
-                        <div class="legend-box available-box"></div>
-                        <span>빈 좌석</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-box selected-box"></div>
-                        <span>선택 좌석</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-box reserved-box"></div>
-                        <span>선택 불가</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="seat-layout-wrapper">
-                <div class="seat-layout">
-                    <div id="leftSection" class="seat-section"></div>
-                    <div id="rightSection" class="seat-section"></div>
-                </div>
-            </div>
-        </main>
-
-        <aside class="sidebar">
-            <div>
-                <div class="sidebar-title">선택 좌석 <span id="selectedCount">0 / 0</span></div>
-                <div class="remaining-info" id="remainingInfo">남은 예매 가능 좌석 수: 0</div>
-
-                <div id="selectedSeatBox" class="selected-seat-box">
-                    <div class="empty-message">선택한 좌석이 없습니다.</div>
-                </div>
-            </div>
-
-            <button id="completeBtn" class="complete-btn">선택 완료</button>
-        </aside>
-    </div>
-</div>
-
-<script>
     const draftId = new URLSearchParams(window.location.search).get('draftId');
     let performanceId = null;
     let memberId = null;
     let maxSelectableSeats = 0;
     const selectedSeats = new Map();
     let draftCache = null;
-
-
 
     async function initPage() {
         try {
@@ -524,7 +216,7 @@
             const removeBtn = document.createElement('button');
             removeBtn.className = 'remove-btn';
             removeBtn.type = 'button';
-            removeBtn.textContent = 'x';
+            removeBtn.textContent = '×';
             removeBtn.addEventListener('click', () => removeSeat(seat.seatNumber));
 
             item.appendChild(left);
@@ -553,6 +245,11 @@
         completeBtn.disabled = selectedSeats.size === 0;
     }
 
+    async function reloadSeatPageState() {
+        selectedSeats.clear();
+        await initPage();
+    }
+
     document.getElementById('completeBtn').addEventListener('click', async () => {
         if (selectedSeats.size === 0) {
             alert('좌석을 선택해주세요.');
@@ -576,12 +273,25 @@
             });
 
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || '선택 좌석 저장 실패');
+                let errorPayload = null;
+                try {
+                    errorPayload = await response.json();
+                } catch (jsonError) {
+                    errorPayload = null;
+                }
+
+                if (response.status === 409 && errorPayload?.conflictedSeats?.length) {
+                    const conflictedSeats = errorPayload.conflictedSeats.join(', ');
+                    alert(`이미 다른 사용자가 선점한 좌석이 있습니다.\n충돌 좌석: ${conflictedSeats}`);
+                    await reloadSeatPageState();
+                    return;
+                }
+
+                throw new Error(errorPayload?.message || '선택 좌석 저장 실패');
             }
 
-            const updatedDraft = await response.json();
-            window.location.href = `/reservationConfirm?draftId=${draftId}`;
+            await response.json();
+            window.location.href = `/reservationConfirm2?draftId=${draftId}`;
         } catch (e) {
             console.error(e);
             alert(e.message || '다음 페이지로 이동하는 중 오류가 발생했습니다.');
@@ -589,6 +299,3 @@
     });
 
     initPage();
-</script>
-</body>
-</html>

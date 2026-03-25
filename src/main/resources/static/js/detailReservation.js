@@ -33,7 +33,7 @@ function formatPrice(price) {
 
 function formatStatus(status) {
     const map = {
-        RESERVED: "예매 중",
+        RESERVED: "예매 완료",
         CANCELED: "취소",
         COMPLETED: "관람 완료"
     };

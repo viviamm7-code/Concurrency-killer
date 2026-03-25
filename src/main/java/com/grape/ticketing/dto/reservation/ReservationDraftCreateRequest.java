@@ -14,4 +14,5 @@ public class ReservationDraftCreateRequest {
     private String performanceVenue;
     private Integer remainingSeatLimit;
     private String performanceUrl;
+    private String imageUrl;
 }

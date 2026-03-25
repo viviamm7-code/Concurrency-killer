@@ -227,7 +227,7 @@
     }
 
     function createCard(performance) {
-        const imageUrl = performance.imageUrl ? `/images/${performance.imageUrl}` : "/images/260128010721_26001001.gif.jpeg";
+        const imageUrl = performance.imageUrl || "";
 
         return `
   <div class="card" onclick="goToDetail(${performance.id})" style="cursor:pointer;">
