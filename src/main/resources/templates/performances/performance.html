@@ -587,6 +587,7 @@
 
         const img = document.getElementById('posterImg');
         img.src = performance.imageUrl || "/images/1.jpeg";
+        // console.log(img.src);
         img.alt = performance.performanceName;
 
         document.getElementById('infoVenue').textContent = performance.venue || '-';
@@ -725,7 +726,6 @@
             if (memberId == null) {
                 throw new Error('로그인이 필요합니다.');
             }
-
             const response = await fetch('/reservation-drafts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -737,7 +737,8 @@
                     performancePrice: data.price,
                     performanceVenue: data.venue,
                     remainingSeatLimit: data.remainingSeatLimit ?? 0,
-                    performanceUrl: window.location.pathname
+                    performanceUrl: window.location.pathname,
+                    imageUrl: data.imageUrl
                 })
             });
 

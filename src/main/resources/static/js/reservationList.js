@@ -37,7 +37,7 @@ function getDisplayStatus(item) {
 
 function formatStatus(status) {
     const statusMap = {
-        RESERVED: "예매 중",
+        RESERVED: "예매 완료",
         CANCELED: "취소",
         COMPLETED: "관람 완료"
     };
@@ -151,7 +151,7 @@ function renderReservations() {
         count.textContent = reservations.length;
 
         content.innerHTML = `
-      ${renderSection("예매 중", reservedItems)}
+      ${renderSection("예매 완료", reservedItems)}
       ${renderSection("취소", canceledItems)}
       ${renderSection("관람 완료", completedItems)}
     `;

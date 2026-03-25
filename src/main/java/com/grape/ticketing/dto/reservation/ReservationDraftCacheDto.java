@@ -20,6 +20,7 @@ public class ReservationDraftCacheDto implements Serializable {
     private String performanceVenue;
     private Integer remainingSeatLimit;
     private String performanceUrl;
+    private String imageUrl;
     private List<String> selectedSeats = new ArrayList<>();
     private Integer totalPrice;
     private boolean confirmed;

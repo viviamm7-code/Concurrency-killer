@@ -63,11 +63,10 @@ function renderDetail(draft) {
                 <div class="seat-section">
                     <div class="seat-title">선택 좌석</div>
                     <div class="seat-list">
-                        ${
-                            seats.length > 0
-                                ? seats.map(seat => `<div class="seat-item">${seat}</div>`).join("")
-                                : `<div class="seat-item">좌석 없음</div>`
-                        }
+                        ${seats.length > 0
+            ? seats.map(seat => `<div class="seat-item">${seat}</div>`).join("")
+            : `<div class="seat-item">좌석 없음</div>`
+        }
                     </div>
                 </div>
 
@@ -105,7 +104,7 @@ async function confirmReservation() {
             throw new Error(payload?.message || "예매 완료 처리 실패");
         }
 
-        alert(`예매가 완료되었습니다. reservationId=${payload.reservationId}`);
+        alert(`예매가 완료되었습니다.`);
         window.location.href = "/reservation";
     } catch (e) {
         if (confirmBtn) {

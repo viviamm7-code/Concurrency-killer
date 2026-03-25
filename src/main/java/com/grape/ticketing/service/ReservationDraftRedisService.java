@@ -61,6 +61,7 @@ public class ReservationDraftRedisService {
         draft.setPerformanceVenue(request.getPerformanceVenue());
         draft.setRemainingSeatLimit(request.getRemainingSeatLimit());
         draft.setPerformanceUrl(request.getPerformanceUrl());
+        draft.setImageUrl(request.getImageUrl());
         draft.setConfirmed(false);
 
         writeDraft(draft);
@@ -305,6 +306,7 @@ public class ReservationDraftRedisService {
                 draft.getPerformanceVenue(),
                 draft.getRemainingSeatLimit(),
                 draft.getPerformanceUrl(),
+                draft.getImageUrl(),
                 draft.getSelectedSeats(),
                 draft.getTotalPrice(),
                 draft.isConfirmed()
