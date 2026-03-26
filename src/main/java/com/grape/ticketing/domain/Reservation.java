@@ -8,6 +8,7 @@ import org.apache.catalina.User;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -32,4 +33,7 @@ public class Reservation extends BaseEntitiy{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "performance_id")
     private Performance performance;
+
+    private String startedAt;
+    private Date ReservedDate;
 }

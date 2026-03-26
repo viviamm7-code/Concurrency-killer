@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -13,6 +14,7 @@ public class ReservationDto {
     private String performanceName;
     private String venue;
     private LocalDateTime startedAt;
+    private Date reservedDate;
     private LocalDateTime reservedAt;
     private List<String> seatNumbers;
     private String reservationStatus;
