@@ -3,6 +3,7 @@ package com.grape.ticketing.dto.reservation;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,10 +17,12 @@ public class ReservationDraftResponse {
     private String performanceTitle;
     private Integer performancePrice;
     private String performanceVenue;
+    private String StartedAt;
     private Integer remainingSeatLimit;
     private String performanceUrl;
     private String imageUrl;
     private List<String> selectedSeats;
     private Integer totalPrice;
     private boolean confirmed;
+    private Date reservedDate;
 }

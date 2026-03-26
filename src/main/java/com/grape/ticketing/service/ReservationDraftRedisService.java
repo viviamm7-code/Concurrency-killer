@@ -59,10 +59,12 @@ public class ReservationDraftRedisService {
         draft.setPerformanceTitle(request.getPerformanceTitle());
         draft.setPerformancePrice(request.getPerformancePrice());
         draft.setPerformanceVenue(request.getPerformanceVenue());
+        draft.setStartedAt(request.getStartedAt());
         draft.setRemainingSeatLimit(request.getRemainingSeatLimit());
         draft.setPerformanceUrl(request.getPerformanceUrl());
         draft.setImageUrl(request.getImageUrl());
         draft.setConfirmed(false);
+        draft.setReservedDate(request.getReservedDate());
 
         writeDraft(draft);
         log.info("Draft created. draftId={}, performanceId={}, memberId={}", draft.getDraftId(), draft.getPerformanceId(), draft.getMemberId());
@@ -82,6 +84,7 @@ public class ReservationDraftRedisService {
         if (request.getPerformanceTitle() != null) draft.setPerformanceTitle(request.getPerformanceTitle());
         if (request.getPerformancePrice() != null) draft.setPerformancePrice(request.getPerformancePrice());
         if (request.getPerformanceVenue() != null) draft.setPerformanceVenue(request.getPerformanceVenue());
+        if (request.getStartedAt() != null) draft.setStartedAt(request.getStartedAt());
         if (request.getRemainingSeatLimit() != null) draft.setRemainingSeatLimit(request.getRemainingSeatLimit());
         if (request.getPerformanceUrl() != null) draft.setPerformanceUrl(request.getPerformanceUrl());
         if (request.getTotalPrice() != null) draft.setTotalPrice(request.getTotalPrice());
@@ -90,6 +93,7 @@ public class ReservationDraftRedisService {
             synchronizeSeatHolds(draft, request.getSelectedSeats());
             draft.setSelectedSeats(new ArrayList<>(request.getSelectedSeats()));
         }
+        if (request.getReservedDate() != null) draft.setReservedDate(request.getReservedDate());
 
         writeDraft(draft);
         log.info("Draft updated. draftId={}, selectedSeats={}, totalPrice={}", draftId, draft.getSelectedSeats(), draft.getTotalPrice());
@@ -127,8 +131,11 @@ public class ReservationDraftRedisService {
         reservation.setMember(member);
         reservation.setPerformance(performance);
         reservation.setReservedAt(LocalDateTime.now());
+        reservation.setStartedAt(draft.getStartedAt());
         reservation.setReservationStatus(ReservationStatus.RESERVED);
+        reservation.setReservedDate(draft.getReservedDate());
         Reservation savedReservation = reservationRepository.save(reservation);
+
 
         // 예매 좌석 데이터 저장
         for (String seatNumber : selectedSeats) {
@@ -304,12 +311,14 @@ public class ReservationDraftRedisService {
                 draft.getPerformanceTitle(),
                 draft.getPerformancePrice(),
                 draft.getPerformanceVenue(),
+                draft.getStartedAt(),
                 draft.getRemainingSeatLimit(),
                 draft.getPerformanceUrl(),
                 draft.getImageUrl(),
                 draft.getSelectedSeats(),
                 draft.getTotalPrice(),
-                draft.isConfirmed()
+                draft.isConfirmed(),
+                draft.getReservedDate()
         );
     }
 }

@@ -460,7 +460,7 @@
                 </div>
             </div>
 
-            <p class="cancellation-note">공연 취소 기한 : 예매 후 7일 이내 수수료 없음</p>
+            <p class="cancellation-note">공연 취소 기한 : 공연 시작 7일 전까지 수수료 없음</p>
         </div>
 
         <!-- Calendar + Book -->
@@ -487,8 +487,8 @@
         <p>아래 내용으로 예매를 진행할까요?</p>
         <div class="modal-detail-row"><span>공연명</span><span id="modalTitle"></span></div>
         <div class="modal-detail-row"><span>장소</span><span id="modalVenue"></span></div>
-        <div class="modal-detail-row"><span>날짜</span><span id="modalStartTime"></span></div>
-        <div class="modal-detail-row"><span>시작</span><span>18:00</span></div>
+        <div class="modal-detail-row"><span>날짜</span><span id="modalStartDate"></span></div>
+        <div class="modal-detail-row"><span>시작</span><span id="modalStartTime"></span></div>
         <div class="modal-detail-row"><span>가격</span><span id="modalPrice"></span></div>
         <div class="modal-actions">
             <button class="modal-cancel" id="modalCancel">취소</button>
@@ -522,23 +522,35 @@
             return value;
         }
 
-        const yyyy = date.getFullYear();
-        const mm = String(date.getMonth() + 1).padStart(2, '0');
-        const dd = String(date.getDate()).padStart(2, '0');
         const hh = String(date.getHours()).padStart(2, '0');
         const min = String(date.getMinutes()).padStart(2, '0');
-        return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+        return `${hh}:${min}`;
+    }
+
+    function formatTime(value) {
+        if (!value) return "-";
+
+        const date = new Date(value);
+        if (isNaN(date)) return value;
+
+        return date.toLocaleTimeString("ko-KR", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+        });
     }
 
     function formatDraftDate(performance) {
         if (performance.startedAt) {
-            return formatDateTime(performance.startedAt);
+            return formatTime(performance.startedAt);
         }
         if (performance.startDate && performance.endDate) {
             return `${performance.startDate} ~ ${performance.endDate}`;
         }
         return performance.startDate || '-';
     }
+
+
 
     function getSelectedPerformanceDate() {
         if (!data) {
@@ -559,9 +571,9 @@
         }
 
         const auth = await response.json();
-        if (!auth.isLoggedIn || auth.memberId == null) {
-            throw new Error('로그인이 필요합니다.');
-        }
+        // if (!auth.isLoggedIn || auth.memberId == null) {
+        //     throw new Error('로그인이 필요합니다.');
+        // }
 
         memberId = Number(auth.memberId);
     }
@@ -587,18 +599,17 @@
 
         const img = document.getElementById('posterImg');
         img.src = performance.imageUrl || "/images/1.jpeg";
-        // console.log(img.src);
         img.alt = performance.performanceName;
 
         document.getElementById('infoVenue').textContent = performance.venue || '-';
         document.getElementById('infoPeriod').textContent = `${performance.startDate || '-'} ~ ${performance.endDate || '-'}`;
         document.getElementById('infoDuration').textContent = `${performance.performanceTime ?? '-'}분`;
-        document.getElementById('infoStartTime').textContent = formatDateTime(performance.startedAt);
+        document.getElementById('infoStartTime').textContent = formatTime(performance.startedAt);
         document.getElementById('infoPrice').textContent = `${(performance.price ?? 0).toLocaleString()}원`;
 
         document.getElementById('modalTitle').textContent = performance.performanceName;
         document.getElementById('modalVenue').textContent = performance.venue || '-';
-        document.getElementById('modalStartTime').textContent = formatDraftDate(performance);
+        document.getElementById('modalStartTime').textContent = formatDateTime(performance.startedAt);
         document.getElementById('modalPrice').textContent = `${(performance.price ?? 0).toLocaleString()}원`;
 
         if (performance.remainingSeatLimit != null) {
@@ -672,6 +683,7 @@
 
             grid.appendChild(el);
         }
+        document.getElementById('modalStartDate').textContent = getSelectedPerformanceDate();
     }
 
     document.getElementById('prevMonth').addEventListener('click', () => {
@@ -694,9 +706,11 @@
 
     const overlay = document.getElementById('modalOverlay');
     document.getElementById('btnBook').addEventListener('click', () => {
-        const dateStr = getSelectedPerformanceDate();
-        document.getElementById('modalStartTime').textContent = dateStr;
-        overlay.classList.add('active');
+        if (selectedDay === null) {
+            alert("날짜를 선택해주세요.")
+        } else {
+            overlay.classList.add('active');
+        }
     });
 
     document.getElementById('modalCancel').addEventListener('click', () => {
@@ -723,9 +737,10 @@
         }, 3000);
 
         try {
-            if (memberId == null) {
+            if (memberId === 0) {
                 throw new Error('로그인이 필요합니다.');
             }
+            const selectedDate = getSelectedPerformanceDate();
             const response = await fetch('/reservation-drafts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -736,9 +751,11 @@
                     performanceTitle: data.performanceName,
                     performancePrice: data.price,
                     performanceVenue: data.venue,
+                    startedAt: data.startedAt,
                     remainingSeatLimit: data.remainingSeatLimit ?? 0,
                     performanceUrl: window.location.pathname,
-                    imageUrl: data.imageUrl
+                    imageUrl: data.imageUrl,
+                    reservedDate: selectedDate
                 })
             });
 
@@ -750,10 +767,10 @@
             window.location.href = `/seat?draftId=${draft.draftId}`;
         } catch (error) {
             if (error.message === '로그인이 필요합니다.') {
+                alert(error.message);
                 window.location.href = '/login';
                 return;
             }
-            alert(error.message);
         }
     });
 

@@ -63,7 +63,7 @@ function createCard(item) {
             </div>
             <div class="info-row">
               <div class="label">공연일</div>
-              <div class="value">${formatDateTime(item.startedAt)}</div>
+              <div class="value">${formatDate(item.reservedDate)} ${formatTime(item.startedAt)}</div>
             </div>
             <div class="info-row">
               <div class="label">예매일</div>
@@ -86,6 +86,7 @@ function createCard(item) {
     `;
 }
 
+
 function renderSection(title, items) {
     return `
     <div class="status-section">
@@ -103,6 +104,32 @@ function renderSection(title, items) {
     }
     </div>
   `;
+}
+function formatDate(value) {
+    if (!value) return "-";
+
+    const date = new Date(value);
+    if (!isNaN(date)) {
+        return date.toLocaleDateString("ko-KR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        });
+    }
+
+    const match = String(value).match(/^\d{4}-\d{2}-\d{2}/);
+    return match ? match[0] : String(value);
+}
+
+function formatTime(value) {
+    if (!value) return "-";
+
+    if (/^\d{2}:\d{2}$/.test(String(value))) {
+        return String(value);
+    }
+
+    const match = String(value).match(/(\d{2}:\d{2})/);
+    return match ? match[1] : "-";
 }
 
 function goToDetail(reservationId) {
