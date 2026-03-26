@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>뮤지컬 긴긴밤</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/css/header.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -24,36 +24,10 @@
             --radius-sm: 8px;
         }
 
-        @charset "utf-8";
-        #loginButton {
-            position: absolute;
-            display: flex;
-            top: 3%;
-            right: 3%;
-            gap: 50px;
-        }
-        #loginButton a{
-            width: 150px;
-            height: 60px;
-            background: linear-gradient(to right, #423047, #333252);
-            display: flex;
-            justify-content: center; /* 가로 중앙 */
-            align-items: center;     /* 세로 중앙 */
-            border-radius: 15px;
-            color: #C7CFDA;
-            text-decoration: none;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        #loginButton a:hover{
-            color: white;
-        }
-
         body {
             background: var(--bg);
             color: var(--text);
-            font-family: 'Noto Sans KR', sans-serif;
+            font-family: "Pretendard", "Apple SD Gothic Neo", sans-serif;
             min-height: 100vh;
             overflow-x: hidden;
         }
@@ -72,58 +46,36 @@
 
         /* ── Header ── */
         header {
-            position: relative;
-            z-index: 10;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 20px 24px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding: 20px 40px;
+            align-items: center;
         }
 
         .btn-back {
             width: 46px; height: 46px;
-            border-radius: 50%;
+            border-radius: 30%;
             background: var(--bg3);
             border: 1px solid var(--border);
             color: var(--text);
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             transition: background .2s, transform .2s;
         }
         .btn-back:hover { background: var(--bg2); transform: scale(1.05); }
 
-        .header-actions { display: flex; gap: 12px; }
-
-        .btn-header {
-            padding: 12px 28px;
-            border-radius: 10px;
-            border: none;
-            font-family: 'Noto Sans KR', sans-serif;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all .2s;
-            letter-spacing: -0.3px;
-        }
-        .btn-login {
-            background: #2a3650;
-            color: var(--text);
-        }
-        .btn-login:hover { background: #344260; }
-        .btn-mybook {
-            background: #3a3050;
-            color: var(--text);
-        }
-        .btn-mybook:hover { background: #46385e; }
-
         /* ── Main layout ── */
         main {
+            width: 100%;
+            max-width: 1200px;
             position: relative;
             z-index: 1;
-            max-width: 1200px;
             margin: 0 auto;
-            padding: 10px 40px 60px;
+            padding: 10px 20px 60px;
         }
 
         h1 {
