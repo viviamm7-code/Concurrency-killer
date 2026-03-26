@@ -4,7 +4,23 @@
   <meta charset="UTF-8">
   <title>Login</title>
   <script type="text/javascript">
+
     window.onload = function () {
+      fetch('/api/auth/check')
+              .then(response => response.json())
+              .then(isLoggedIn => {
+                if (isLoggedIn) {
+                  alert("이미 로그인된 상태입니다.");
+                  if (document.referrer && !document.referrer.includes('/login')) {
+                    history.back();
+                  } else {
+                    location.href = '/performance-list';
+                  }
+                  return;
+                }
+              })
+              .catch(error => console.error('로그인 체크 실패:', error));
+
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('error') === 'true') {
         alert('아이디 또는 비밀번호가 올바르지 않습니다.');

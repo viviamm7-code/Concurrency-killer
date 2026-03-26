@@ -66,4 +66,10 @@ public class MemberController {
         }
         return status;
     }
+
+    @GetMapping("/api/auth/check")
+    @ResponseBody
+    public boolean checkLogin(HttpSession session) {
+        return session.getAttribute("loginMember") != null;
+    }
 }
