@@ -20,11 +20,21 @@
             min-height: 100vh;
         }
 
+        header {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 20px 0px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         .wrap {
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 40px 20px 80px;
+            padding: 0px 20px 80px;
         }
 
         .top-box {
@@ -194,7 +204,10 @@
     </style>
 </head>
 <body>
-<div id="loginButton"></div>
+<header>
+    <div></div>  <!-- 왼쪽 빈 공간 (뒤로가기 버튼 없으므로) -->
+    <div id="loginButton"></div>
+</header>
 <div class="wrap">
     <div class="top-box">
         <div class="sub-title">MY TICKETS</div>
