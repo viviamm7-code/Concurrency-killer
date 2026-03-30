@@ -21,18 +21,7 @@ function formatDateTime(dateTimeStr) {
 }
 
 function getDisplayStatus(item) {
-    if (item.reservationStatus === "CANCELED") {
-        return "CANCELED";
-    }
-
-    const startedAt = new Date(item.startedAt);
-    const now = new Date();
-
-    if (!isNaN(startedAt) && startedAt < now) {
-        return "COMPLETED";
-    }
-
-    return "RESERVED";
+    return item.reservationStatus || "RESERVED";
 }
 
 function formatStatus(status) {

@@ -1,24 +1,35 @@
 spring:
   datasource:
-    url: jdbc:mariadb://3.37.87.54:3306/ticketing
-    username: "root"
-    password: "!123456"
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: none # create -> create옵션은 서버 끌 때 테이블 다 삭제되니까 none이나 update로 바꿔서 사용하면 됩니다.
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.MariaDBDialect
+
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 
-  # 선택 (SQL 로그 더 자세히 보고 싶을 때)
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - openid
+              - profile
+              - email
+
 logging:
   level:
     org:

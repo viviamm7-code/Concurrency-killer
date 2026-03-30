@@ -18,7 +18,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ReservationSchedulerService {
-
+    private final ReservationService reservationService;
     private final ReservationRepository reservationRepository;
     private final SeatRepository seatRepository;
 
@@ -49,5 +49,10 @@ public class ReservationSchedulerService {
                         .map(ReservationSeat::getSeat)
                         .toList()
         );
+    }
+
+    @Scheduled(fixedRate = 60000) // 1분마다 실행
+    public void completeReservations() {
+        reservationService.completeExpiredReservations();
     }
 }

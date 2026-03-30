@@ -1,6 +1,6 @@
 package com.grape.ticketing.service;
 
-import com.grape.ticketing.domain.Member;
+import com.grape.ticketing.domain.member.Member;
 import com.grape.ticketing.domain.Performance;
 import com.grape.ticketing.domain.Reservation;
 import com.grape.ticketing.domain.ReservationSeat;
