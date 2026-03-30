@@ -1,10 +1,11 @@
 package com.grape.ticketing.domain;
 
+import com.grape.ticketing.domain.member.Member;
 import com.grape.ticketing.domain.status.ReservationStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.catalina.User;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Entity
 @Getter @Setter
+@Table(name = "reservation")
 public class Reservation extends BaseEntitiy{
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "reservation_id")

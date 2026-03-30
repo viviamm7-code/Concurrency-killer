@@ -22,4 +22,9 @@ public interface ReservationRepository extends JpaRepository<Reservation,Long> {
             ReservationStatus reservationStatus,
             LocalDateTime time
     );
+
+    List<Reservation> findByReservationStatusAndPerformance_StartedAtBefore(
+            ReservationStatus reservationStatus,
+            LocalDateTime time
+    );
 }

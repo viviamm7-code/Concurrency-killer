@@ -1,6 +1,6 @@
 package com.grape.ticketing.web;
 
-import com.grape.ticketing.domain.Member;
+import com.grape.ticketing.domain.member.Member;
 import com.grape.ticketing.service.LoginService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -21,8 +21,8 @@ public class MemberController {
     public String login(){
         return "members/login";
     }
-    @RequestMapping("/logout")
-    public String logout(HttpSession session){
+    @RequestMapping("/logout1")
+    public String logout1(HttpSession session){
         session.invalidate();
         return "redirect:/login";
     }

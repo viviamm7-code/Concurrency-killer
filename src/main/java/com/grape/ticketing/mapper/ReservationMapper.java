@@ -50,20 +50,4 @@ public interface ReservationMapper {
     default int calculateTotalPrice(Reservation reservation) {
         return reservation.getPerformance().getPrice() * reservation.getReservationSeats().size();
     }
-
-    default Reservation toReservation(Member member, Performance performance) {
-        Reservation reservation = new Reservation();
-        reservation.setMember(member);
-        reservation.setPerformance(performance);
-        reservation.setReservedAt(LocalDateTime.now());
-        reservation.setReservationStatus(ReservationStatus.RESERVED);
-        return reservation;
-    }
-
-    default ReservationSeat toReservationSeat(Reservation reservation, Seat seat) {
-        ReservationSeat reservationSeat = new ReservationSeat();
-        reservationSeat.setReservation(reservation);
-        reservationSeat.setSeat(seat);
-        return reservationSeat;
-    }
 }

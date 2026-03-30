@@ -1,6 +1,6 @@
 package com.grape.ticketing.service;
 
-import com.grape.ticketing.domain.Member;
+import com.grape.ticketing.domain.member.Member;
 import com.grape.ticketing.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
