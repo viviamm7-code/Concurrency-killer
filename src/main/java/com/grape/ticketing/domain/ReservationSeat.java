@@ -1,11 +1,12 @@
 package com.grape.ticketing.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter @Setter
+@Table(name = "reservation_seat")
 public class ReservationSeat extends BaseEntitiy{
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "reservationSeat_id")

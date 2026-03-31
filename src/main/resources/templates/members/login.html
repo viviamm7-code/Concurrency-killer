@@ -105,13 +105,67 @@
       cursor: pointer;
     }
 
-    #nologin {
+
+
+
+    .login-actions {
       position: absolute;
-      right: 30px;
-      bottom: 25px;
+      top: 385px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .google-login-btn {
+      width: 280px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: #ffffff;
+      color: #3c4043;
+      border: 1px solid #dadce0;
+      border-radius: 14px;
       text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      transition: all 0.2s ease;
+    }
+
+    .google-login-btn:hover {
+      background: #f8f9fa;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .google-login-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .google-icon {
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #nologin {
+      color: #cfd6e4;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    #nologin:hover {
       color: white;
-      font-weight: bold;
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -119,13 +173,26 @@
 <div class="loginBox">
   <h1>포도알 사수 작전</h1>
 
-  <form action="./members/login" method="post" name="lfrm">
+  <form action="/members/login" method="post" name="lfrm">
     <input type="text" id="username" name="username" placeholder="username"/> <br/><br/>
     <input type="password" id="password" name="password" placeholder="PW"/> <br/>
     <button id="lbtn">로그인</button>
   </form>
+  <div class="login-actions">
+    <a href="/oauth2/authorization/google" class="google-login-btn">
+        <span class="google-icon">
+            <svg width="20" height="20" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path fill="#EA4335" d="M9 7.364v3.709h5.182c-.227 1.191-.909 2.2-1.936 2.882l3.127 2.427c1.818-1.673 2.864-4.136 2.864-7.073 0-.673-.061-1.318-.173-1.945H9z"/>
+                <path fill="#34A853" d="M3.645 10.713 2.94 13.09 0.611 13.14A8.998 8.998 0 0 0 9 18c2.455 0 4.514-.809 6.018-2.182l-3.127-2.427c-.864.582-1.968.927-2.891.927-2.223 0-4.109-1.5-4.782-3.605z"/>
+                <path fill="#4A90E2" d="M0.611 4.86A8.998 8.998 0 0 0 0 9c0 1.45.345 2.818.958 4.14l3.687-2.427A5.385 5.385 0 0 1 4.218 9c0-.596.1-1.173.427-1.713z"/>
+                <path fill="#FBBC05" d="M9 3.682c1.336 0 2.536.459 3.482 1.364l2.609-2.609C13.509.964 11.455 0 9 0A8.998 8.998 0 0 0 .611 4.86l3.607 2.427C4.891 5.182 6.777 3.682 9 3.682z"/>
+            </svg>
+        </span>
+      <span>Google로 로그인</span>
+    </a>
 
-  <a id="nologin" href="/performance-list">비 로그인으로 접속하기</a>
+    <a id="nologin" href="/performance-list">비회원으로 접속하기</a>
+  </div>
 </div>
 </body>
 </html>

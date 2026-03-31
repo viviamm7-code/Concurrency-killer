@@ -96,3 +96,86 @@ update seat
 set seat_status = 'RESERVED'
 where performance_id = 4
   and seat_number in ('C5', 'G5');
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS reservation_seat;
+DROP TABLE IF EXISTS reservation;
+DROP TABLE IF EXISTS seat;
+DROP TABLE IF EXISTS social_account;
+DROP TABLE IF EXISTS performance;
+DROP TABLE IF EXISTS member;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+공연 데이터
+INSERT INTO performance (
+    end_date,
+    performance_time,
+    price,
+    start_date,
+    created_date,
+    last_modified_date,
+    started_at,
+    image_url,
+    performance_name,
+    venue,
+    performance_status
+) VALUES
+(
+    '2026-06-30',
+    165,
+    95000,
+    '2026-04-20',
+    '2026-03-25 14:34:49.361263',
+    '2026-03-25 14:34:49.361263',
+    '2026-03-26 19:00:49.359692',
+    'https://operation-grape.s3.ap-northeast-2.amazonaws.com/p1.jpeg',
+    '뮤지컬 데스노트',
+    '디큐브 링크아트센터',
+    'ON_SALE'
+),
+(
+    '2026-08-20',
+    180,
+    110000,
+    '2026-06-01',
+    '2026-03-25 14:34:50.024306',
+    '2026-03-25 14:34:50.024306',
+    '2026-03-27 19:30:50.024194',
+    'https://operation-grape.s3.ap-northeast-2.amazonaws.com/p2.png',
+    '<셰과 치히로의 행방불명> 오리지널 투어',
+    '예술의전당 오페라하우스',
+    'ON_SALE'
+),
+(
+    '2026-07-31',
+    175,
+    80000,
+    '2026-05-13',
+    '2026-03-25 14:34:50.723891',
+    '2026-03-25 14:34:50.723891',
+    '2026-03-28 19:00:50.723706',
+    'https://operation-grape.s3.ap-northeast-2.amazonaws.com/p3.jpeg',
+    '빌리 엘리어트',
+    '블루스퀘어',
+    'ON_SALE'
+),
+(
+    '2026-07-19',
+    150,
+    66000,
+    '2026-05-24',
+    '2026-03-25 14:34:51.437015',
+    '2026-03-25 14:34:51.437015',
+    '2026-03-29 18:30:51.436884',
+    'https://operation-grape.s3.ap-northeast-2.amazonaws.com/p4.png',
+    '뮤지컬 서편제',
+    '광림아트센터 BBCH홀',
+    'ON_SALE'
+);
+
+1. component 주석 + create 테이블 만들기
+2. 쿼리로 데이터 넣기
+3. component 주석 풀고 + none 데이터만 넣기
+4. component 다시 주석

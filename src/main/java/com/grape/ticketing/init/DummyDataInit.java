@@ -1,18 +1,18 @@
 package com.grape.ticketing.init;
 
-import com.grape.ticketing.domain.Member;
 import com.grape.ticketing.domain.Performance;
-import com.grape.ticketing.domain.status.Role;
 import com.grape.ticketing.domain.Seat;
-import com.grape.ticketing.domain.status.PerformanceStatus;
+import com.grape.ticketing.domain.member.Member;
 import com.grape.ticketing.domain.status.SeatStatus;
 import com.grape.ticketing.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 //@Component
 @RequiredArgsConstructor
@@ -22,26 +22,31 @@ public class DummyDataInit implements CommandLineRunner {
     private final PerformanceRepository performanceRepository;
     private final ReservationRepository reservationRepository;
     private final ReservationSeatRepository reservationSeatRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
     public void run(String... args) {
         createMembers();
-        //createPerformancesAndSeats();
+        createSeatsForExistingPerformances();
     }
 
     private void createMembers() {
-        Member admin = new Member();
-        admin.setUsername("admin");
-        admin.setPassword("1234");
-        admin.setRole(Role.ADMIN);
+        Member admin = new Member("kim",
+                "test@gmail.com",
+                "admin",
+                passwordEncoder.encode("1234"),
+                "ROLE_ADMIN");
+
         memberRepository.save(admin);
 
         for (int i = 1; i <= 100; i++) {
-            Member user = new Member();
-            user.setUsername("user" + i);
-            user.setPassword("1234");
-            user.setRole(Role.USER);
+            Member user = new Member("name",
+                    "user@gmail.com",
+                    "user" + (i+1),
+                    passwordEncoder.encode("1234"),
+                    "ROLE_USER");
+
             memberRepository.save(user);
         }
     }
@@ -62,15 +67,30 @@ public class DummyDataInit implements CommandLineRunner {
 //        }
 //    }
 
+    private void createSeatsForExistingPerformances() {
+        for (long i = 1; i <= 4; i++) {
+            final long performanceId = i;
+
+            Performance performance = performanceRepository.findById(performanceId)
+                    .orElseThrow(() -> new IllegalArgumentException("공연이 없습니다. id=" + performanceId));
+
+            createSeatsForPerformance(performance);
+        }
+    }
+
     private void createSeatsForPerformance(Performance performance) {
+        List<Seat> seats = new ArrayList<>();
+
         for (char row = 'A'; row <= 'J'; row++) {
             for (int col = 1; col <= 10; col++) {
                 Seat seat = new Seat();
                 seat.setSeatNumber(row + String.valueOf(col)); // A1 ~ J10
                 seat.setSeatStatus(SeatStatus.AVAILABLE);
                 seat.setPerformance(performance);
-                seatRepository.save(seat);
+                seats.add(seat);
             }
         }
+
+        seatRepository.saveAll(seats);
     }
 }

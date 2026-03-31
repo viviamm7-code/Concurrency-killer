@@ -99,36 +99,24 @@ public class ReservationService {
     }
 
     @Transactional
-    public Long confirmReservation(ReservationConfirmRequest request) {
-        Member member = memberRepository.findById(request.getMemberId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+    public void completeExpiredReservations() {
+        List<Reservation> reservations =
+                reservationRepository.findByReservationStatusAndPerformance_StartedAtBefore(
+                        ReservationStatus.RESERVED,
+                        LocalDateTime.now()
+                );
 
-        Performance performance = performanceRepository.findById(request.getPerformanceId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 공연입니다."));
+        for (Reservation reservation : reservations) {
+            List<Seat> seats = reservation.getReservationSeats().stream()
+                    .map(ReservationSeat::getSeat)
+                    .toList();
 
-        Reservation reservation = reservationMapper.toReservation(member, performance);
-        reservationRepository.save(reservation);
-
-        List<Seat> seats = seatRepository.findAllByPerformanceIdAndSeatNumberIn(
-                request.getPerformanceId(),
-                request.getSeatNumbers()
-        );
-
-        if (seats.size() != request.getSeatNumbers().size()) {
-            throw new IllegalArgumentException("존재하지 않거나 잘못된 좌석이 포함되어 있습니다.");
-        }
-
-        for (Seat seat : seats) {
-            if (seat.getSeatStatus() == SeatStatus.RESERVED) {
-                throw new IllegalStateException("이미 예약된 좌석입니다.");
+            for (Seat seat : seats) {
+                seat.setSeatStatus(SeatStatus.AVAILABLE);
             }
 
-            seat.setSeatStatus(SeatStatus.RESERVED);
-
-            ReservationSeat reservationSeat = reservationMapper.toReservationSeat(reservation, seat);
-            reservationSeatRepository.save(reservationSeat);
+            seatRepository.saveAll(seats);
+            reservation.setReservationStatus(ReservationStatus.COMPLETED);
         }
-
-        return reservation.getId();
     }
 }

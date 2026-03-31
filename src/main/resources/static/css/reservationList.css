@@ -5,43 +5,57 @@
     font-family: "Pretendard", "Apple SD Gothic Neo", sans-serif;
 }
 
+:root {
+    --bg: #0f1623;
+    --bg2: #161f30;
+    --bg3: #1e2a3d;
+    --card: #1a2436;
+    --border: rgba(255,255,255,0.07);
+    --accent: #e8612a;
+    --accent2: #f07a44;
+    --text: #e8edf5;
+    --text-muted: #7a8ba0;
+    --text-dim: #4a5a6e;
+    --highlight: #e8612a;
+    --radius: 14px;
+    --radius-sm: 8px;
+}
+
 body {
     background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
     color: #f8fafc;
     min-height: 100vh;
 }
 
-@charset "utf-8";
-#loginButton {
-    position: absolute;
+header {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 20px 0;
     display: flex;
-    top: 3%;
-    right: 3%;
-    gap: 50px;
-}
-#loginButton a{
-    width: 150px;
-    height: 60px;
-    background: linear-gradient(to right, #423047, #333252);
-    display: flex;
-    justify-content: center; /* 가로 중앙 */
-    align-items: center;     /* 세로 중앙 */
-    border-radius: 15px;
-    color: #C7CFDA;
-    text-decoration: none;
-    font-size: 24px;
-    font-weight: bold;
+    justify-content: space-between;
+    align-items: center;
 }
 
-#loginButton a:hover{
-    color: white;
+.btn-back {
+    width: 46px; height: 46px;
+    border-radius: 30%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s, transform .2s;
 }
+.btn-back:hover { background: var(--bg2); transform: scale(1.05); }
 
 .wrap {
     width: 100%;
-    max-width: 1440px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 40px 20px 80px;
+
 }
 
 .top-box {
@@ -99,13 +113,12 @@ body {
 
 .card-grid {
     display: grid;
-    grid-template-columns: repeat(4, 320px);
-    gap: 24px;
-    justify-content: start;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
 }
 
 .card {
-    width: 320px;
+    width: 100%;
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(18px);
     border: 1px solid rgba(255, 255, 255, 0.08);

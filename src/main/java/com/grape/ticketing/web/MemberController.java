@@ -1,6 +1,6 @@
 package com.grape.ticketing.web;
 
-import com.grape.ticketing.domain.Member;
+import com.grape.ticketing.domain.member.Member;
 import com.grape.ticketing.service.LoginService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -21,27 +21,10 @@ public class MemberController {
     public String login(){
         return "members/login";
     }
-    @RequestMapping("/logout")
-    public String logout(HttpSession session){
+    @RequestMapping("/logout1")
+    public String logout1(HttpSession session){
         session.invalidate();
         return "redirect:/login";
-    }
-
-    @PostMapping("/members/login")
-    public String login(@RequestParam("username") String username,
-                        @RequestParam("password") String password,
-                        HttpServletRequest request,
-                        HttpSession session) {
-        Member loginMember = loginService.login(username, password);
-
-        if(loginMember == null) {
-            return "redirect:/login?error=true";
-        }
-
-        session = request.getSession();
-        session.setAttribute("loginMember", loginMember.getId());
-
-        return "redirect:/performance-list";
     }
 
     @RequestMapping("/ticketing")

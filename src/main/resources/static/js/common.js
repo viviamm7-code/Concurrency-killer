@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             if (auth.isLoggedIn) {
                 // 로그인 된 상태 -> 로그아웃 버튼과 내 예매 버튼
                 headerContainer.innerHTML = `
-                    <a href="/logout" class="loginGradientBtn logout-style">로그아웃</a>
+                    <a href="/logout1" class="loginGradientBtn logout-style">로그아웃</a>
                     <a href="/reservation" class="myPage">내 예매</a>
                 `;
             } else {
