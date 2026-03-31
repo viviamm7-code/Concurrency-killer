@@ -7,6 +7,7 @@ import com.grape.ticketing.domain.status.SeatStatus;
 import com.grape.ticketing.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class DummyDataInit implements CommandLineRunner {
     private final PerformanceRepository performanceRepository;
     private final ReservationRepository reservationRepository;
     private final ReservationSeatRepository reservationSeatRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -30,12 +32,21 @@ public class DummyDataInit implements CommandLineRunner {
     }
 
     private void createMembers() {
-        Member admin = new Member("kim", "test@gmail.com","name","1234","ADMIN");
+        Member admin = new Member("kim",
+                "test@gmail.com",
+                "admin",
+                passwordEncoder.encode("1234"),
+                "ROLE_ADMIN");
 
         memberRepository.save(admin);
 
         for (int i = 1; i <= 100; i++) {
-            Member user = new Member("name","user@gmail.com","user " + (i+1), "1234", "USER");
+            Member user = new Member("name",
+                    "user@gmail.com",
+                    "user" + (i+1),
+                    passwordEncoder.encode("1234"),
+                    "ROLE_USER");
+
             memberRepository.save(user);
         }
     }

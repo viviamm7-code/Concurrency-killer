@@ -27,23 +27,6 @@ public class MemberController {
         return "redirect:/login";
     }
 
-    @PostMapping("/members/login")
-    public String login(@RequestParam("username") String username,
-                        @RequestParam("password") String password,
-                        HttpServletRequest request,
-                        HttpSession session) {
-        Member loginMember = loginService.login(username, password);
-
-        if(loginMember == null) {
-            return "redirect:/login?error=true";
-        }
-
-        session = request.getSession();
-        session.setAttribute("loginMember", loginMember.getId());
-
-        return "redirect:/performance-list";
-    }
-
     @RequestMapping("/ticketing")
     public String ticketing(){
         return "ticketing";
