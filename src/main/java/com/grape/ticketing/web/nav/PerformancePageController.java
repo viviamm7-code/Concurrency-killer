@@ -9,22 +9,22 @@ public class PerformancePageController {
 
     @GetMapping("/performance-list")
     public String performanceListPage() {
-        return "/performances/performance-list";
+        return "performances/performance-list";
     }
 
     @GetMapping("/performances/{performanceId}")
     public String performanceDetailPage(@PathVariable Long performanceId) {
-        return "/performances/performance";
+        return "performances/performance";
     }
 
     @GetMapping("/seat")
     public String seatPage() {
-        return "/seats/seat";
+        return "seats/seat";
     }
 
     @GetMapping("/reservationConfirm")
     public String reservationConfirmPage() {
-        return "/reservation/reservationConfirm";
+        return "reservation/reservationConfirm";
     }
 
     @GetMapping("/reservationConfirm2")
