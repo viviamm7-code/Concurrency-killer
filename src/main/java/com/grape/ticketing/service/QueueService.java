@@ -1,6 +1,5 @@
 package com.grape.ticketing.service;
 
-import com.grape.ticketing.dto.queue.RegisterRequestTO;
 import com.grape.ticketing.dto.queue.RegisterResponseTO;
 import com.grape.ticketing.dto.queue.Status;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +15,9 @@ public class QueueService {
     /**
      * 대기열에 예매 요청한 사용자를 등록하는 큐
      */
-    public RegisterResponseTO registerQueue(Long memberId, RegisterRequestTO request) {
-        String userQueueKey = getUserQueueKey(request.getPerformanceId(), memberId);
-        String waitingQueueKey = getWaitingKey(request.getPerformanceId());
+    public RegisterResponseTO registerQueue(Long memberId, Long performanceId) {
+        String userQueueKey = getUserQueueKey(performanceId, memberId);
+        String waitingQueueKey = getWaitingKey(performanceId);
 
         //등록되어있으면 바로 대기순번 조회 후 응답
         if (queueRedisService.check(userQueueKey)) {
@@ -27,7 +26,7 @@ public class QueueService {
             Long rank = queueRedisService.getRank(waitingQueueKey, memberId);
             return RegisterResponseTO.builder()
                     .memberId(memberId)
-                    .performanceId(request.getPerformanceId())
+                    .performanceId(performanceId)
                     .status(status)
                     .rank(rank != null ? rank + 1 : null) // 사용자에게는 1부터 보여주기
                     .build();
@@ -37,7 +36,7 @@ public class QueueService {
         Long now = System.currentTimeMillis();
         Map<String, Object> queueInfo = Map.of(
                 "userId", memberId.toString(),
-                "performanceId", request.getPerformanceId().toString(),
+                "performanceId", performanceId.toString(),
                 "status", Status.WAITING,
                 "enteredAt", String.valueOf(now),
                 "activeUntil", "0"  //수정
@@ -52,7 +51,7 @@ public class QueueService {
 
         return RegisterResponseTO.builder()
                 .memberId(memberId)
-                .performanceId(request.getPerformanceId())
+                .performanceId(performanceId)
                 .status(Status.WAITING)
                 .rank(rank != null ? rank + 1 : null)
                 .build();
