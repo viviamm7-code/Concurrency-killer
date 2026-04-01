@@ -1,6 +1,7 @@
 package com.grape.ticketing.web.api;
 
 import com.grape.ticketing.dto.queue.RegisterResponseTO;
+import com.grape.ticketing.dto.queue.StatusResponseTO;
 import com.grape.ticketing.service.QueueService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -28,5 +29,17 @@ public class QueueController {
         return result;
     }
 
-
+    /**
+     * 상태 조회 api
+     * 클라이언트가 현재 자신이 입장 가능한 상태인지 조회하는 api
+     */
+    @GetMapping("/status")
+    public StatusResponseTO getStatus(/*HttpSession session,*/ @RequestParam Long performanceId) {
+         /*Long memberId = (Long) session.getAttribute("loginMember");
+        if (memberId == null) {
+            throw new IllegalStateException("로그인이 필요합니다.");
+        }*/
+        Long memberId = 1L;
+        return queueService.getStatus(memberId, performanceId);
+    }
 }

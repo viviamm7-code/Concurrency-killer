@@ -2,6 +2,7 @@ package com.grape.ticketing.service;
 
 import com.grape.ticketing.dto.queue.RegisterResponseTO;
 import com.grape.ticketing.dto.queue.Status;
+import com.grape.ticketing.dto.queue.StatusResponseTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -36,11 +37,17 @@ public class QueueRedisService {
 
     //대기순번 조회
     public Long getRank(String waitingKey, Long userId) {
-        return redisTemplate.opsForZSet().rank(waitingKey, userId);
+        Long rank = redisTemplate.opsForZSet().rank(waitingKey, userId);
+        return rank != null ? rank + 1 : null;
     }
 
     //상태 조회
     public Status getStatus(String userQueueKey) {
         return Status.valueOf(redisTemplate.opsForHash().get(userQueueKey, "status").toString());
+    }
+
+    //유저 모든 정보 조회
+    public Map<Object, Object> getUserInfo(String userQueueKey) {
+        return redisTemplate.opsForHash().entries(userQueueKey);
     }
 }
