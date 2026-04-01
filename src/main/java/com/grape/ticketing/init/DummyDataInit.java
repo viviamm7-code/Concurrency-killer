@@ -41,7 +41,7 @@ public class DummyDataInit implements CommandLineRunner {
         memberRepository.save(admin);
 
         for (int i = 1; i <= 100; i++) {
-            Member user = new Member("name",
+            Member user = new Member("user",
                     "user@gmail.com",
                     "user" + (i+1),
                     passwordEncoder.encode("1234"),
