@@ -77,6 +77,8 @@ public class ReservationDraftRedisService {
         return toResponse(draft);
     }
 
+
+
     public ReservationDraftResponse updateDraft(UUID draftId, ReservationDraftUpdateRequest request) {
         ReservationDraftCacheDto draft = getDraftEntity(draftId);
 
@@ -109,7 +111,7 @@ public class ReservationDraftRedisService {
         return (ReservationDraftCacheDto) value;
     }
 
-    //reservation, reservation_seat, seat 테이블을 동시에 업데이트 되어야하기때문에 @Transactional 사용
+    //reservation, reservation_seat, seat, payment 테이블을 동시에 업데이트 되어야하기때문에 @Transactional 사용
     @Transactional
     public ReservationConfirmResponse confirmDraft(UUID draftId) {
         ReservationDraftCacheDto draft = getDraftEntity(draftId);
@@ -135,7 +137,6 @@ public class ReservationDraftRedisService {
         reservation.setReservationStatus(ReservationStatus.RESERVED);
         reservation.setReservedDate(draft.getReservedDate());
         Reservation savedReservation = reservationRepository.save(reservation);
-
 
         // 예매 좌석 데이터 저장
         for (String seatNumber : selectedSeats) {
@@ -174,6 +175,7 @@ public class ReservationDraftRedisService {
 
         return toResponse(draft);
     }
+
     private void synchronizeSeatHolds(ReservationDraftCacheDto draft, List<String> requestedSeats) {
         List<String> currentSeats = draft.getSelectedSeats() == null
                 ? new ArrayList<>()
@@ -320,5 +322,20 @@ public class ReservationDraftRedisService {
                 draft.isConfirmed(),
                 draft.getReservedDate()
         );
+    }
+
+    public void savePaymentInfo(UUID draftId, String paymentKey, Long amount) {
+        String key = "reservation:draft:" + draftId;
+
+        ReservationDraftCacheDto draft = (ReservationDraftCacheDto) redisTemplate.opsForValue().get(key);
+
+        if (draft == null) {
+            throw new IllegalArgumentException("임시 예매 정보가 없습니다.");
+        }
+
+        draft.setPaymentKey(paymentKey);
+        draft.setAmount(amount);
+
+        redisTemplate.opsForValue().set(key, draft);
     }
 }
