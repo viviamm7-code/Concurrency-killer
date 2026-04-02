@@ -64,13 +64,13 @@
     }
 
     h1 {
-      position: absolute;
-      top: 70px;
-      left: 50%;
-      transform: translateX(-50%);
-      margin: 0;
-      color: white;
-      font-weight: bold;
+        position: absolute;
+        top: 45px;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0;
+        color: white;
+        font-weight: bold;
     }
 
     form {
@@ -107,7 +107,7 @@
 
     .login-panel {
         position: absolute;
-        top: 1px;
+        top: -40px;
         left: 50%;
         transform: translateX(-50%);
         width: 100%;
@@ -123,20 +123,21 @@
     }
 
     .login-form input {
-        width: 360px;
+        width: 160px;
         height: 46px;
         border-radius: 12px;
         border: none;
         padding: 0 14px;
         margin-bottom: 16px;
+        margin-left: 180px;
         font-size: 16px;
     }
 
     .login-submit-btn {
         position: absolute;
         top: 2px;
-        left: 390px;
-        width: 130px;
+        left: 350px;
+        width: 120px;
         height: 108px;
         margin-top: 0;
         background: linear-gradient(to right, #DD534B, #E87836);
@@ -162,7 +163,7 @@
     }
 
     .social-login-btn {
-        width: 250px;
+        width: 200px;
         height: 46px;
         display: flex;
         align-items: center;
@@ -220,6 +221,24 @@
         line-height: 1;
     }
 
+    .kakao-login-btn {
+        background: #FEE500;
+        color: #191919;
+        border: 1px solid #FEE500;
+    }
+
+    .kakao-login-btn:hover {
+        background: #f2da00;
+    }
+
+    .kakao-icon {
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     #nologin {
         margin-top: 18px;
         width: 100%;
@@ -260,6 +279,14 @@
                     <span>Google로 로그인</span>
                 </a>
 
+                <a href="/oauth2/authorization/kakao" class="social-login-btn kakao-login-btn">
+                <span class="social-icon kakao-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path fill="#191600" d="M12 3C6.477 3 2 6.477 2 10.765c0 2.77 1.86 5.198 4.658 6.568l-1.178 4.31c-.104.381.326.684.662.467l5.15-3.304c.235.022.472.033.708.033 5.523 0 10-3.477 10-7.765S17.523 3 12 3z"/>
+                    </svg>
+                </span>
+                    <span>카카오로 로그인</span>
+                </a>
                 <a href="/oauth2/authorization/naver" class="social-login-btn naver-login-btn">
                     <span class="social-icon naver-icon">N</span>
                     <span>네이버로 로그인</span>

@@ -60,6 +60,10 @@ public class OAuth2LoginConfig {
                     additionalParameters.put("auth_type", "reauthenticate");
                 }
 
+                if ("kakao".equals(registrationId)) {
+                    additionalParameters.put("prompt", "login");
+                }
+
                 return OAuth2AuthorizationRequest.from(authorizationRequest)
                         .additionalParameters(additionalParameters)
                         .build();

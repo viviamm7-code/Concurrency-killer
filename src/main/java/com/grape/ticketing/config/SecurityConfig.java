@@ -29,21 +29,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                //비로그인
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/api/auth/check"
-                        , "/performance-list",
-                                //api도 다 가져오기
-                                "/api/**"
-                                ,"/performances/**")
-                        .permitAll()
+                        .requestMatchers(
+                                "/", "/login", "/css/**", "/js/**", "/images/**",
+                                "/api/auth/check", "/performance-list", "/api/**", "/performances/**"
+                        ).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                //일반 로그인
                 .formLogin(form -> form
                         .loginPage("/login")
-                        // 여기서 Spring Security가 CustomUserDetailService 호출
                         .loginProcessingUrl("/members/login")
                         .successHandler((request, response, authentication) -> {
                             System.out.println("authentication name = " + authentication.getName());
@@ -57,15 +52,14 @@ public class SecurityConfig {
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
-                //소셜 로그인
                 .oauth2Login(oauth -> oauth
                         .loginPage("/login")
                         .authorizationEndpoint(endpoint -> endpoint
                                 .authorizationRequestResolver(authorizationRequestResolver)
                         )
                         .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService)   // 네이버로
-                                .oidcUserService(customOidcUserService) // 구글로
+                                .userService(customOAuth2UserService)
+                                .oidcUserService(customOidcUserService)
                         )
                         .successHandler((request, response, authentication) -> {
                             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
@@ -73,20 +67,11 @@ public class SecurityConfig {
                             String email = (String) oAuth2User.getAttributes().get("email");
 
                             if (email == null) {
-                                Object responseObj = oAuth2User.getAttributes().get("response");
-                                if (responseObj instanceof Map<?, ?> responseMap) {
-                                    email = (String) responseMap.get("email");
-                                }
-                            }
-
-                            if (email == null) {
                                 throw new IllegalStateException("소셜 로그인 email이 없습니다.");
                             }
 
-                            final String finalEmail = email;
-
-                            Member member = memberRepository.findByEmail(finalEmail)
-                                    .orElseThrow(() -> new IllegalArgumentException("소셜 로그인 회원이 없습니다. email=" + finalEmail));
+                            Member member = memberRepository.findByEmail(email)
+                                    .orElseThrow(() -> new IllegalArgumentException("소셜 로그인 회원이 없습니다. email=" + email));
 
                             request.getSession().setAttribute("loginMember", member.getId());
                             response.sendRedirect("/performance-list");
@@ -100,5 +85,35 @@ public class SecurityConfig {
                 );
 
         return http.build();
+    }
+
+    private String extractEmail(OAuth2User oAuth2User) {
+        Map<String, Object> attributes = oAuth2User.getAttributes();
+
+        // 1. 구글
+        String email = (String) attributes.get("email");
+        if (email != null) {
+            return email;
+        }
+
+        // 2. 네이버
+        Object responseObj = attributes.get("response");
+        if (responseObj instanceof Map<?, ?> responseMap) {
+            Object naverEmail = responseMap.get("email");
+            if (naverEmail instanceof String) {
+                return (String) naverEmail;
+            }
+        }
+
+        // 3. 카카오
+        Object kakaoAccountObj = attributes.get("kakao_account");
+        if (kakaoAccountObj instanceof Map<?, ?> kakaoAccountMap) {
+            Object kakaoEmail = kakaoAccountMap.get("email");
+            if (kakaoEmail instanceof String) {
+                return (String) kakaoEmail;
+            }
+        }
+
+        return null;
     }
 }
