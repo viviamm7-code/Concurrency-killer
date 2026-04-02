@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+//일반 로그인용
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final MemberRepository memberRepository;

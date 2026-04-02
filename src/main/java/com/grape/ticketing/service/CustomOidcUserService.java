@@ -8,24 +8,20 @@ import com.grape.ticketing.repository.SocialAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-//네이버나 카카오 붙히면 사용
-public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+//구글 로그인용 -> 구글은 OidcUserService 탐
+public class CustomOidcUserService extends OidcUserService {
 
     private final MemberRepository memberRepository;
     private final SocialAccountRepository socialAccountRepository;
@@ -33,13 +29,15 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     @Override
     @Transactional
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User oAuth2User = new DefaultOAuth2UserService().loadUser(userRequest);
-        Map<String, Object> attributes = oAuth2User.getAttributes();
+    public OidcUser loadUser(OidcUserRequest userRequest) {
+        OidcUser oidcUser = super.loadUser(userRequest);
 
-        String providerId = (String) attributes.get("sub");
-        String email = (String) attributes.get("email");
-        String name = (String) attributes.get("name");
+        String providerId = oidcUser.getSubject(); // sub
+        String email = oidcUser.getEmail();
+        String name = oidcUser.getFullName();
+        System.out.println("CustomOidcUserService 실행됨");
+        System.out.println("email = " + oidcUser.getEmail());
+        System.out.println("sub = " + oidcUser.getSubject());
 
         SocialAccount socialAccount = socialAccountRepository
                 .findByProviderAndProviderId(AuthProvider.GOOGLE, providerId)
@@ -47,21 +45,16 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         Member member = socialAccount.getMember();
 
-        Map<String, Object> customAttributes = new HashMap<>(attributes);
-        customAttributes.put("memberId", member.getId());
 
-        return new DefaultOAuth2User(
+        return new DefaultOidcUser(
                 List.of(new SimpleGrantedAuthority(member.getRole())),
-                customAttributes,
+                oidcUser.getIdToken(),
+                oidcUser.getUserInfo(),
                 "sub"
         );
     }
 
     private SocialAccount createGoogleAccount(String providerId, String email, String name) {
-        System.out.println("createGoogleAccount 호출됨");
-        System.out.println("providerId = " + providerId);
-        System.out.println("email = " + email);
-
         String username = "google_" + providerId;
         String encodedPassword = passwordEncoder.encode(UUID.randomUUID().toString());
 
@@ -73,19 +66,15 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 "ROLE_USER"
         );
 
-        memberRepository.save(member);
-        System.out.println("member 저장 완료 id = " + member.getId());
+        Member savedMember = memberRepository.save(member);
 
         SocialAccount socialAccount = SocialAccount.builder()
                 .provider(AuthProvider.GOOGLE)
                 .providerId(providerId)
                 .email(email)
-                .member(member)
+                .member(savedMember)
                 .build();
 
-        SocialAccount saved = socialAccountRepository.save(socialAccount);
-        System.out.println("socialAccount 저장 완료 id = " + saved.getId());
-
-        return saved;
+        return socialAccountRepository.save(socialAccount);
     }
 }
