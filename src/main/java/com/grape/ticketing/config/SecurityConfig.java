@@ -14,6 +14,8 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequest
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.Map;
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -62,14 +64,29 @@ public class SecurityConfig {
                                 .authorizationRequestResolver(authorizationRequestResolver)
                         )
                         .userInfoEndpoint(userInfo -> userInfo
-                                .oidcUserService(customOidcUserService)
+                                .userService(customOAuth2UserService)   // 네이버로
+                                .oidcUserService(customOidcUserService) // 구글로
                         )
                         .successHandler((request, response, authentication) -> {
                             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+
                             String email = (String) oAuth2User.getAttributes().get("email");
 
-                            Member member = memberRepository.findByEmail(email)
-                                    .orElseThrow(() -> new IllegalArgumentException("소셜 로그인 회원이 없습니다. email=" + email));
+                            if (email == null) {
+                                Object responseObj = oAuth2User.getAttributes().get("response");
+                                if (responseObj instanceof Map<?, ?> responseMap) {
+                                    email = (String) responseMap.get("email");
+                                }
+                            }
+
+                            if (email == null) {
+                                throw new IllegalStateException("소셜 로그인 email이 없습니다.");
+                            }
+
+                            final String finalEmail = email;
+
+                            Member member = memberRepository.findByEmail(finalEmail)
+                                    .orElseThrow(() -> new IllegalArgumentException("소셜 로그인 회원이 없습니다. email=" + finalEmail));
 
                             request.getSession().setAttribute("loginMember", member.getId());
                             response.sendRedirect("/performance-list");

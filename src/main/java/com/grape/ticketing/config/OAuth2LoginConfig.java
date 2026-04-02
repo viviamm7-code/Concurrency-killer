@@ -12,8 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-// 구글 로그인 할 떄 계정 선택창을 강제로 다시 띄우는 설정
-// 구글 계정 선택창을 prompt=select_account로 다시 보이게 함
+// 소셜 로그인할 때 계정 선택창/재인증 화면을 다시 띄우는 설정
 public class OAuth2LoginConfig {
 
     @Bean
@@ -47,10 +46,19 @@ public class OAuth2LoginConfig {
                     return null;
                 }
 
+                String registrationId =
+                        (String) authorizationRequest.getAttributes().get("registration_id");
+
                 Map<String, Object> additionalParameters =
                         new HashMap<>(authorizationRequest.getAdditionalParameters());
 
-                additionalParameters.put("prompt", "select_account");
+                if ("google".equals(registrationId)) {
+                    additionalParameters.put("prompt", "select_account");
+                }
+
+                if ("naver".equals(registrationId)) {
+                    additionalParameters.put("auth_type", "reauthenticate");
+                }
 
                 return OAuth2AuthorizationRequest.from(authorizationRequest)
                         .additionalParameters(additionalParameters)

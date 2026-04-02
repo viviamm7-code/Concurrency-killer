@@ -24,7 +24,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-//네이버나 카카오 붙히면 사용
+// 네이버용 서비스
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final MemberRepository memberRepository;
@@ -35,15 +35,26 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = new DefaultOAuth2UserService().loadUser(userRequest);
+
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        String providerId = (String) attributes.get("sub");
-        String email = (String) attributes.get("email");
-        String name = (String) attributes.get("name");
+        if (!"naver".equals(registrationId)) {
+            throw new OAuth2AuthenticationException("지원하지 않는 OAuth2 로그인입니다. registrationId=" + registrationId);
+        }
+
+        Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+        if (response == null) {
+            throw new OAuth2AuthenticationException("네이버 사용자 정보(response)가 없습니다.");
+        }
+
+        String providerId = String.valueOf(response.get("id"));
+        String email = (String) response.get("email");
+        String name = (String) response.get("name");
 
         SocialAccount socialAccount = socialAccountRepository
-                .findByProviderAndProviderId(AuthProvider.GOOGLE, providerId)
-                .orElseGet(() -> createGoogleAccount(providerId, email, name));
+                .findByProviderAndProviderId(AuthProvider.NAVER, providerId)
+                .orElseGet(() -> createNaverAccount(providerId, email, name));
 
         Member member = socialAccount.getMember();
 
@@ -53,39 +64,52 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         return new DefaultOAuth2User(
                 List.of(new SimpleGrantedAuthority(member.getRole())),
                 customAttributes,
-                "sub"
+                "response"
         );
     }
 
-    private SocialAccount createGoogleAccount(String providerId, String email, String name) {
-        System.out.println("createGoogleAccount 호출됨");
+    private SocialAccount createNaverAccount(String providerId, String email, String name) {
+        System.out.println("createNaverAccount 호출됨");
         System.out.println("providerId = " + providerId);
         System.out.println("email = " + email);
+        System.out.println("name = " + name);
 
-        String username = "google_" + providerId;
+        String safeEmail = (email != null && !email.isBlank())
+                ? email
+                : "naver_" + providerId + "@social.local";
+
+        String username = "naver_" + providerId;
         String encodedPassword = passwordEncoder.encode(UUID.randomUUID().toString());
 
         Member member = new Member(
-                name,
-                email,
+                name != null ? name : "naver_user",
+                safeEmail,
                 username,
                 encodedPassword,
                 "ROLE_USER"
         );
 
-        memberRepository.save(member);
-        System.out.println("member 저장 완료 id = " + member.getId());
+        Member savedMember = memberRepository.save(member);
+        memberRepository.flush();
+        System.out.println("member 저장 완료 id = " + savedMember.getId());
 
-        SocialAccount socialAccount = SocialAccount.builder()
-                .provider(AuthProvider.GOOGLE)
-                .providerId(providerId)
-                .email(email)
-                .member(member)
-                .build();
+        try {
+            SocialAccount socialAccount = SocialAccount.builder()
+                    .provider(AuthProvider.NAVER)
+                    .providerId(providerId)
+                    .email(safeEmail)
+                    .member(savedMember)
+                    .build();
 
-        SocialAccount saved = socialAccountRepository.save(socialAccount);
-        System.out.println("socialAccount 저장 완료 id = " + saved.getId());
+            SocialAccount saved = socialAccountRepository.save(socialAccount);
+            socialAccountRepository.flush();
 
-        return saved;
+            System.out.println("socialAccount 저장 완료 id = " + saved.getId());
+            return saved;
+        } catch (Exception e) {
+            System.out.println("socialAccount 저장 중 예외 발생");
+            e.printStackTrace();
+            throw e;
+        }
     }
 }
