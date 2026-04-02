@@ -24,7 +24,10 @@ public class Performance extends BaseEntitiy {
 
     private String performanceName;
     private int price;
-    private String venue;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "venue_id")
+    private Venue venue;
 
     private int performanceTime; //공연 소요시간
     private LocalDateTime startedAt; //공연 시작시간

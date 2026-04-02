@@ -38,6 +38,10 @@ public class PerformanceTO {
         private LocalDateTime startedAt;
         private int price;
         private Integer remainingSeatLimit;
+        private String address;
+        private Double latitude;
+        private Double longitude;
+
 
     }
 }

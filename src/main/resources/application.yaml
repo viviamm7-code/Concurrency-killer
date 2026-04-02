@@ -33,6 +33,10 @@ spring:
 toss:
   client-key: ${TOSS_CLIENT_KEY}
   secret-key: ${TOSS_SECRET_KEY}
+  
+kakao:
+  map:
+    app-key: ${KAKAO_MAP_APP_KEY}
 
 logging:
   level:

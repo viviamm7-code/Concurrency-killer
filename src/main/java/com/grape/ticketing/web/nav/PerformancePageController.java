@@ -11,6 +11,8 @@ public class PerformancePageController {
 
     @Value("${toss.client-key}")
     private String tossClientKey;
+    @Value("${kakao.map.app-key}")
+    private String kakaoMapAppKey;
 
     @GetMapping("/performance-list")
     public String performanceListPage() {
@@ -18,7 +20,8 @@ public class PerformancePageController {
     }
 
     @GetMapping("/performances/{performanceId}")
-    public String performanceDetailPage(@PathVariable Long performanceId) {
+    public String performanceDetailPage(@PathVariable Long performanceId, Model model) {
+        model.addAttribute("kakaoMapAppKey", kakaoMapAppKey);
         return "/performances/performance";
     }
 
