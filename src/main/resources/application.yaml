@@ -7,7 +7,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -29,6 +29,14 @@ spring:
               - openid
               - profile
               - email
+
+toss:
+  client-key: ${TOSS_CLIENT_KEY}
+  secret-key: ${TOSS_SECRET_KEY}
+  
+kakao:
+  map:
+    app-key: ${KAKAO_MAP_APP_KEY}
 
 logging:
   level:

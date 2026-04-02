@@ -1,6 +1,7 @@
 package com.grape.ticketing.domain.member;
 
 import com.grape.ticketing.domain.BaseEntitiy;
+import com.grape.ticketing.domain.Payment;
 import com.grape.ticketing.domain.Reservation;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

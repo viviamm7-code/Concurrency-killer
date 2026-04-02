@@ -41,7 +41,7 @@ public class DummyDataInit implements CommandLineRunner {
         memberRepository.save(admin);
 
         for (int i = 1; i <= 100; i++) {
-            Member user = new Member("user",
+            Member user = new Member("name",
                     "user@gmail.com",
                     "user" + (i+1),
                     passwordEncoder.encode("1234"),
@@ -68,12 +68,13 @@ public class DummyDataInit implements CommandLineRunner {
 //    }
 
     private void createSeatsForExistingPerformances() {
-        for (long i = 1; i <= 4; i++) {
-            final long performanceId = i;
+        List<Performance> performances = performanceRepository.findAll();
 
-            Performance performance = performanceRepository.findById(performanceId)
-                    .orElseThrow(() -> new IllegalArgumentException("공연이 없습니다. id=" + performanceId));
+        if (performances.isEmpty()) {
+            throw new IllegalArgumentException("공연 데이터가 없습니다.");
+        }
 
+        for (Performance performance : performances) {
             createSeatsForPerformance(performance);
         }
     }

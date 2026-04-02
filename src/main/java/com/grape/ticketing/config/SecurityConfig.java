@@ -3,12 +3,14 @@ package com.grape.ticketing.config;
 import com.grape.ticketing.domain.member.Member;
 import com.grape.ticketing.repository.MemberRepository;
 import com.grape.ticketing.service.CustomOAuth2UserService;
+import com.grape.ticketing.service.CustomOidcUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -18,11 +20,14 @@ public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final MemberRepository memberRepository;
+    private final CustomOidcUserService customOidcUserService;
+    private final OAuth2AuthorizationRequestResolver authorizationRequestResolver;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                //비로그인
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/api/auth/check"
                         , "/performance-list",
@@ -33,17 +38,23 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
+                //일반 로그인
                 .formLogin(form -> form
                         .loginPage("/login")
+                        // 여기서 Spring Security가 CustomUserDetailService 호출
                         .loginProcessingUrl("/members/login")
                         .defaultSuccessUrl("/performance-list", true)
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
+                //소셜 로그인
                 .oauth2Login(oauth -> oauth
                         .loginPage("/login")
+                        .authorizationEndpoint(endpoint -> endpoint
+                                .authorizationRequestResolver(authorizationRequestResolver)
+                        )
                         .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService)
+                                .oidcUserService(customOidcUserService)
                         )
                         .successHandler((request, response, authentication) -> {
                             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
@@ -64,10 +75,5 @@ public class SecurityConfig {
                 );
 
         return http.build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }
