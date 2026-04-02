@@ -676,6 +676,51 @@
     });
 
     document.getElementById('modalConfirm').addEventListener('click', async () => {
+        const btn = document.getElementById('btnBook');
+        btn.textContent = '✓ 예매 완료';
+        btn.style.background = 'linear-gradient(135deg, #2a9060, #38b070)';
+        btn.style.boxShadow = '0 4px 20px rgba(42,144,96,0.4)';
+        setTimeout(() => {
+            btn.textContent = '예매하기';
+            btn.style.background = '';
+            btn.style.boxShadow = '';
+        }, 3000);
+
+        try {
+            const response = await fetch('/reservation-drafts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    performanceId: data.id,
+                    performanceDate: getSelectedPerformanceDate(),
+                    performanceTitle: data.performanceName,
+                    performancePrice: data.price,
+                    performanceVenue: data.venue,
+                    startedAt: data.startedAt,
+                    remainingSeatLimit: data.remainingSeatLimit ?? 0,
+                    performanceUrl: window.location.pathname,
+                    imageUrl: data.imageUrl,
+                    reservedDate: selectedDate
+                })
+            });
+
+            if (response.status === 401 || response.redirected) {
+                // 시큐리티가 "너 로그인 안 했어"라고 하면 로그인 페이지로 보냄
+                alert("로그인이 필요한 서비스입니다.");
+                window.location.href = '/login';
+                return;
+            }
+
+            if (!response.ok) throw new Error('예매 요청 실패');
+
+            const draft = await response.json();
+            window.location.href = `/seat?draftId=${draft.draftId}`;
+        } catch (error) {
+            console.error(error);
+        }
+    });
+
+    /*document.getElementById('modalConfirm').addEventListener('click', async () => {
         overlay.classList.remove('active');
 
         const btn = document.getElementById('btnBook');
@@ -724,7 +769,7 @@
                 return;
             }
         }
-    });
+    });*/
 
     loadPerformance();
 </script>

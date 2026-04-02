@@ -36,15 +36,7 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/members/login")
-                        .successHandler((request, response, authentication) -> {
-                            System.out.println("authentication name = " + authentication.getName());
-
-                            Member member = memberRepository.findByUsername(authentication.getName())
-                                    .orElseThrow();
-
-                            request.getSession().setAttribute("loginMember", member.getId());
-                            response.sendRedirect("/performance-list");
-                        })
+                        .defaultSuccessUrl("/performance-list", true)
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
