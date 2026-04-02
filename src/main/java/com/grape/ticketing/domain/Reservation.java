@@ -36,6 +36,9 @@ public class Reservation extends BaseEntitiy{
     @JoinColumn(name = "performance_id")
     private Performance performance;
 
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "reservation")
+    private Payment payment;
+
     private String startedAt;
-    private Date ReservedDate;
+    private Date reservedDate;
 }

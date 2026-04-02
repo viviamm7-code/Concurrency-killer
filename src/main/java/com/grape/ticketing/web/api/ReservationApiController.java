@@ -48,10 +48,4 @@ public class ReservationApiController {
                                               HttpSession session) {
         return reservationService.getCancelPreview(getLoginMemberId(session), reservationId);
     }
-
-    @GetMapping("/api/reservation/{reservationId}/confirm")
-    public ReservationDetailDto reservationConfirm(@PathVariable Long reservationId,
-                                                   HttpSession session) {
-        return reservationService.getDetailReservation(getLoginMemberId(session), reservationId);
-    }
 }

@@ -16,7 +16,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -101,9 +103,9 @@ public class ReservationService {
     @Transactional
     public void completeExpiredReservations() {
         List<Reservation> reservations =
-                reservationRepository.findByReservationStatusAndPerformance_StartedAtBefore(
+                reservationRepository.findAllByReservationStatusAndReservedDateBefore(
                         ReservationStatus.RESERVED,
-                        LocalDateTime.now()
+                        new Date()
                 );
 
         for (Reservation reservation : reservations) {
@@ -115,8 +117,15 @@ public class ReservationService {
                 seat.setSeatStatus(SeatStatus.AVAILABLE);
             }
 
-            seatRepository.saveAll(seats);
             reservation.setReservationStatus(ReservationStatus.COMPLETED);
+
         }
+
+        seatRepository.saveAll(
+                reservations.stream()
+                        .flatMap(r -> r.getReservationSeats().stream())
+                        .map(ReservationSeat::getSeat)
+                        .toList()
+        );
     }
 }

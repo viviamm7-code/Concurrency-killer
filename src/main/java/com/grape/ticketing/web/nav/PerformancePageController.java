@@ -1,11 +1,16 @@
 package com.grape.ticketing.web.nav;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class PerformancePageController {
+
+    @Value("${toss.client-key}")
+    private String tossClientKey;
 
     @GetMapping("/performance-list")
     public String performanceListPage() {
@@ -28,7 +33,8 @@ public class PerformancePageController {
     }
 
     @GetMapping("/reservationConfirm2")
-    public String reservationConfirm2Page() {
+    public String reservationConfirm2Page(Model model) {
+        model.addAttribute("tossClientKey", tossClientKey);
         return "reservation/reservationConfirm2";
     }
 }
