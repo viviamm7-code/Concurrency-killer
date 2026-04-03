@@ -29,7 +29,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 //비로그인
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/api/auth/check"
+                        .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images" +
+                                        "/**", "/api" +
+                                        "/auth/check"
                         , "/performance-list",
                                 //api도 다 가져오기
                                 "/api/**"

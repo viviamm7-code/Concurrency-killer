@@ -4,10 +4,7 @@ import com.grape.ticketing.domain.BaseEntitiy;
 import com.grape.ticketing.domain.Payment;
 import com.grape.ticketing.domain.Reservation;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -64,6 +61,7 @@ public class Member extends BaseEntitiy implements UserDetails {
     @Override public boolean isCredentialsNonExpired() { return true; }
     @Override public boolean isEnabled() { return true; }
 
+    @Builder
     public Member(String name, String email, String username, String password, String role) {
         this.name = name;
         this.email = email;
