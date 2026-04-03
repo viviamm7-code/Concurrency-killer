@@ -5,6 +5,8 @@ import com.grape.ticketing.service.LoginService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,15 +36,18 @@ public class MemberController {
 
     @GetMapping("/api/auth/status")
     @ResponseBody
-    public Map<String, Object> getAuthStatus(HttpSession session) {
+    public Map<String, Object> getAuthStatus(Authentication authentication) {
         Map<String, Object> status = new HashMap<>();
 
-        // 저장한 세션 키 값인 "loginMember"를 확인합니다.
-        Object loginMemberId = session.getAttribute("loginMember");
+        boolean isLoggedIn =
+                authentication != null &&
+                authentication.isAuthenticated() &&
+                !(authentication instanceof AnonymousAuthenticationToken);
 
-        if (loginMemberId != null) {
+
+        if (isLoggedIn) {
             status.put("isLoggedIn", true);
-            status.put("memberId", loginMemberId);
+            status.put("memberId", authentication.getName());
         } else {
             status.put("isLoggedIn", false);
             status.put("memberId", null);

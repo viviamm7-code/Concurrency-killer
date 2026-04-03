@@ -1,5 +1,6 @@
 package com.grape.ticketing.web.api;
 
+import com.grape.ticketing.domain.member.Member;
 import com.grape.ticketing.dto.reservation.ReservationConfirmResponse;
 import com.grape.ticketing.dto.reservation.ReservationDraftCreateRequest;
 import com.grape.ticketing.dto.reservation.ReservationDraftResponse;
@@ -9,6 +10,7 @@ import com.grape.ticketing.service.ReservationDraftRedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,8 +32,11 @@ public class ReservationDraftController {
     private final ReservationDraftRedisService reservationDraftRedisService;
 
     @PostMapping
-    public ReservationDraftResponse createDraft(@RequestBody ReservationDraftCreateRequest request) {
-        return reservationDraftRedisService.createDraft(request);
+    public ReservationDraftResponse createDraft(
+            @RequestBody ReservationDraftCreateRequest request,
+            @AuthenticationPrincipal Member member
+    ) {
+        return reservationDraftRedisService.createDraft(member.getId(), request);
     }
 
     @GetMapping("/{draftId}")

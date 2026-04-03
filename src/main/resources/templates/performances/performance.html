@@ -943,6 +943,7 @@
         }, 3000);
 
         try {
+            const selectedDate = getSelectedPerformanceDate();
             const response = await fetch('/reservation-drafts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

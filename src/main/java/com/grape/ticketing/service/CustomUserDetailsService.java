@@ -21,10 +21,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("유저 없음"));
 
-        return User.builder()
+        return member;
+        /*return User.builder()
                 .username(member.getUsername())
                 .password(member.getPassword())
                 .authorities(member.getRole()) // ROLE_USER
-                .build();
+                .build();*/
     }
 }

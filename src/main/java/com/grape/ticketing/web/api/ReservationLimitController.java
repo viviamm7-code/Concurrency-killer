@@ -1,8 +1,10 @@
 package com.grape.ticketing.web.api;
 
+import com.grape.ticketing.domain.member.Member;
 import com.grape.ticketing.dto.reservation.RemainingSeatCountTO;
 import com.grape.ticketing.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,9 +17,9 @@ public class ReservationLimitController {
     @GetMapping("/{performanceId}/remaining-seat-count")
     public RemainingSeatCountTO getRemainingSeatCount(
             @PathVariable Long performanceId,
-            @RequestParam Long memberId
+            @AuthenticationPrincipal Member member
     ) {
-        long remainingSeatCount = reservationService.getRemainingSeatCount(memberId, performanceId);
+        long remainingSeatCount = reservationService.getRemainingSeatCount(performanceId, member.getId());
 
         return new RemainingSeatCountTO(remainingSeatCount);
     }
