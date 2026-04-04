@@ -50,6 +50,7 @@ public class QueueService {
 
         //대기열에 저장
         queueRedisService.addWaitingQueue(waitingQueueKey, memberId, now);
+        queueRedisService.addPerformance(performanceId);  //대기열 생긴 공연도 저장
 
         //사용자의 대기순번 조회
         Long rank = queueRedisService.getRank(waitingQueueKey, memberId);
