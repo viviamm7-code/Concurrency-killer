@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
@@ -32,10 +30,10 @@ public class SecurityConfig {
                         .requestMatchers("/", "/join", "/login", "/css/**", "/js/**", "/images" +
                                         "/**", "/api" +
                                         "/auth/check"
-                        , "/performance-list",
+                        , "/performance-list", "/already-logged-in",
                                 //api도 다 가져오기
                                 "/api/**"
-                                ,"/performances/**")
+                                ,"/performances/**", "/error")
                         .permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
@@ -45,7 +43,7 @@ public class SecurityConfig {
                         .loginPage("/login")
                         // 여기서 Spring Security가 CustomUserDetailService 호출
                         .loginProcessingUrl("/members/login")
-                        .defaultSuccessUrl("/performance-list", true)
+                        .defaultSuccessUrl("/performance-list", false)
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )

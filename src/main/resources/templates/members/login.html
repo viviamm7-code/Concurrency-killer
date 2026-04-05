@@ -8,18 +8,26 @@
     window.onload = function () {
       fetch('/api/auth/check')
               .then(response => response.json())
-              .then(isLoggedIn => {
-                if (isLoggedIn) {
-                  alert("이미 로그인된 상태입니다.");
+              .then(data => {
+                  if (data.isLoggedIn) {
+                      alert("이미 로그인된 상태입니다.");
+                      location.href = '/performance-list';
+                  } else {
+                      document.body.style.display = 'flex';
+                  }
+              })
+                  /*// 이전 페이지가 로그인 페이지가 아니라면 뒤로가기, 맞다면 목록으로
                   if (document.referrer && !document.referrer.includes('/login')) {
                     history.back();
                   } else {
                     location.href = '/performance-list';
                   }
-                  return;
                 }
-              })
-              .catch(error => console.error('로그인 체크 실패:', error));
+              })*/
+              .catch(error => {
+                  console.error('로그인 체크 실패:', error);
+                  document.body.style.display = 'flex';
+            });
 
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('error') === 'true') {
@@ -49,7 +57,7 @@
       margin: 0;
       min-height: 100vh;
       background: #121726;
-      display: flex;
+      display: none; /*정상 접속 시 flex로 전환*/
       justify-content: center;
       align-items: center;
       font-family: sans-serif;

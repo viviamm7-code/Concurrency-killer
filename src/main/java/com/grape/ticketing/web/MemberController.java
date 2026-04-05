@@ -25,10 +25,41 @@ public class MemberController {
     private final MemberService memberService;
 
 
-    @RequestMapping("/login")
-    public String login(){
+    @GetMapping("/login")
+    // @ResponseBody
+    public Object login(Authentication authentication) {
+        // 이미 로그인 된 사용자인지 확인
+        boolean isLoggedIn = authentication != null &&
+                authentication.isAuthenticated() &&
+                !(authentication instanceof AnonymousAuthenticationToken);
+
+        if (isLoggedIn) {
+            String script = "<script>" +
+                    "alert('이미 로그인 된 상태입니다.');"+
+                    "location.href = 'performance-list';" +
+                    "</script>";
+            return ResponseEntity.ok()
+                    .header("Content-Type", "text/html;charset=UTF-8")
+                    .body(script);
+        }
+
         return "members/login";
     }
+    @GetMapping("/already-logged-in")
+    @ResponseBody
+    public ResponseEntity<String> alreadyLoggedIn() {
+        String script = "<script>" +
+                "alert('이미 로그인 된 상태입니다.');" +
+                "location.href = '/performance-list';" +
+                "</script>";
+        return ResponseEntity.ok()
+                .header("content-type", "text/html; charset=utf-8")
+                .body(script);
+    }
+/*    @RequestMapping("/login")
+    public String login(){
+        return "members/login";
+    }*/
     @RequestMapping("/logout1")
     public String logout1(HttpSession session){
         session.invalidate();
@@ -76,7 +107,17 @@ public class MemberController {
 
     @GetMapping("/api/auth/check")
     @ResponseBody
-    public boolean checkLogin(HttpSession session) {
-        return session.getAttribute("loginMember") != null;
+    public Map<String, Object> checkLogin(Authentication authentication) {
+        Map<String, Object> status = new HashMap<>();
+
+        // 시큐리티 인증 객체가 있고, 익명 사용자인지 확인
+        boolean isLoggedIn = authentication != null &&
+                authentication.isAuthenticated() &&
+                !(authentication instanceof AnonymousAuthenticationToken);
+        status.put("isLoggedIn", isLoggedIn);
+        return status;
     }
+/*    public boolean checkLogin(HttpSession session) {
+        return session.getAttribute("loginMember") != null;
+    }*/
 }

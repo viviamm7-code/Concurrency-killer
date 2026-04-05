@@ -4,16 +4,126 @@
     <meta charset="UTF-8">
     <title>join</title>
     <style type="text/css">
+        /* 기본 배경 설정 */
         body {
-            margin: 0;
-            min-height: 100vh;
-            background: #121726;
+            background-color: #121726; /* 어두운 배경 */
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: sans-serif;
-            color: white;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Pretendard', -apple-system, sans-serif;
         }
+
+        /* 카드 컨테이너 */
+        .signup-container {
+            background-color: #262a37; /* 카드 배경 */
+            padding: 40px;
+            border-radius: 30px;
+            width: 380px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 상단 헤더 (화살표 + 제목) */
+        .header {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 0;
+            top: 5px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        h1 {
+            color: white;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        /* 입력 필드 그룹 */
+        .signup-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .input-group label {
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        input {
+            width: 100%;
+            height: 35px;
+            border-radius: 20px;
+            border: none;
+            background-color: #ffffff;
+            padding: 0 15px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        /* 이메일 입력 필드 특수 처리 */
+        .email-wrapper {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 10px;
+        }
+
+        .email-wrapper span {
+            color: white;
+            font-weight: bold;
+        }
+
+        /* 제출 버튼 */
+        .submit-btn {
+            margin-top: 20px;
+            height: 45px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(to right, #e65b46, #f08236); /* 오렌지 그라데이션 */
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+        }
+
+        /*뒤로가기*/
+        .btn-back {
+            width: 46px; height: 46px;
+            border-radius: 30%;
+            background: #1E2A3DFF;
+            border: 1px solid #FFFFFF12;
+            color: #E8EDF5FF;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background .2s, transform .2s;
+        }
+        .btn-back:hover { background: #161F30FF; transform: scale(1.05); }
     </style>
 </head>
 <script type="text/javascript">
@@ -21,11 +131,30 @@
         document.querySelector('form').addEventListener('submit', function(e) {
             e.preventDefault(); // 기본 submit 막기
 
+            const email = `${this.email1.value}@${this.email2.value}`;
+            const fields = [
+                {name : 'username', label: '아이디'},
+                {name : 'name', label: '이름'},
+                {name : 'password', label: '비밀번호'},
+                {name : 'email1', label: '이메일 아이디'},
+                {name : 'email2', label: '이메일 도메인'}
+            ]
+
+            for (const field of fields) {
+                const value = this[field.name].value.trim();
+                if (!value) {
+                    alert(`${field.label}을(를) 입력하세요.`);
+                    this[field.name].focus();
+                    return;
+                }
+            }
+
+
             const data = {
                 username: this.username.value,
                 name: this.name.value,
                 password: this.password.value,
-                email: this.email.value
+                email: email
             };
 
             fetch('/api/member/join', {
@@ -34,7 +163,7 @@
                 body: JSON.stringify(data)
             }).then(async res => {
                 if(res.ok) {
-                    alert("회원가입 완료");
+                    alert("회원가입이 완료되었습니다.");
                     window.location.href = "/login";
                 } else {
                     const errorText = await res.text();
@@ -46,14 +175,41 @@
     }
 </script>
 <body>
+<div class="signup-container">
 
-<form action="/api/member/join" method="post">
-    아이디 : <input type="text" name="username" placeholder="USERNAME"/> <br/>
-    이름 : <input type="text" name="name" placeholder="NAME"/> <br/>
-    비밀번호 : <input type="password" name="password" placeholder="PASSWORD"/> <br/>
-    이메일 : <input type="email" name="email" placeholder="EMAIL"/> <br/>
-    <button type="submit">회원가입 완료</button>
-</form>
 
+    <div class="header">
+        <button class="btn-back" onclick="history.back()">←</button>
+        <h1>회원 가입</h1>
+    </div>
+
+    <form class="signup-form">
+        <div class="input-group">
+            <label for="username">아이디 *</label>
+            <input type="text" id="username" name="username">
+        </div>
+
+        <div class="input-group">
+            <label for="name">이름 *</label>
+            <input type="text" id="name" name="name">
+        </div>
+
+        <div class="input-group">
+            <label for="password">비밀번호 *</label>
+            <input type="password" id="password" name="password">
+        </div>
+
+        <div class="input-group">
+            <label for="email">이메일</label>
+            <div class="email-wrapper">
+                <input type="text" id="email-id" name="email1">
+                <span>@</span>
+                <input type="text" id="email-domain" name="email2">
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">회원가입 완료</button>
+    </form>
+</div>
 </body>
 </html>
