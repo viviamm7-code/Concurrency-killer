@@ -39,3 +39,13 @@ logging:
         type:
           descriptor:
             sql: trace
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "prometheus"
+  metrics:
+    export:
+      prometheus:
+        enabled: true

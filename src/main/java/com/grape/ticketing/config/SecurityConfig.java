@@ -24,11 +24,20 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/api/auth/check"
-                        , "/performance-list",
+                        .requestMatchers(
+                                "/",
+                                "/login",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/api/auth/check",
+                                "/performance-list",
                                 //api도 다 가져오기
-                                "/api/**"
-                                ,"/performances/**")
+                                "/api/**",
+                                "/performances/**",
+                                "/actuator",
+                                "/actuator/**",
+                                "/error")
                         .permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
