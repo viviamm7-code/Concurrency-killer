@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>내 정보</title>
+    <link rel="stylesheet" type="text/css" href="/css/header.css">
+    <link rel="stylesheet" type="text/css" href="/css/mypage.css">
+    <script src="/js/common.js" defer></script>
+    <script src="/js/mypage.js" defer></script>
+</head>
+<body>
+<header>
+    <div></div>
+    <div class="header-actions">
+        <div id="loginButton"></div>
+    </div>
+</header>
+
+<div class="wrap">
+    <section class="top-box">
+        <div class="sub-title">MY PAGE</div>
+        <div class="main-title">내 정보</div>
+        <div class="desc">계정 정보 확인과 비밀번호 변경이 가능합니다.</div>
+    </section>
+
+    <section id="loadingBox" class="message-box">
+        회원 정보를 불러오는 중입니다...
+    </section>
+
+    <section id="errorBox" class="message-box hidden">
+        회원 정보를 불러오지 못했습니다.
+    </section>
+
+    <section id="profileSection" class="profile-card hidden">
+        <div class="profile-header">
+            <div>
+                <div class="profile-badge">ACCOUNT</div>
+                <h2 id="profileName" class="profile-title">-</h2>
+                <p id="profileRole" class="profile-role">-</p>
+            </div>
+        </div>
+
+        <div class="info-list">
+            <div class="info-row">
+                <div class="label">아이디</div>
+                <div class="value" id="username">-</div>
+            </div>
+            <div class="info-row">
+                <div class="label">이름</div>
+                <div class="value" id="name">-</div>
+            </div>
+            <div class="info-row">
+                <div class="label">이메일</div>
+                <div class="value" id="email">-</div>
+            </div>
+            <div class="info-row">
+                <div class="label">가입일</div>
+                <div class="value" id="createdAt">-</div>
+            </div>
+        </div>
+
+        <div class="action-row">
+            <a href="/performance-list" class="action-btn secondary-btn">공연 목록으로</a>
+            <a href="/reservation" class="action-btn primary-btn">내 예매 보기</a>
+        </div>
+    </section>
+
+    <section id="passwordSection" class="profile-card hidden password-card">
+        <div class="profile-header">
+            <div>
+                <div class="profile-badge">PASSWORD</div>
+                <h2 class="profile-title">비밀번호 변경</h2>
+                <p class="profile-role">현재 비밀번호 확인 후 새 비밀번호로 변경합니다.</p>
+            </div>
+        </div>
+
+        <form id="passwordForm" class="password-form">
+            <input type="password" id="currentPassword" placeholder="현재 비밀번호" />
+            <input type="password" id="newPassword" placeholder="새 비밀번호" />
+            <input type="password" id="newPasswordConfirm" placeholder="새 비밀번호 확인" />
+            <button type="submit" class="password-btn">비밀번호 변경</button>
+        </form>
+    </section>
+    <div class="mypage-danger-zone">
+        <h3>회원 탈퇴</h3>
+        <p>탈퇴 시 회원 정보와 연관 데이터가 삭제되며 복구할 수 없습니다.</p>
+        <button type="button" id="deleteMyAccountBtn" class="danger-btn">회원 탈퇴</button>
+    </div>
+</div>
+</body>
+</html>

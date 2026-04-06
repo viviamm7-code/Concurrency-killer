@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>뮤지컬 긴긴밤</title>
     <link rel="stylesheet" type="text/css" href="/css/header.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -934,28 +933,20 @@
     document.getElementById('modalConfirm').addEventListener('click', async () => {
         overlay.classList.remove('active');
 
-        const btn = document.getElementById('btnBook');
-        btn.textContent = '✓ 예매 완료';
-        btn.style.background = 'linear-gradient(135deg, #2a9060, #38b070)';
-        btn.style.boxShadow = '0 4px 20px rgba(42,144,96,0.4)';
-        setTimeout(() => {
-            btn.textContent = '예매하기';
-            btn.style.background = '';
-            btn.style.boxShadow = '';
-        }, 3000);
-
         try {
-            if (memberId === 0) {
+            if (!memberId || Number.isNaN(memberId)) {
                 throw new Error('로그인이 필요합니다.');
             }
+
             const selectedDate = getSelectedPerformanceDate();
+
             const response = await fetch('/reservation-drafts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     memberId,
                     performanceId: data.id,
-                    performanceDate: getSelectedPerformanceDate(),
+                    performanceDate: selectedDate,
                     performanceTitle: data.performanceName,
                     performancePrice: data.price,
                     performanceVenue: data.venue,
@@ -968,17 +959,29 @@
             });
 
             if (!response.ok) {
-                throw new Error('draft 생성 실패');
+                const errorText = await response.text();
+                console.error('draft 생성 실패:', errorText);
+                throw new Error('좌석 선택 페이지로 이동하지 못했습니다.');
             }
 
             const draft = await response.json();
+            console.log('draft 응답:', draft);
+
+            if (!draft || !draft.draftId) {
+                throw new Error('draftId가 없습니다.');
+            }
+
             window.location.href = `/seat?draftId=${draft.draftId}`;
         } catch (error) {
+            console.error('예매 진행 실패:', error);
+
             if (error.message === '로그인이 필요합니다.') {
                 alert(error.message);
                 window.location.href = '/login';
                 return;
             }
+
+            alert(error.message || '예매 진행 중 오류가 발생했습니다.');
         }
     });
 

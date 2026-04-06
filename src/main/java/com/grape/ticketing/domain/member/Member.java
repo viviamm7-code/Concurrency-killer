@@ -1,7 +1,6 @@
 package com.grape.ticketing.domain.member;
 
 import com.grape.ticketing.domain.BaseEntitiy;
-import com.grape.ticketing.domain.Payment;
 import com.grape.ticketing.domain.Reservation;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -30,8 +29,9 @@ public class Member extends BaseEntitiy {
     private String password;
     private String role;
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Reservation> reservations = new ArrayList<>();
+
 
     public Member(String name, String email, String username, String password, String role) {
         this.name = name;

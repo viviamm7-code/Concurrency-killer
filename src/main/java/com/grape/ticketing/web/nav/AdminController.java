@@ -1,6 +1,5 @@
 package com.grape.ticketing.web.nav;
 
-import com.grape.ticketing.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/admin")
 public class AdminController {
 
-    private final AdminService adminService;
 
     @GetMapping
     public String adminHome() {
@@ -20,15 +18,8 @@ public class AdminController {
     }
 
     @GetMapping("/members")
-    public String memberManagePage(Model model) {
-        model.addAttribute("members", adminService.getMembers());
+    public String members() {
         return "admin/members";
-    }
-
-
-    @GetMapping("/performances")
-    public String performances(Model model) {
-        return "admin/performances";
     }
 
     @GetMapping("/reservations")

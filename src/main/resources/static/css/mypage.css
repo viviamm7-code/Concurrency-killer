@@ -1,0 +1,226 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Pretendard", "Apple SD Gothic Neo", sans-serif;
+}
+
+body {
+    background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+    color: #f8fafc;
+    min-height: 100vh;
+}
+
+header {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.wrap {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 20px 80px;
+}
+
+.top-box {
+    margin-bottom: 32px;
+}
+
+.sub-title {
+    color: #94a3b8;
+    font-size: 14px;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.main-title {
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 12px;
+}
+
+.desc {
+    color: #cbd5e1;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.message-box {
+    padding: 40px 20px;
+    text-align: center;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #cbd5e1;
+    font-size: 16px;
+}
+
+.profile-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    padding: 28px;
+    margin-bottom: 24px;
+}
+
+.profile-header {
+    margin-bottom: 28px;
+}
+
+.profile-badge {
+    display: inline-block;
+    background: rgba(244, 114, 182, 0.15);
+    color: #f9a8d4;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px 12px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+}
+
+.profile-title {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.profile-role {
+    color: #cbd5e1;
+    font-size: 15px;
+}
+
+.info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.label {
+    color: #94a3b8;
+    font-size: 14px;
+    min-width: 90px;
+}
+
+.value {
+    text-align: right;
+    color: #f8fafc;
+    font-size: 16px;
+    font-weight: 600;
+    word-break: break-all;
+}
+
+.action-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 160px;
+    height: 48px;
+    padding: 0 18px;
+    border-radius: 15px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    color: #C7CFDA;
+    background: linear-gradient(to right, #423047, #333252);
+    border: none;
+}
+
+.action-btn:hover {
+    color: white;
+}
+
+.password-card {
+    margin-top: 24px;
+}
+
+.password-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.password-form input {
+    width: 100%;
+    height: 48px;
+    border-radius: 14px;
+    border: none;
+    padding: 0 16px;
+    background: rgba(255,255,255,0.08);
+    color: white;
+    font-size: 15px;
+    outline: none;
+}
+
+.password-form input::placeholder {
+    color: #94a3b8;
+}
+
+.password-btn {
+    width: 100%;
+    height: 48px;
+    border-radius: 15px;
+    border: none;
+    background: linear-gradient(to right, #423047, #333252);
+    color: #C7CFDA;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.password-btn:hover {
+    color: white;
+}
+
+.hidden {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 30px;
+    }
+
+    .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .value {
+        text-align: left;
+    }
+}

@@ -1,8 +1,11 @@
 package com.grape.ticketing.web.api;
 
-import com.grape.ticketing.dto.admin.*;
-import com.grape.ticketing.service.AdminService;
+import com.grape.ticketing.dto.admin.AdminDashboardResponseDto;
+import com.grape.ticketing.dto.admin.AdminMemberDetailResponseDto;
+import com.grape.ticketing.dto.admin.AdminMemberListResponseDto;
+import com.grape.ticketing.service.AdminMemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,30 +15,29 @@ import java.util.List;
 @RequestMapping("/api/admin")
 public class AdminApiController {
 
-    private final AdminService adminService;
+    private final AdminMemberService adminMemberService;
 
-    @GetMapping("/dashboard")
-    public AdminDashboardResponseDto getDashboard() {
-        return adminService.getDashboard();
+    @GetMapping()
+    public AdminDashboardResponseDto dashboard() {
+        return adminMemberService.getDashboard();
     }
 
     @GetMapping("/members")
-    public List<AdminMemberResponseDto> getMembers() {
-        return adminService.getMembers();
+    public List<AdminMemberListResponseDto> getMembers(
+            @RequestParam(required = false) String keyword
+    ) {
+        return adminMemberService.getMembers(keyword);
     }
 
-    @GetMapping("/performances")
-    public List<AdminPerformanceResponseDto> getPerformances() {
-        return adminService.getPerformances();
+    @GetMapping("/members/{memberId}")
+    public AdminMemberDetailResponseDto getMemberDetail(
+            @PathVariable Long memberId
+    ) {
+        return adminMemberService.getMemberDetail(memberId);
     }
 
-    @GetMapping("/reservations")
-    public List<AdminReservationResponseDto> getReservations() {
-        return adminService.getReservations();
-    }
-
-    @GetMapping("/payments")
-    public List<AdminPaymentResponseDto> getPayments() {
-        return adminService.getPayments();
+    @DeleteMapping("/members/{memberId}/delete")
+    public void deleteMember(@PathVariable Long memberId) {
+        adminMemberService.deleteMember(memberId);
     }
 }

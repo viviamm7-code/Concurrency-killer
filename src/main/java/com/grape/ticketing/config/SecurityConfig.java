@@ -30,16 +30,23 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/**", "/api/admin/**").hasAuthority("ADMIN_ROLE")
+                        .requestMatchers("/admin/**", "/api/admin/**")
+                        .hasAnyAuthority("ROLE_ADMIN")
+
+                        .requestMatchers("/api/me", "/api/mypage")
+                        .authenticated()
+
                         .requestMatchers(
                                 "/", "/login", "/signup",
                                 "/css/**", "/js/**", "/images/**",
-                                "/api/auth/check",
-                                "/performance-list",
-                                "/performances/**",
-                                "/api/performances/**",
-                                "/api/auth/status"
+                                "/api/auth/check", "/api/auth/status",
+                                "/performance-list", "/performances/**", "/api/performances/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
                         ).permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -84,7 +91,7 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/performance-list")
+                        .logoutSuccessUrl("/login")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                         .deleteCookies("JSESSIONID")

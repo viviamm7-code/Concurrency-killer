@@ -2,10 +2,8 @@ const adminName = document.getElementById("adminName");
 const forbiddenBox = document.getElementById("forbiddenBox");
 const dashboardSection = document.getElementById("dashboardSection");
 const reloadBtn = document.getElementById("reloadBtn");
-const roleText = document.getElementById("roleText");
 
 const totalMembers = document.getElementById("totalMembers");
-const totalPerformances = document.getElementById("totalPerformances");
 const totalReservations = document.getElementById("totalReservations");
 const totalPayments = document.getElementById("totalPayments");
 
@@ -35,13 +33,9 @@ async function loadAdminPage() {
             return;
         }
 
-        adminName.textContent = `${me.loginId}님`;
-        roleText.textContent = me.role;
-
-        const dashboard = await fetchJson("/api/admin/dashboard");
+        const dashboard = await fetchJson("/api/admin");
 
         totalMembers.textContent = dashboard.totalMembers ?? 0;
-        totalPerformances.textContent = dashboard.totalPerformances ?? 0;
         totalReservations.textContent = dashboard.totalReservations ?? 0;
         totalPayments.textContent = dashboard.totalPayments ?? 0;
 

@@ -64,7 +64,7 @@ async function loadPage() {
     try {
         const me = await fetchJson("/api/me");
 
-        if (!me || me.role !== "ADMIN_ROLE") {
+        if (!me || me.role !== "ROLE_ROLE") {
             showForbidden();
             return;
         }
