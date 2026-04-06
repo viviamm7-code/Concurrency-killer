@@ -6,6 +6,7 @@ import com.grape.ticketing.dto.reservation.ReservationDraftResponse;
 import com.grape.ticketing.dto.reservation.ReservationDraftUpdateRequest;
 import com.grape.ticketing.exception.SeatHoldConflictException;
 import com.grape.ticketing.service.ReservationDraftRedisService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
+@Tag(name = "Redis 정보 저장")
 @RestController
 @RequestMapping("/reservation-drafts")
 @RequiredArgsConstructor
