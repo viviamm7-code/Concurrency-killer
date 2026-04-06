@@ -15,7 +15,7 @@ public class QueueSchedulerService {
 
     private final QueueRedisService queueRedisService;
     private static final long MAX_ACTIVE = 2L;  //입장 가능한 최대 인원
-    private static final long ACTIVE_DURATION_MILLIS = 10 * 60 * 1000L;  //입장 허용 시간(10분)
+    private static final long ACTIVE_DURATION_MILLIS = 60 * 1000L;  //입장 허용 시간(1분)
 
     /**
      * 개요: 스케줄러를 통해 유저의 대기 상태를 2초마다 업데이트하는 메서드

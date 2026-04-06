@@ -3,8 +3,13 @@ package com.grape.ticketing.web.api;
 import com.grape.ticketing.dto.queue.RegisterResponseTO;
 import com.grape.ticketing.dto.queue.StatusResponseTO;
 import com.grape.ticketing.service.QueueService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/queue")
@@ -39,5 +44,17 @@ public class QueueController {
             throw new IllegalStateException("로그인이 필요합니다.");
         }*/
         return queueService.getStatus(memberId, performanceId);
+    }
+
+    /**
+     * SSE로 대기인원 조회하는 api
+     */
+    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter stream(HttpSession session, @RequestParam UUID draftId) {
+        Long memberId = (Long) session.getAttribute("loginMember");
+        if (memberId == null) {
+            throw new IllegalStateException("로그인이 필요합니다.");
+        }
+        return queueService.getWaitingInfo(memberId, draftId);
     }
 }

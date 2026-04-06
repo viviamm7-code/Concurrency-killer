@@ -80,7 +80,8 @@
 
         /* ── 숫자 블록 ── */
         .wait-nums {
-            display: grid;
+            display: flex;
+            justify-content: center;
             grid-template-columns: 1fr 1px 1fr;
             width: 100%;
             text-align: center;
@@ -170,8 +171,8 @@
     <!-- 공연 정보 -->
     <div class="show-info">
         <div class="show-text">
-            <h2>빌리 엘리어트</h2>
-            <p>블루스퀘어 &nbsp;·&nbsp; 2026-05-13 ~ 2026-07-31 &nbsp;·&nbsp; 80,000원</p>
+            <h2></h2>
+            <p>&nbsp;·&nbsp; 0000-00-00 &nbsp;·&nbsp; 0원</p>
         </div>
     </div>
 
@@ -198,13 +199,13 @@
         <div class="wait-nums">
             <div class="num-block">
                 <div class="label">내 대기 순번</div>
-                <div class="value" id="my-num">3,200</div>
+                <div class="value" id="my-num">0</div>
             </div>
-            <div class="divider-v"></div>
+            <!--<div class="divider-v"></div>
             <div class="num-block">
                 <div class="label">예상 대기 시간</div>
-                <div class="value" id="wait-time">107<span>분</span></div>
-            </div>
+                <div class="value" id="wait-time">0<span>분</span></div>
+            </div>-->
         </div>
 
         <!-- 진행률 바 -->
@@ -240,42 +241,41 @@
     const params = new URLSearchParams(window.location.search);
     const draftId = params.get('draftId');
 
-    const TOTAL = 3200;
+    const TOTAL = 0;
     let myNum = TOTAL;
     let refreshCountdown = 30;
 
     const myNumEl     = document.getElementById('my-num');
-    const waitTimeEl  = document.getElementById('wait-time');
     const progFill    = document.getElementById('prog-fill');
     const pctText     = document.getElementById('pct-text');
     const infoMsg     = document.getElementById('info-msg');
     const refreshLabel = document.getElementById('refresh-label');
 
-    const sse = new EventSource('/waiting-status');
+    const sse = new EventSource(`/api/queue/stream?draftId=${draftId}`);
 
-    sse.addEventListener('queue-update', (e) => {
+    sse.addEventListener('waiting-info', (e) => {
         const data = JSON.parse(e.data);
+        console.log('status:', data.status, typeof data.status);
 
         // ACTIVE면 좌석 페이지로 이동
         if (data.status === 'ACTIVE') {
             sse.close();
-            window.location.href = `/seat?draftId=${draft.draftId}`;
+            window.location.href = `/seat?draftId=${draftId}`;
             return;
         }
 
         // 공연 정보 업데이트
-        document.querySelector('.show-text h2').textContent = data.showTitle;
+        document.querySelector('.show-text h2').textContent = data.title;
         document.querySelector('.show-text p').textContent =
-            `${data.venue} · ${data.period} · ${data.price.toLocaleString()}원`;
+            `${data.venue} · ${data.date} · ${data.price}원`;
 
         // 대기 정보 업데이트
-        myNumEl.textContent      = data.myNum.toLocaleString();
-        waitTimeEl.innerHTML     = data.waitMin + '<span>분</span>';
-        progFill.style.width     = data.pct + '%';
-        pctText.textContent      = data.pct + '%';
+        myNumEl.textContent      = data.rank
+        progFill.style.width     = data.percent + '%';
+        pctText.textContent      = data.percent + '%';
 
         // 500명 미만이면 안내 메시지 색상 변경
-        if (data.myNum < 500) {
+        if (data.rank < 500) {
             infoMsg.textContent       = '거의 다 왔어요! 잠시 후 예매 페이지로 이동합니다.';
             infoMsg.style.color       = '#7ac87a';
             infoMsg.style.borderColor = 'rgba(100,200,100,0.3)';

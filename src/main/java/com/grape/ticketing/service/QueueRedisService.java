@@ -43,7 +43,7 @@ public class QueueRedisService {
     //대기순번 조회
     public Long getRank(String waitingKey, Long userId) {
         Long rank = redisTemplate.opsForZSet().rank(waitingKey, userId);
-        return rank != null ? rank + 1 : null;
+        return rank != null ? rank + 1 : 0;
     }
 
     //상태 조회
@@ -133,6 +133,12 @@ public class QueueRedisService {
         return size == null ? 0L : size;
     }
 
+    //waiting큐 크기 조회
+    public Long getWaitingCount(String waitingQueueKey) {
+        Long size = redisTemplate.opsForZSet().size(waitingQueueKey);
+        return size == null ? 0L : size;
+    }
+
     //큐 비었는지 검사
     public boolean isWaitingQueueEmpty(String waitingKey) {
         Long size = redisTemplate.opsForZSet().size(waitingKey);  //대기큐 크기 조회
@@ -142,4 +148,7 @@ public class QueueRedisService {
     public boolean isActiveQueueEmpty(String activeKey) {
         return getActiveCount(activeKey) == 0L;
     }
+
+    //공연 정보 조회
+
 }
