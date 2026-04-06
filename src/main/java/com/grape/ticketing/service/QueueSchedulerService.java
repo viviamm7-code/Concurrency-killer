@@ -14,13 +14,13 @@ import java.util.Set;
 public class QueueSchedulerService {
 
     private final QueueRedisService queueRedisService;
-    private static final long MAX_ACTIVE = 2L;  //입장 가능한 최대 인원
-    private static final long ACTIVE_DURATION_MILLIS = 60 * 1000L;  //입장 허용 시간(1분)
+    public static final long MAX_ACTIVE = 2L;  //입장 가능한 최대 인원
+    public static final long ACTIVE_DURATION_MILLIS = 60 * 1000L;  //입장 허용 시간(1분)
 
     /**
      * 개요: 스케줄러를 통해 유저의 대기 상태를 2초마다 업데이트하는 메서드
      */
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelay = 2000)
     public void updateStatus() {
         //공연 조회
         Set<Long> performanceIds = queueRedisService.getRegisteredPerformanceIds();

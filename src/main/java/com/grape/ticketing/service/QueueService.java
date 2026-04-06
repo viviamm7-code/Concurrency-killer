@@ -19,6 +19,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import static com.grape.ticketing.service.QueueSchedulerService.ACTIVE_DURATION_MILLIS;
+import static com.grape.ticketing.service.QueueSchedulerService.MAX_ACTIVE;
+
 @Service
 @RequiredArgsConstructor
 public class QueueService {
@@ -34,8 +37,10 @@ public class QueueService {
     public RegisterResponseTO registerQueue(Long memberId, Long performanceId) {
         String userQueueKey = getUserQueueKey(performanceId, memberId);
         String waitingQueueKey = getWaitingKey(performanceId);
+        String activeKey = getActiveKey(performanceId);
+        Long now = System.currentTimeMillis();
 
-        //등록되어있으면 바로 대기순번 조회 후 응답
+        //이미 대기열에 등록되어있으면 바로 대기순번 조회 후 응답
         if (queueRedisService.check(userQueueKey)) {
             Status result = queueRedisService.getStatus(userQueueKey);
             Status status = result != null ? result : Status.WAITING;
@@ -48,18 +53,20 @@ public class QueueService {
                     .build();
         }
 
-        System.out.println("대기큐 인원수: " + queueRedisService.getWaitingCount(waitingQueueKey));
         //사용자 정보 저장
-        Long now = System.currentTimeMillis();
-        Map<String, Object> queueInfo = Map.of(
-                "userId", memberId.toString(),
-                "performanceId", performanceId.toString(),
-                "status", Status.WAITING,
-                "enteredAt", String.valueOf(now),
-                "activeUntil", 0,  //수정
-                "initialRank", queueRedisService.getWaitingCount(waitingQueueKey) + 1
-        );
+        Map<String, Object> queueInfo = createUserInfoMap(memberId, performanceId, now, waitingQueueKey);
         queueRedisService.addUserQueue(userQueueKey, queueInfo);
+
+        //자리가 있으면 대기열 등록없이 바로 ACTIVE
+        if (checkActiveQueue(activeKey)) {
+            activateDirectly(performanceId, memberId, activeKey);
+            return RegisterResponseTO.builder()
+                    .memberId(memberId)
+                    .performanceId(performanceId)
+                    .status(Status.ACTIVE)
+                    .rank(0L)
+                    .build();
+        }
 
         //대기열에 저장
         queueRedisService.addWaitingQueue(waitingQueueKey, memberId, now);
@@ -131,7 +138,7 @@ public class QueueService {
             } catch (Exception e) {
                 emitter.completeWithError(e);  //에러 발생 시 종료. onError에서 task 정리됨
             }
-        }, 0, 30, TimeUnit.SECONDS);  //30초마다 전송
+        }, 0, 15, TimeUnit.SECONDS);  //15초마다 전송
 
         // task 정리
         Runnable cleanup = () -> task.cancel(true);  //task 끝내는 작업
@@ -174,6 +181,18 @@ public class QueueService {
                 .build();
     }
 
+    //redis에 저장할 유저 정보를 Map으로 변환
+    private Map<String, Object> createUserInfoMap(Long memberId, Long performanceId, Long now, String waitingQueueKey) {
+        return Map.of(
+                "userId", memberId.toString(),
+                "performanceId", performanceId.toString(),
+                "status", Status.WAITING,
+                "enteredAt", String.valueOf(now),
+                "activeUntil", 0,  //수정
+                "initialRank", queueRedisService.getWaitingCount(waitingQueueKey) + 1
+        );
+    }
+
     //redis에서 가져온 데이터를 Map으로 변환
     private Map<String, Object> createWaitingInfoMap(WaitingInfo info) {
         Map<String, Object> data = new HashMap<>();
@@ -188,11 +207,29 @@ public class QueueService {
         return data;
     }
 
+    //active큐에 자리 있는지 확인
+    private boolean checkActiveQueue(String activeKey) {
+        long activeCount = queueRedisService.getActiveCount(activeKey);
+        return MAX_ACTIVE - activeCount > 0;
+    }
+
+    //대기열 등록없이 활성화
+    private void activateDirectly(Long performanceId, Long memberId, String activeKey){
+        long activeUntil = System.currentTimeMillis() + ACTIVE_DURATION_MILLIS;
+        String userQueueKey = getUserQueueKey(performanceId, memberId);
+        queueRedisService.updateUserStatusToActive(userQueueKey, activeUntil);  //유저 active상태로 변경
+        queueRedisService.addActiveUser(activeKey, memberId);  //active큐에도 추가
+    }
+
     private String getUserQueueKey(Long performanceId, Long memberId) {
         return "queue:user:" + performanceId + ":" + memberId;
     }
 
     private String getWaitingKey(Long performanceId) {
         return "queue:waiting:" + performanceId;
+    }
+
+    private String getActiveKey(Long performanceId) {
+        return "queue:active:" + performanceId;
     }
 }
