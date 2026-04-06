@@ -9,51 +9,56 @@
 <body>
 <header>
     <a href="/admin" class="btn-back">←</a>
-
-    <div class="header-right">
-        <span id="adminName">관리자 확인 중...</span>
-        <span class="admin-chip">ADMIN</span>
-    </div>
 </header>
 
-<div class="wrap">
+<main class="wrap">
     <section class="top-box">
-        <p class="sub-title">RESERVATION MANAGEMENT</p>
+        <p class="sub-title">ADMIN RESERVATION MANAGEMENT</p>
         <h1 class="main-title">예매 관리</h1>
-        <p class="desc">예매 내역과 예매 상태를 확인합니다.</p>
+        <p class="desc">
+            전체 예매 내역을 조회하고 회원 아이디로 검색할 수 있습니다.
+        </p>
     </section>
 
-    <section id="forbiddenBox" class="message-box hidden">
-        관리자만 접근할 수 있습니다.
-    </section>
-
-    <section id="pageSection" class="hidden">
-        <div class="page-actions">
-            <div class="count-box">총 예매 수 <span id="reservationCount">0</span>건</div>
-
-            <div class="page-search-wrap">
-                <input type="text" id="searchInput" class="page-search-input" placeholder="회원/공연 검색" />
-                <button id="reloadBtn" class="page-btn">새로고침</button>
-            </div>
+    <section class="page-actions">
+        <div class="page-search-wrap">
+            <input
+                    type="text"
+                    id="reservationSearchInput"
+                    class="page-search-input"
+                    placeholder="회원 아이디 검색"
+            />
         </div>
 
-        <div class="page-table-wrap">
-            <table class="page-table">
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>회원</th>
-                    <th>공연명</th>
-                    <th>총 금액</th>
-                </tr>
-                </thead>
-                <tbody id="reservationTableBody"></tbody>
-            </table>
+        <div class="count-box">
+            총 <span id="reservationCount">0</span>건
         </div>
-
-        <div id="emptyBox" class="message-box small hidden">예매 데이터가 없습니다.</div>
     </section>
-</div>
+
+    <section class="page-table-wrap">
+        <table class="page-table">
+            <thead>
+            <tr>
+                <th style="width: 110px;">예매번호</th>
+                <th>회원 아이디</th>
+                <th>회원 이름</th>
+                <th>공연명</th>
+                <th>좌석</th>
+                <th>상태</th>
+            </tr>
+            </thead>
+            <tbody id="reservationTableBody"></tbody>
+        </table>
+    </section>
+
+    <div id="reservationEmptyBox" class="message-box small hidden">
+        조회된 예매 내역이 없습니다.
+    </div>
+
+    <div id="reservationErrorBox" class="message-box small hidden">
+        예매 정보를 불러오는 중 오류가 발생했습니다.
+    </div>
+</main>
 
 <script src="/js/admin-reservations.js"></script>
 </body>

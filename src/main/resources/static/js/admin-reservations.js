@@ -1,106 +1,134 @@
-const adminNameEl = document.getElementById("adminName");
-const forbiddenBox = document.getElementById("forbiddenBox");
-const pageSection = document.getElementById("pageSection");
-const reservationCountEl = document.getElementById("reservationCount");
+const reservationSearchInput = document.getElementById("reservationSearchInput");
 const reservationTableBody = document.getElementById("reservationTableBody");
-const emptyBox = document.getElementById("emptyBox");
-const reloadBtn = document.getElementById("reloadBtn");
-const searchInput = document.getElementById("searchInput");
+const reservationCount = document.getElementById("reservationCount");
+const reservationEmptyBox = document.getElementById("reservationEmptyBox");
+const reservationErrorBox = document.getElementById("reservationErrorBox");
 
-let reservations = [];
+let debounceTimer = null;
 
-async function fetchJson(url) {
-    const response = await fetch(url, {
-        method: "GET",
-        credentials: "include"
-    });
+document.addEventListener("DOMContentLoaded", () => {
+    fetchReservations();
+});
 
-    if (response.status === 401 || response.status === 403) {
-        throw new Error("FORBIDDEN");
+reservationSearchInput.addEventListener("input", () => {
+    clearTimeout(debounceTimer);
+
+    debounceTimer = setTimeout(() => {
+        fetchReservations(reservationSearchInput.value.trim());
+    }, 300);
+});
+
+async function fetchReservations(keyword = "") {
+    try {
+        hideMessageBoxes();
+        reservationTableBody.innerHTML = "";
+
+        const url = keyword
+            ? `/api/admin/reservations?keyword=${encodeURIComponent(keyword)}`
+            : `/api/admin/reservations`;
+
+        const response = await fetch(url, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Accept": "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`예매 목록 조회 실패: ${response.status}`);
+        }
+
+        const reservations = await response.json();
+        renderReservations(reservations);
+    } catch (error) {
+        console.error(error);
+        reservationCount.textContent = "0";
+        reservationErrorBox.classList.remove("hidden");
     }
-
-    if (!response.ok) {
-        throw new Error("API_ERROR");
-    }
-
-    return response.json();
 }
 
-function getStatusBadge(status) {
-    if (status === "RESERVED") {
-        return `<span class="status-badge status-reserved">예매 완료</span>`;
-    }
-    if (status === "CANCELED") {
-        return `<span class="status-badge status-canceled">취소</span>`;
-    }
-    if (status === "COMPLETED") {
-        return `<span class="status-badge status-completed">관람 완료</span>`;
-    }
-    return `<span class="status-badge">${status ?? ""}</span>`;
-}
-
-function renderReservations(list) {
+function renderReservations(reservations) {
     reservationTableBody.innerHTML = "";
-    reservationCountEl.textContent = list.length;
+    reservationCount.textContent = reservations.length;
 
-    if (!list.length) {
-        emptyBox.classList.remove("hidden");
+    if (!reservations || reservations.length === 0) {
+        reservationEmptyBox.classList.remove("hidden");
         return;
     }
 
-    emptyBox.classList.add("hidden");
+    reservations.forEach(reservation => {
+        const row = document.createElement("tr");
 
-    list.forEach(reservation => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-      <td>${reservation.reservationId ?? ""}</td>
-      <td>${reservation.loginId ?? ""}</td>
-      <td>${reservation.performanceTitle ?? ""}</td>
-      <td>${getStatusBadge(reservation.reservationStatus)}</td>
-      <td>${reservation.totalPrice ?? 0}</td>
-    `;
-        reservationTableBody.appendChild(tr);
+        row.innerHTML = `
+            <td>${reservation.reservationId ?? ""}</td>
+            <td>${escapeHtml(reservation.username ?? "")}</td>
+            <td>${escapeHtml(reservation.memberName ?? "")}</td>
+            <td>${escapeHtml(reservation.performanceTitle ?? "")}</td>
+         
+            <td>${escapeHtml(reservation.seatInfo ?? "")}</td>
+            <td>${renderStatusBadge(reservation.reservationStatus)}</td>
+          
+            
+        `;
+
+        reservationTableBody.appendChild(row);
     });
 }
 
-function filterReservations() {
-    const keyword = searchInput.value.trim().toLowerCase();
-
-    const filtered = reservations.filter(reservation =>
-        (reservation.loginId || "").toLowerCase().includes(keyword) ||
-        (reservation.performanceTitle || "").toLowerCase().includes(keyword)
-    );
-
-    renderReservations(filtered);
-}
-
-async function loadPage() {
-    try {
-        const me = await fetchJson("/api/me");
-
-        if (!me || me.role !== "ROLE_ADMIN") {
-            showForbidden();
-            return;
-        }
-
-        adminNameEl.textContent = `${me.loginId}님`;
-
-        reservations = await fetchJson("/api/admin/reservations");
-        renderReservations(reservations);
-
-        pageSection.classList.remove("hidden");
-        forbiddenBox.classList.add("hidden");
-    } catch (error) {
-        showForbidden();
+function renderStatusBadge(status) {
+    if (!status) {
+        return `<span class="status-badge">-</span>`;
     }
+
+    if (status === "RESERVED") {
+        return `<span class="status-badge status-reserved">예매 완료</span>`;
+    }
+
+    if (status === "CANCELED") {
+        return `<span class="status-badge status-canceled">취소</span>`;
+    }
+
+    if (status === "COMPLETED") {
+        return `<span class="status-badge status-completed">관람 완료</span>`;
+    }
+
+    return `<span class="status-badge">${escapeHtml(status)}</span>`;
 }
 
-function showForbidden() {
-    pageSection.classList.add("hidden");
-    forbiddenBox.classList.remove("hidden");
-    adminNameEl.textContent = "접근 불가";
+function formatPrice(value) {
+    if (value === null || value === undefined) return "-";
+    return `${Number(value).toLocaleString("ko-KR")}원`;
 }
 
-reloadBtn?.addEventListener("click", loadPage);
-searchInput?.addEventListener("input", filterReservations);
-window.addEventListener("DOMContentLoaded", loadPage);
+function formatDateTime(value) {
+    if (!value) return "-";
+
+    const date = new Date(value);
+
+    if (isNaN(date.getTime())) {
+        return value;
+    }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
+
+function hideMessageBoxes() {
+    reservationEmptyBox.classList.add("hidden");
+    reservationErrorBox.classList.add("hidden");
+}
+
+function escapeHtml(value) {
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+}

@@ -45,7 +45,7 @@ function renderDetail(draft) {
                     </div>
 
                     <div class="info-item">
-                        <div class="info-label">예매자</div>
+                        <div class="info-label">예매자 아이디</div>
                         <div class="info-value">${formatMemberLabel(draft.memberId)}</div>
                     </div>
 

@@ -82,11 +82,22 @@
             <button type="submit" class="password-btn">비밀번호 변경</button>
         </form>
     </section>
-    <div class="mypage-danger-zone">
-        <h3>회원 탈퇴</h3>
-        <p>탈퇴 시 회원 정보와 연관 데이터가 삭제되며 복구할 수 없습니다.</p>
-        <button type="button" id="deleteMyAccountBtn" class="danger-btn">회원 탈퇴</button>
-    </div>
+
+    <section id="dangerSection" class="profile-card hidden password-card">
+        <div class="profile-header">
+            <div>
+                <div class="profile-badge">DANGER ZONE</div>
+                <h2 class="profile-title">회원 탈퇴</h2>
+                <p class="profile-role">탈퇴 시 회원 정보와 연관 데이터가 삭제되며 복구할 수 없습니다.</p>
+            </div>
+        </div>
+
+        <div class="action-row">
+            <button type="button" id="deleteMyAccountBtn" class="action-btn danger-btn">
+                회원 탈퇴
+            </button>
+        </div>
+    </section>
 </div>
 </body>
 </html>

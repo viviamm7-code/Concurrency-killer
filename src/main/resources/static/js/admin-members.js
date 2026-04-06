@@ -143,9 +143,6 @@ async function toggleMemberDetail(memberId, clickedRow) {
                 <div style="color:#94a3b8; font-size:14px; font-weight:700;">아이디</div>
                 <div style="color:#f8fafc; font-size:14px;">${escapeHtml(member.username ?? "")}</div>
 
-                <div style="color:#94a3b8; font-size:14px; font-weight:700;">이름</div>
-                <div style="color:#f8fafc; font-size:14px;">${escapeHtml(member.name ?? "")}</div>
-
                 <div style="color:#94a3b8; font-size:14px; font-weight:700;">이메일</div>
                 <div style="color:#f8fafc; font-size:14px; word-break:break-all;">
                     ${escapeHtml(member.email ?? "")}
@@ -153,9 +150,6 @@ async function toggleMemberDetail(memberId, clickedRow) {
 
                 <div style="color:#94a3b8; font-size:14px; font-weight:700;">권한</div>
                 <div style="color:#f8fafc; font-size:14px;">${escapeHtml(member.role ?? "")}</div>
-
-                <div style="color:#94a3b8; font-size:14px; font-weight:700;">상태</div>
-                <div style="color:#f8fafc; font-size:14px;">${escapeHtml(member.status ?? "")}</div>
 
                 <div style="color:#94a3b8; font-size:14px; font-weight:700;">가입일</div>
                 <div style="color:#f8fafc; font-size:14px;">${formatDateTime(member.createdAt)}</div>
@@ -189,7 +183,7 @@ async function toggleMemberDetail(memberId, clickedRow) {
 }
 
 async function deleteMember(memberId) {
-    const confirmed = confirm("정말 이 회원과 연관된 데이터를 모두 삭제하시겠습니까?");
+    const confirmed = confirm("정말 이 회원과 기록을 모두 삭제하시겠습니까?");
     if (!confirmed) return;
 
     try {

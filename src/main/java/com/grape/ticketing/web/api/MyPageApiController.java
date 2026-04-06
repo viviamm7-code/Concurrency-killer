@@ -1,8 +1,6 @@
 package com.grape.ticketing.web.api;
 
 import com.grape.ticketing.domain.member.Member;
-import com.grape.ticketing.dto.SessionMemberDto;
-import com.grape.ticketing.dto.user.MemberDeleteRequestDto;
 import com.grape.ticketing.dto.user.MyPageResponseDto;
 import com.grape.ticketing.dto.user.PasswordUpdateRequestDto;
 import com.grape.ticketing.repository.MemberRepository;

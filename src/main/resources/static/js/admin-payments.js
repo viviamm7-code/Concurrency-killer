@@ -1,92 +1,112 @@
-const adminNameEl = document.getElementById("adminName");
-const forbiddenBox = document.getElementById("forbiddenBox");
-const pageSection = document.getElementById("pageSection");
-const paymentCountEl = document.getElementById("paymentCount");
+const paymentSearchInput = document.getElementById("paymentSearchInput");
 const paymentTableBody = document.getElementById("paymentTableBody");
-const emptyBox = document.getElementById("emptyBox");
-const reloadBtn = document.getElementById("reloadBtn");
-const searchInput = document.getElementById("searchInput");
+const paymentCount = document.getElementById("paymentCount");
+const paymentEmptyBox = document.getElementById("paymentEmptyBox");
+const paymentErrorBox = document.getElementById("paymentErrorBox");
 
-let payments = [];
+let debounceTimer = null;
 
-async function fetchJson(url) {
-    const response = await fetch(url, {
-        method: "GET",
-        credentials: "include"
-    });
+document.addEventListener("DOMContentLoaded", () => {
+    fetchPayments();
+});
 
-    if (response.status === 401 || response.status === 403) {
-        throw new Error("FORBIDDEN");
+paymentSearchInput.addEventListener("input", () => {
+    clearTimeout(debounceTimer);
+
+    debounceTimer = setTimeout(() => {
+        fetchPayments(paymentSearchInput.value.trim());
+    }, 300);
+});
+
+async function fetchPayments(keyword = "") {
+    try {
+        hideMessageBoxes();
+        paymentTableBody.innerHTML = "";
+
+        const url = keyword
+            ? `/api/admin/payments?keyword=${encodeURIComponent(keyword)}`
+            : `/api/admin/payments`;
+
+        const response = await fetch(url, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Accept": "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`결제 목록 조회 실패: ${response.status}`);
+        }
+
+        const payments = await response.json();
+        renderPayments(payments);
+    } catch (error) {
+        console.error(error);
+        paymentCount.textContent = "0";
+        paymentErrorBox.classList.remove("hidden");
     }
-
-    if (!response.ok) {
-        throw new Error("API_ERROR");
-    }
-
-    return response.json();
 }
 
-function renderPayments(list) {
+function renderPayments(payments) {
     paymentTableBody.innerHTML = "";
-    paymentCountEl.textContent = list.length;
+    paymentCount.textContent = payments.length;
 
-    if (!list.length) {
-        emptyBox.classList.remove("hidden");
+    if (!payments || payments.length === 0) {
+        paymentEmptyBox.classList.remove("hidden");
         return;
     }
 
-    emptyBox.classList.add("hidden");
+    payments.forEach(payment => {
+        const row = document.createElement("tr");
 
-    list.forEach(payment => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-      <td>${payment.paymentId ?? ""}</td>
-      <td>${payment.reservationId ?? ""}</td>
-      <td>${payment.orderId ?? ""}</td>
-      <td>${payment.paymentKey ?? ""}</td>
-      <td>${payment.amount ?? 0}</td>
-    `;
-        paymentTableBody.appendChild(tr);
+        row.innerHTML = `
+            <td>${payment.paymentId ?? ""}</td>
+            <td>${escapeHtml(payment.username ?? "")}</td>
+            <td>${escapeHtml(payment.memberName ?? "")}</td>
+            <td>${escapeHtml(payment.performanceTitle ?? "")}</td>
+            <td>${formatPrice(payment.amount)}</td>
+            <td>${escapeHtml(payment.orderId ?? "-")}</td>
+            <td>${formatDateTime(payment.paidAt)}</td>
+        `;
+
+        paymentTableBody.appendChild(row);
     });
 }
 
-function filterPayments() {
-    const keyword = searchInput.value.trim().toLowerCase();
-
-    const filtered = payments.filter(payment =>
-        (payment.orderId || "").toLowerCase().includes(keyword)
-    );
-
-    renderPayments(filtered);
+function formatPrice(value) {
+    if (value === null || value === undefined) return "-";
+    return `${Number(value).toLocaleString("ko-KR")}원`;
 }
 
-async function loadPage() {
-    try {
-        const me = await fetchJson("/api/me");
+function formatDateTime(value) {
+    if (!value) return "-";
 
-        if (!me || me.role !== "ROLE_ROLE") {
-            showForbidden();
-            return;
-        }
+    const date = new Date(value);
 
-        adminNameEl.textContent = `${me.loginId}님`;
-
-        payments = await fetchJson("/api/admin/payments");
-        renderPayments(payments);
-
-        pageSection.classList.remove("hidden");
-        forbiddenBox.classList.add("hidden");
-    } catch (error) {
-        showForbidden();
+    if (isNaN(date.getTime())) {
+        return value;
     }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
-function showForbidden() {
-    pageSection.classList.add("hidden");
-    forbiddenBox.classList.remove("hidden");
-    adminNameEl.textContent = "접근 불가";
+function hideMessageBoxes() {
+    paymentEmptyBox.classList.add("hidden");
+    paymentErrorBox.classList.add("hidden");
 }
 
-reloadBtn?.addEventListener("click", loadPage);
-searchInput?.addEventListener("input", filterPayments);
-window.addEventListener("DOMContentLoaded", loadPage);
+function escapeHtml(value) {
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+}

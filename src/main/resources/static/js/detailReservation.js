@@ -112,7 +112,7 @@ function renderDetail(data) {
                         <div class="info-value">${data.reservationId}</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">이름</div>
+                        <div class="info-label">예매자 아이디</div>
                         <div class="info-value">${data.reservationName || "-"}</div>
                     </div>
                     <div class="info-item">

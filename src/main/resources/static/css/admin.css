@@ -484,3 +484,14 @@ header {
         grid-template-columns: 1fr;
     }
 }
+
+.danger-btn {
+    border: none;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    cursor: pointer;
+}
+
+.danger-btn:hover {
+    opacity: 0.92;
+}

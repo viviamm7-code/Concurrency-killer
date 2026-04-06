@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const profileSection = document.getElementById("profileSection");
     const passwordSection = document.getElementById("passwordSection");
     const passwordForm = document.getElementById("passwordForm");
+    const dangerSection = document.getElementById("dangerSection");
 
     try {
         const response = await fetch("/api/mypage", {
@@ -38,11 +39,14 @@ document.addEventListener("DOMContentLoaded", async function () {
         errorBox.classList.add("hidden");
         profileSection.classList.remove("hidden");
         passwordSection.classList.remove("hidden");
+        dangerSection.classList.remove("hidden");
+
     } catch (error) {
         console.error(error);
         loadingBox.classList.add("hidden");
         profileSection.classList.add("hidden");
         passwordSection.classList.add("hidden");
+        dangerSection.classList.add("hidden");
         errorBox.classList.remove("hidden");
     }
 
@@ -106,7 +110,7 @@ const deleteMyAccountBtn = document.getElementById("deleteMyAccountBtn");
 
 if (deleteMyAccountBtn) {
     deleteMyAccountBtn.addEventListener("click", async () => {
-        const confirmed = confirm("정말 회원 탈퇴하시겠습니까? 관련 데이터도 함께 삭제됩니다.");
+        const confirmed = confirm("정말 회원 탈퇴하시겠습니까?");
         if (!confirmed) return;
 
         try {
