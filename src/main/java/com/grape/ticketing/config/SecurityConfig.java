@@ -30,11 +30,16 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admin/**", "/api/admin/**").hasAuthority("ADMIN_ROLE")
                         .requestMatchers(
-                                "/", "/login", "/css/**", "/js/**", "/images/**",
-                                "/api/auth/check", "/performance-list", "/api/**", "/performances/**"
+                                "/", "/login", "/signup",
+                                "/css/**", "/js/**", "/images/**",
+                                "/api/auth/check",
+                                "/performance-list",
+                                "/performances/**",
+                                "/api/performances/**",
+                                "/api/auth/status"
                         ).permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -79,8 +84,9 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login")
+                        .logoutSuccessUrl("/performance-list")
                         .invalidateHttpSession(true)
+                        .clearAuthentication(true)
                         .deleteCookies("JSESSIONID")
                 );
 

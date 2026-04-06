@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+</html>a<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>공연 관리</title>
+    <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+<header>
+    <a href="/admin" class="btn-back">←</a>
+
+    <div class="header-right">
+        <span id="adminName">관리자 확인 중...</span>
+        <span class="admin-chip">ADMIN</span>
+    </div>
+</header>
+
+<div class="wrap">
+    <section class="top-box">
+        <p class="sub-title">PERFORMANCE MANAGEMENT</p>
+        <h1 class="main-title">공연 관리</h1>
+        <p class="desc">등록된 공연 정보와 공연 일정을 확인합니다.</p>
+    </section>
+
+    <section id="forbiddenBox" class="message-box hidden">
+        관리자만 접근할 수 있습니다.
+    </section>
+
+    <section id="pageSection" class="hidden">
+        <div class="page-actions">
+            <div class="count-box">총 공연 수 <span id="performanceCount">0</span>개</div>
+
+            <div class="page-search-wrap">
+                <input type="text" id="searchInput" class="page-search-input" placeholder="공연명 검색" />
+                <button id="reloadBtn" class="page-btn">새로고침</button>
+            </div>
+        </div>
+
+        <div class="page-table-wrap">
+            <table class="page-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>공연명</th>
+                    <th>공연장</th>
+                    <th>공연일</th>
+                </tr>
+                </thead>
+                <tbody id="performanceTableBody"></tbody>
+            </table>
+        </div>
+
+        <div id="emptyBox" class="message-box small hidden">공연 데이터가 없습니다.</div>
+    </section>
+</div>
+
+<script src="/js/admin-performances.js"></script>
+</body>
+</html>
