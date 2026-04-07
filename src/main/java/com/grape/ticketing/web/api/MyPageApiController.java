@@ -5,6 +5,8 @@ import com.grape.ticketing.dto.user.MyPageResponseDto;
 import com.grape.ticketing.dto.user.PasswordUpdateRequestDto;
 import com.grape.ticketing.repository.MemberRepository;
 import com.grape.ticketing.service.AdminMemberService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,12 +20,14 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/mypage")
+@Tag(name = "내 정보 API")
 public class MyPageApiController {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final AdminMemberService adminMemberService;
 
+    @Operation(summary = "내 계정 정보 조회")
     @GetMapping
     public MyPageResponseDto getMyPage(HttpSession session) {
         Member member = getLoginMember(session);
@@ -42,6 +46,7 @@ public class MyPageApiController {
         );
     }
 
+    @Operation(summary = "비밀번호 변경")
     @PatchMapping("/password")
     public Map<String, String> updatePassword(@RequestBody PasswordUpdateRequestDto request, HttpSession session) {
         Member member = getLoginMember(session);
@@ -94,6 +99,7 @@ public class MyPageApiController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."));
     }
 
+    @Operation(summary = "회원 탈퇴")
     @DeleteMapping("/delete")
     public void deleteMyAccount(HttpSession session) {
         Long loginMemberId = (Long) session.getAttribute("loginMember");

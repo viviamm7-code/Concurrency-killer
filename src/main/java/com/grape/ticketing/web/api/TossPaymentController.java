@@ -1,6 +1,8 @@
 package com.grape.ticketing.web.api;
 
 import com.grape.ticketing.service.TossPaymentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,10 +17,12 @@ import java.util.UUID;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/payments/toss")
+@Tag(name = "TossPayment 결제 API")
 public class TossPaymentController {
 
     private final TossPaymentService tossPaymentService;
 
+    @Operation(summary = "결제 성공 Redirection")
     @GetMapping("/success")
     public String success(
             @RequestParam String paymentKey,
@@ -28,12 +32,12 @@ public class TossPaymentController {
             Model model
     ) {
         tossPaymentService.handleSuccess(draftId, paymentKey, orderId, amount);
-        System.out.println("handleSuccess 완료");
         model.addAttribute("message", "결제가 완료되었습니다.");
         model.addAttribute("reservationUrl", "/reservation");
         return "payments/success";
     }
 
+    @Operation(summary = "결제 실패 Redirection")
     @GetMapping("/fail")
     public String fail(
             @RequestParam(required = false) String code,
