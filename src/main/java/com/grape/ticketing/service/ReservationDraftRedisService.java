@@ -51,10 +51,10 @@ public class ReservationDraftRedisService {
     private final SeatRepository seatRepository;
     private final QueueRedisService queueRedisService;
 
-    public ReservationDraftResponse createDraft(ReservationDraftCreateRequest request) {
+    public ReservationDraftResponse createDraft(Long memberId, ReservationDraftCreateRequest request) {
         ReservationDraftCacheDto draft = new ReservationDraftCacheDto();
         draft.setDraftId(UUID.randomUUID());
-        draft.setMemberId(request.getMemberId());
+        draft.setMemberId(memberId);
         draft.setPerformanceId(request.getPerformanceId());
         draft.setPerformanceDate(request.getPerformanceDate());
         draft.setPerformanceTitle(request.getPerformanceTitle());
@@ -116,6 +116,10 @@ public class ReservationDraftRedisService {
     @Transactional
     public ReservationConfirmResponse confirmDraft(UUID draftId) {
         ReservationDraftCacheDto draft = getDraftEntity(draftId);
+
+        // 로그 추가
+        System.out.println("DEBUG: PerformanceId = " + draft.getPerformanceId());
+        System.out.println("DEBUG: MemberId = " + draft.getMemberId());
 
         Member member = memberRepository.findById(draft.getMemberId())
                 .orElseThrow(() -> new IllegalArgumentException("회원이 없습니다."));

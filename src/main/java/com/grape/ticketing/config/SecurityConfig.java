@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
@@ -37,19 +35,20 @@ public class SecurityConfig {
                         .authenticated()
 
                         .requestMatchers(
-                                "/", "/login", "/signup",
-                                "/css/**", "/js/**", "/images/**",
-                                "/api/auth/check", "/api/auth/status",
+                                "/", "/login", "/signup", "/join",
+                                "/css/**", "/js/**", "/images/**", "/api/auth/**",
                                 "/performance-list", "/performances/**", "/api/performances/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
                                 "/webjars/**",
-                                "/api/queue/**"  //테스트용 -> 시연 영상 찍은 후에 지우기
+                                "/api/queue/**", "/already-logged-in", "/error",
+                                "/api/member/join"//테스트용 -> 시연 영상 찍은 후에 지우기
                         ).permitAll()
 
                         .anyRequest().authenticated()
                 )
+                //일반 로그인
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/members/login")
@@ -65,6 +64,7 @@ public class SecurityConfig {
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
+                //소셜 로그인
                 .oauth2Login(oauth -> oauth
                         .loginPage("/login")
                         .authorizationEndpoint(endpoint -> endpoint
