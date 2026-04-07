@@ -1,22 +1,36 @@
 @charset "utf-8";
+
 #loginButton {
     display: flex;
     gap: 12px;
+    align-items: center;
 }
-#loginButton a{
+
+#loginButton form {
+    margin: 0;
+    display: flex;
+}
+
+#loginButton a,
+#loginButton button {
     width: 120px;
     height: 48px;
     background: linear-gradient(to right, #423047, #333252);
     display: flex;
-    justify-content: center; /* 가로 중앙 */
-    align-items: center;     /* 세로 중앙 */
+    justify-content: center;
+    align-items: center;
     border-radius: 15px;
     color: #C7CFDA;
     text-decoration: none;
     font-size: 16px;
     font-weight: bold;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-#loginButton a:hover{
+#loginButton a:hover,
+#loginButton button:hover {
     color: white;
 }

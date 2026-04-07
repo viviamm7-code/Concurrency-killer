@@ -6,6 +6,8 @@ import com.grape.ticketing.dto.reservation.ReservationDraftResponse;
 import com.grape.ticketing.dto.reservation.ReservationDraftUpdateRequest;
 import com.grape.ticketing.exception.SeatHoldConflictException;
 import com.grape.ticketing.service.ReservationDraftRedisService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,24 +23,28 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
+@Tag(name = "Redis 정보 저장")
 @RestController
 @RequestMapping("/reservation-drafts")
 @RequiredArgsConstructor
+@Tag(name = "Redis 사용 API")
 public class ReservationDraftController {
 
     private final ReservationDraftRedisService reservationDraftRedisService;
 
+    @Operation(summary = "임시 예매 정보 저장")
     @PostMapping
     public ReservationDraftResponse createDraft(@RequestBody ReservationDraftCreateRequest request) {
         return reservationDraftRedisService.createDraft(request);
     }
 
+    @Operation(summary = "임시 예매 정보 조회")
     @GetMapping("/{draftId}")
     public ReservationDraftResponse getDraft(@PathVariable UUID draftId) {
         return reservationDraftRedisService.getDraft(draftId);
     }
 
+    @Operation(summary = "임시 예매 정보 수정")
     @PutMapping("/{draftId}")
     public ReservationDraftResponse updateDraft(
             @PathVariable UUID draftId,
@@ -47,11 +53,13 @@ public class ReservationDraftController {
         return reservationDraftRedisService.updateDraft(draftId, request);
     }
 
+    @Operation(summary = "예매 완료 저장")
     @PostMapping("/{draftId}/confirm")
     public ReservationConfirmResponse confirmDraft(@PathVariable UUID draftId) {
         return reservationDraftRedisService.confirmDraft(draftId);
     }
 
+    @Operation(summary = "선점된 좌석 풀기")
     @PostMapping("/{draftId}/release-seats")
     public ReservationDraftResponse releaseSelectedSeats(@PathVariable UUID draftId) {
         return reservationDraftRedisService.releaseSelectedSeats(draftId);

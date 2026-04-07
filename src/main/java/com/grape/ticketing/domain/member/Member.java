@@ -29,8 +29,9 @@ public class Member extends BaseEntitiy {
     private String password;
     private String role;
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Reservation> reservations = new ArrayList<>();
+
 
     public Member(String name, String email, String username, String password, String role) {
         this.name = name;

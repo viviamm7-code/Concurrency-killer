@@ -1,8 +1,8 @@
 package com.grape.ticketing.web;
 
-import com.grape.ticketing.domain.member.Member;
 import com.grape.ticketing.service.LoginService;
-import jakarta.servlet.http.HttpServletRequest;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -13,6 +13,7 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
+@Tag(name = "로그인 API")
 public class MemberController {
 
     private final LoginService loginService;
@@ -21,8 +22,8 @@ public class MemberController {
     public String login(){
         return "members/login";
     }
-    @RequestMapping("/logout1")
-    public String logout1(HttpSession session){
+    @RequestMapping("/logout")
+    public String logout(HttpSession session){
         session.invalidate();
         return "redirect:/login";
     }
@@ -32,6 +33,7 @@ public class MemberController {
         return "ticketing";
     }
 
+    @Operation(summary = "세션 키값으로 로그인 상태 확인")
     @GetMapping("/api/auth/status")
     @ResponseBody
     public Map<String, Object> getAuthStatus(HttpSession session) {
@@ -50,6 +52,7 @@ public class MemberController {
         return status;
     }
 
+    @Operation(summary = "로그인 상태 확인")
     @GetMapping("/api/auth/check")
     @ResponseBody
     public boolean checkLogin(HttpSession session) {

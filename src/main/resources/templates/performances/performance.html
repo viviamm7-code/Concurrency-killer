@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>뮤지컬 긴긴밤</title>
     <link rel="stylesheet" type="text/css" href="/css/header.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -148,6 +147,8 @@
             border-bottom: none;
         }
 
+
+
         .cancellation-note {
             margin-top: 28px;
             font-size: 13px;
@@ -213,6 +214,98 @@
             grid-template-columns: repeat(7, minmax(0, 1fr));
             gap: 4px;
             text-align: center;
+        }
+
+        .venue-inline-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .venue-text {
+            color: var(--text);
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .venue-map-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: none;
+            border-radius: 999px;
+            background: #FEE500;
+            color: #191919;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: transform .15s, opacity .15s, box-shadow .15s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+            white-space: nowrap;
+        }
+
+        .venue-map-btn:hover {
+            transform: translateY(-1px);
+            opacity: 0.96;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.24);
+        }
+
+        .venue-map-icon {
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        .map-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.72);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .map-modal.active {
+            display: flex;
+        }
+
+        .map-modal-content {
+            width: 100%;
+            max-width: 860px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+        }
+
+        .map-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .map-modal-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .map-close-btn {
+            border: none;
+            background: transparent;
+            color: var(--text);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        #kakaoMap {
+            width: 100%;
+            height: 420px;
         }
 
         .cal-dow {
@@ -392,7 +485,13 @@
             <div class="info-table">
                 <div class="info-row">
                     <div class="info-label">장소</div>
-                    <div class="info-value" id="infoVenue"></div>
+                    <div class="info-value venue-inline-wrap">
+                        <span id="infoVenueText" class="venue-text"></span>
+                        <button type="button" id="infoVenue" class="venue-map-btn">
+                            <span class="venue-map-icon">📍</span>
+                            카카오 지도 보기
+                        </button>
+                    </div>
                 </div>
                 <div class="info-row">
                     <div class="info-label">공연 기간</div>
@@ -444,11 +543,20 @@
         <div class="modal-detail-row"><span>가격</span><span id="modalPrice"></span></div>
         <div class="modal-actions">
             <button class="modal-cancel" id="modalCancel">취소</button>
-            <button class="modal-confirm" id="modalConfirm">예매 완료</button>
+            <button class="modal-confirm" id="modalConfirm">예매하기</button>
         </div>
     </div>
 </div>
 
+<div class="map-modal" id="mapModal">
+    <div class="map-modal-content">
+        <div class="map-modal-header">
+            <div class="map-modal-title" id="mapTitle">공연장 위치</div>
+            <button type="button" class="map-close-btn" id="mapCloseBtn">×</button>
+        </div>
+        <div id="kakaoMap"></div>
+    </div>
+</div>
 <script>
     let memberId = null;
     let data = null;
@@ -463,6 +571,141 @@
     let currentMonth = 0;
     let selectedDay = 25;
 
+    let kakaoMap = null;
+    let kakaoMarker = null;
+
+    async function loadKakaoSdk() {
+        if (window.kakao && window.kakao.maps) {
+            return;
+        }
+
+        const res = await fetch('/api/performances/config/map');
+        if (!res.ok) {
+            throw new Error('카카오 지도 설정을 불러오지 못했습니다.');
+        }
+
+        const config = await res.json();
+        const appKey = config.kakaoMapAppKey;
+
+        if (!appKey) {
+            throw new Error('카카오 지도 키가 없습니다.');
+        }
+
+        await new Promise((resolve, reject) => {
+            const existing = document.querySelector('script[data-kakao-map="true"]');
+            if (existing) {
+                existing.addEventListener('load', resolve, { once: true });
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${appKey}&libraries=services&autoload=false`;
+            script.dataset.kakaoMap = 'true';
+            script.onload = () => kakao.maps.load(resolve);
+            script.onerror = () => reject(new Error('카카오 SDK 로드 실패'));
+            document.head.appendChild(script);
+        });
+    }
+
+    function closeMapModal() {
+        document.getElementById('mapModal').classList.remove('active');
+    }
+
+    async function openMapModal() {
+        try {
+            if (!data) return;
+
+            const venueName = data.venue || '공연장';
+            const address = data.address;
+            const latitude = data.latitude;
+            const longitude = data.longitude;
+
+            if ((latitude == null || longitude == null) && !address) {
+                alert('공연장 위치 정보가 없습니다.');
+                return;
+            }
+
+            await loadKakaoSdk();
+
+            document.getElementById('mapTitle').textContent = `${venueName} 위치`;
+            document.getElementById('mapModal').classList.add('active');
+
+            const mapContainer = document.getElementById('kakaoMap');
+            const defaultCenter = new kakao.maps.LatLng(37.5665, 126.9780);
+
+            if (!kakaoMap) {
+                kakaoMap = new kakao.maps.Map(mapContainer, {
+                    center: defaultCenter,
+                    level: 3
+                });
+            }
+
+            kakaoMap.relayout();
+
+            if (kakaoMarker) {
+                kakaoMarker.setMap(null);
+            }
+
+            // 위도/경도 있으면 바로 지도 표시
+            if (latitude != null && longitude != null) {
+                const coords = new kakao.maps.LatLng(latitude, longitude);
+
+                kakaoMap.setCenter(coords);
+                kakaoMap.setLevel(3);
+
+                kakaoMarker = new kakao.maps.Marker({
+                    map: kakaoMap,
+                    position: coords
+                });
+
+                const infowindow = new kakao.maps.InfoWindow({
+                    content: `
+                            <div style="
+                                padding:8px 12px;
+                                font-size:13px;
+                                font-weight:600;
+                                color:#191919;
+                                background:#ffffff;
+                                border:1px solid #ddd;
+                                border-radius:8px;
+                                white-space:nowrap;
+                            ">
+                                ${venueName}
+                            </div>
+    `
+                });
+                infowindow.open(kakaoMap, kakaoMarker);
+                return;
+            }
+
+            // 주소 fallback
+            const geocoder = new kakao.maps.services.Geocoder();
+
+            geocoder.addressSearch(address, function(result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+                    kakaoMap.setCenter(coords);
+                    kakaoMap.setLevel(3);
+
+                    kakaoMarker = new kakao.maps.Marker({
+                        map: kakaoMap,
+                        position: coords
+                    });
+
+                    const infowindow = new kakao.maps.InfoWindow({
+                        content: `<div style="padding:6px 10px;font-size:13px;">${venueName}</div>`
+                    });
+                    infowindow.open(kakaoMap, kakaoMarker);
+                } else {
+                    alert('공연장 위치를 찾을 수 없습니다.');
+                }
+            });
+        } catch (error) {
+            console.error('지도 열기 실패:', error);
+            alert(error.message || '지도를 불러오지 못했습니다.');
+        }
+    }
 
     function formatDateTime(value) {
         if (!value) {
@@ -553,7 +796,11 @@
         img.src = performance.imageUrl || "/images/1.jpeg";
         img.alt = performance.performanceName;
 
-        document.getElementById('infoVenue').textContent = performance.venue || '-';
+        const venueText = document.getElementById('infoVenueText');
+        const venueButton = document.getElementById('infoVenue');
+
+        venueText.textContent = performance.venue || '-';
+        venueButton.onclick = openMapModal;
         document.getElementById('infoPeriod').textContent = `${performance.startDate || '-'} ~ ${performance.endDate || '-'}`;
         document.getElementById('infoDuration').textContent = `${performance.performanceTime ?? '-'}분`;
         document.getElementById('infoStartTime').textContent = formatTime(performance.startedAt);
@@ -694,31 +941,31 @@
         }
     });
 
+    document.getElementById('mapCloseBtn').addEventListener('click', closeMapModal);
+
+    document.getElementById('mapModal').addEventListener('click', (e) => {
+        if (e.target.id === 'mapModal') {
+            closeMapModal();
+        }
+    });
+
     document.getElementById('modalConfirm').addEventListener('click', async () => {
         overlay.classList.remove('active');
 
-        const btn = document.getElementById('btnBook');
-        btn.textContent = '✓ 예매 완료';
-        btn.style.background = 'linear-gradient(135deg, #2a9060, #38b070)';
-        btn.style.boxShadow = '0 4px 20px rgba(42,144,96,0.4)';
-        setTimeout(() => {
-            btn.textContent = '예매하기';
-            btn.style.background = '';
-            btn.style.boxShadow = '';
-        }, 3000);
-
         try {
-            if (memberId === 0) {
+            if (!memberId || Number.isNaN(memberId)) {
                 throw new Error('로그인이 필요합니다.');
             }
+
             const selectedDate = getSelectedPerformanceDate();
+
             const response = await fetch('/reservation-drafts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     memberId,
                     performanceId: data.id,
-                    performanceDate: getSelectedPerformanceDate(),
+                    performanceDate: selectedDate,
                     performanceTitle: data.performanceName,
                     performancePrice: data.price,
                     performanceVenue: data.venue,
@@ -731,21 +978,34 @@
             });
 
             if (!response.ok) {
-                throw new Error('draft 생성 실패');
+                const errorText = await response.text();
+                console.error('draft 생성 실패:', errorText);
+                throw new Error('좌석 선택 페이지로 이동하지 못했습니다.');
             }
 
             const draft = await response.json();
+            console.log('draft 응답:', draft);
+
+            if (!draft || !draft.draftId) {
+                throw new Error('draftId가 없습니다.');
+            }
+
+            window.location.href = `/seat?draftId=${draft.draftId}`;
 
             //초안 생성 후, 대기열 등록
             registerQueue(data.id, memberId, draft.draftId)
             //window.location.href = `/seat?draftId=${draft.draftId}`;
             window.location.href = `/waitingQueue?draftId=${draft.draftId}`;
         } catch (error) {
+            console.error('예매 진행 실패:', error);
+
             if (error.message === '로그인이 필요합니다.') {
                 alert(error.message);
                 window.location.href = '/login';
                 return;
             }
+
+            alert(error.message || '예매 진행 중 오류가 발생했습니다.');
         }
     });
 

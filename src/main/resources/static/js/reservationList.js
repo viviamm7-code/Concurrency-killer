@@ -1,7 +1,3 @@
-function goReservationConfirm() {
-    location.href = `/reservation/2/confirm`;
-}
-
 let reservations = [];
 let currentFilter = "ALL";
 
@@ -72,6 +68,7 @@ function createCard(item) {
           </div>
         </div>
       </div>
+      
     `;
 }
 
@@ -170,6 +167,7 @@ function renderReservations() {
       ${renderSection("예매 완료", reservedItems)}
       ${renderSection("취소", canceledItems)}
       ${renderSection("관람 완료", completedItems)}
+     
     `;
 
         return;

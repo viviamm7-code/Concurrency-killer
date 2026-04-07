@@ -27,4 +27,8 @@ public class ReservationDraftCacheDto implements Serializable {
     private Integer totalPrice;
     private boolean confirmed;
     private Date reservedDate;
+
+    //결제
+    private String paymentKey;
+    private Long amount;
 }

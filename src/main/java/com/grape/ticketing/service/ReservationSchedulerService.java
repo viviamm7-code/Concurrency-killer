@@ -21,35 +21,7 @@ public class ReservationSchedulerService {
     private final ReservationService reservationService;
     private final ReservationRepository reservationRepository;
     private final SeatRepository seatRepository;
-
-    @Scheduled(fixedDelay = 60000) // 1분마다 실행
-    @Transactional
-    public void completeExpiredReservations() {
-        List<Reservation> reservations =
-                reservationRepository.findAllByReservationStatusAndPerformance_StartedAtBefore(
-                        ReservationStatus.RESERVED,
-                        LocalDateTime.now()
-                );
-
-        for (Reservation reservation : reservations) {
-            List<Seat> seats = reservation.getReservationSeats().stream()
-                    .map(ReservationSeat::getSeat)
-                    .toList();
-
-            for (Seat seat : seats) {
-                seat.setSeatStatus(SeatStatus.AVAILABLE);
-            }
-
-            reservation.setReservationStatus(ReservationStatus.COMPLETED);
-        }
-
-        seatRepository.saveAll(
-                reservations.stream()
-                        .flatMap(r -> r.getReservationSeats().stream())
-                        .map(ReservationSeat::getSeat)
-                        .toList()
-        );
-    }
+    
 
     @Scheduled(fixedRate = 60000) // 1분마다 실행
     public void completeReservations() {

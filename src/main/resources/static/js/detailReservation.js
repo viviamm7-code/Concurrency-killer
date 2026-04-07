@@ -1,5 +1,5 @@
 const fallbackImage = "https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=1200&q=80";
-
+console.log("dsadsadsadas");
 function getReservationIdFromPath() {
     const pathParts = window.location.pathname.split("/");
     const value = pathParts[pathParts.length - 1];
@@ -112,7 +112,7 @@ function renderDetail(data) {
                         <div class="info-value">${data.reservationId}</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">이름</div>
+                        <div class="info-label">예매자 아이디</div>
                         <div class="info-value">${data.reservationName || "-"}</div>
                     </div>
                     <div class="info-item">
@@ -170,6 +170,24 @@ function closeCancelModal() {
     document.getElementById("cancelModal").style.display = "none";
 }
 
+function getPerformanceDateTime(data) {
+    const datePart = typeof data.reservedDate === "string"
+        ? data.reservedDate.slice(0, 10)
+        : null;
+
+    const timeMatch = typeof data.startedAt === "string"
+        ? data.startedAt.match(/(\d{2}:\d{2})/)
+        : null;
+
+    const timePart = timeMatch ? timeMatch[1] : null;
+
+    if (!datePart || !timePart) {
+        return null;
+    }
+
+    return new Date(`${datePart}T${timePart}:00`);
+}
+
 function getDisplayStatus(data) {
     if (data.reservationStatus === "CANCELED") {
         return "CANCELED";
@@ -179,10 +197,10 @@ function getDisplayStatus(data) {
         return "COMPLETED";
     }
 
-    const startedAt = new Date(data.startedAt);
+    const performanceDateTime = getPerformanceDateTime(data);
     const now = new Date();
 
-    if (!isNaN(startedAt) && startedAt < now) {
+    if (performanceDateTime && !isNaN(performanceDateTime.getTime()) && performanceDateTime < now) {
         return "COMPLETED";
     }
 
