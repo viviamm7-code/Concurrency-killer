@@ -1,11 +1,13 @@
 package com.grape.ticketing.web.api;
 
+import com.grape.ticketing.dto.queue.InactiveResponseTO;
 import com.grape.ticketing.dto.queue.RegisterResponseTO;
 import com.grape.ticketing.dto.queue.StatusResponseTO;
 import com.grape.ticketing.service.QueueService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -56,5 +58,21 @@ public class QueueController {
             throw new IllegalStateException("로그인이 필요합니다.");
         }
         return queueService.getWaitingInfo(memberId, draftId);
+    }
+
+    /**
+     * active 유저와 사용자 정보 삭제하는 api(예매 완료 시 호출)
+     */
+    @DeleteMapping("/inactive")
+    public InactiveResponseTO deleteActiveUser(HttpSession session, @RequestParam Long performanceId) {
+        Long memberId = (Long) session.getAttribute("loginMember");
+        if (memberId == null) {
+            throw new IllegalStateException("로그인이 필요합니다.");
+        }
+        queueService.deleteActiveUser(memberId, performanceId);
+        return InactiveResponseTO.builder()
+                .code(200)
+                .message("active 유저 삭제 성공")
+                .build();
     }
 }

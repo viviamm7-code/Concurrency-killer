@@ -639,7 +639,7 @@
     }
 
     //대기열 등록 api 호출
-    async function registerQueue(performanceId, memberId, draftId) {
+    async function registerQueue(performanceId, memberId) {
         try {
             const response = await fetch(`/api/queue/register?performanceId=${performanceId}&memberId=${memberId}`, {
                 method: 'POST'

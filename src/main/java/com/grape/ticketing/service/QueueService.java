@@ -148,6 +148,22 @@ public class QueueService {
         return emitter;
     }
 
+    /**
+     * 개요: redis에서 active큐에서 입장 허용된 유저와 유저 정보를 삭제하는 메서드
+     * 인자값: 멤버id, 공연id
+     * 반환값: 없음
+     */
+    public void deleteActiveUser(Long memberId, Long performanceId) {
+        String activeKey = getActiveKey(performanceId);
+        String userQueueKey = getUserQueueKey(performanceId, memberId);
+        queueRedisService.removeActiveUser(activeKey, memberId);
+        queueRedisService.removeUserInfo(userQueueKey);
+    }
+
+
+//================================================================================================================
+
+
     //redis에서 공연, 대기인원(순번) 정보 조회
     private WaitingInfo getRedisWaitingInfo(Long userId, UUID draftId) {
         int waitMin = 0;
