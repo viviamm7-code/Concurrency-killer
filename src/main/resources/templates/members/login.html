@@ -16,14 +16,6 @@
                       document.body.style.display = 'flex';
                   }
               })
-                  /*// 이전 페이지가 로그인 페이지가 아니라면 뒤로가기, 맞다면 목록으로
-                  if (document.referrer && !document.referrer.includes('/login')) {
-                    history.back();
-                  } else {
-                    location.href = '/performance-list';
-                  }
-                }
-              })*/
               .catch(error => {
                   console.error('로그인 체크 실패:', error);
                   document.body.style.display = 'flex';
@@ -175,6 +167,14 @@
       color: white;
       text-decoration: underline;
     }
+    #toJoin{
+        position: absolute;
+        bottom: -80%;
+        left: 45%;
+        font-size: 10px;
+        font-weight: bold;
+        color: white;
+    }
   </style>
 </head>
 <body>
@@ -200,7 +200,7 @@
       </a>
 
       <a id="nologin" href="/performance-list">비회원으로 접속하기</a>
-      <a href="/join">회원가입</a>
+      <a id="toJoin" href="/join">회원가입 하기</a>
   </div>
 </div>
 </body>

@@ -47,6 +47,9 @@ dependencies {
 
 	//Spring-security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// 이메일 발송을 위한 스타터
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {

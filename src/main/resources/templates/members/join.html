@@ -14,6 +14,10 @@
             margin: 0;
             font-family: 'Pretendard', -apple-system, sans-serif;
         }
+        span {
+            font-size: 12px;
+            color: #8B8B8B;
+        }
 
         /* 카드 컨테이너 */
         .signup-container {
@@ -124,10 +128,23 @@
             transition: background .2s, transform .2s;
         }
         .btn-back:hover { background: #161F30FF; transform: scale(1.05); }
+
+        #btn-send-code, #btn-verify-code {
+            background-color: #3b4252;
+            color: white;
+            border: 1px solid #ffffff33;
+            height: 35px;
+            font-size: 12px;
+        }
+        #btn-send-code:hover, #btn-verify-code:hover {
+            background-color: #4c566a;
+        }
     </style>
 </head>
 <script type="text/javascript">
     window.onload = () => {
+        let timerInterval; // 3분 타이머를 멈추기 위한 변수
+        let isEmailVerified = false; // 이메일 인증 여부 확인용
         document.querySelector('form').addEventListener('submit', function(e) {
             e.preventDefault(); // 기본 submit 막기
 
@@ -136,6 +153,7 @@
                 {name : 'username', label: '아이디'},
                 {name : 'name', label: '이름'},
                 {name : 'password', label: '비밀번호'},
+                {name : 'passwordCheck', label: '비밀번호'},
                 {name : 'email1', label: '이메일 아이디'},
                 {name : 'email2', label: '이메일 도메인'}
             ]
@@ -145,6 +163,12 @@
                 if (!value) {
                     alert(`${field.label}을(를) 입력하세요.`);
                     this[field.name].focus();
+                    return;
+                }
+
+                if (this.password.value != this.passwordCheck.value) {
+                    alert('비밀번호가 일치하지 않습니다')
+                    this.passwordCheck.focus();
                     return;
                 }
             }
@@ -171,6 +195,88 @@
                     console.error("서버 응답 에러 :", errorText);
                 }
             });
+
+            if (!isEmailVerified) {
+                alert("이메일 인증을 완료해야 가입이 가능합니다.");
+                return;
+            }
+        });
+
+        // 이메일 인증 3분 타이머
+        function startTimer(duration, display) {
+            let timer = duration, minutes, seconds;
+
+            // 기존에 들고 있던 타이머가 있다면 초기화
+            if (timerInterval) clearInterval(timerInterval);
+
+            timerInterval = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = minutes + ':' + seconds;
+
+                if (--timer < 0) {
+                    clearInterval(timerInterval);
+                    display.textContent = "시간 만료";
+                    alert("인증 시간이 만료되었습니다. 다시 요청해 주세요.");
+                }
+            }, 1000);
+        }
+
+        // 1. 인증번호 발송 버튼 클릭 시
+        document.getElementById('btn-send-code').addEventListener('click', function() {
+            const email1 = document.getElementById('email-id').value;
+            const email2 = document.getElementById('email-domain').value;
+
+            if(!email1 || !email2) {
+                alert("이메일을 먼저 입력해 주세요");
+                return;
+            }
+
+            const email = `${email1}@${email2}`;
+
+            // 서버에 인증번호 발송 요청
+            fetch(`/api/auth/email-send?email=${email}`, {method: 'POST'})
+                .then(res => {
+                    if(res.ok) {
+                        alert("인증번호가 발송되었습니다. 메일함을 확인해 주세요.");
+                        // 3분 타이머 시작
+                        const display = document.querySelector('#timer');
+                        startTimer(180, display);
+                    } else {
+                        alert("발송 실패. 이메일 주소를 확인해 주세요.");
+                    }
+                });
+        });
+
+        // 2. 인증번호 확인 버튼 클릭 시
+        document.getElementById('btn-verify-code').addEventListener('click', function() {
+            const email =
+                `${document.getElementById('email-id').value}@${document.getElementById('email-domain').value}`;
+            const code = document.getElementsByName('authCode')[0].value;
+
+            if (!code) {
+                alert("인증번호를 입력해 주세요.");
+                return;
+            }
+
+            fetch(`/api/auth/email-verify?email=${email}&code=${code}`, {method: 'POST'})
+            .then(res => res.json())
+                .then(isSuccess => {
+                    if(isSuccess) {
+                        alert("인증에 성공하였습니다.");
+                        isEmailVerified = true; // 인증 성공 상태로 변경
+                        clearInterval(timerInterval); // 인증 성공 시 타이머 멈춤
+                        document.querySelector('#timer').textContent = "인증 완료";
+                        document.querySelector('#timer').style.color = "#4CAF50";
+                        document.getElementsByName('authCode')[0].readOnly = true; // 수정 불가 처리
+                    } else {
+                        alert("인증번호가 일치하지 않거나 만료되었습니다.");
+                    }
+                });
         });
     }
 </script>
@@ -185,7 +291,7 @@
 
     <form class="signup-form">
         <div class="input-group">
-            <label for="username">아이디 *</label>
+            <label for="username">아이디 * <span>(4~20자)</span></label>
             <input type="text" id="username" name="username">
         </div>
 
@@ -195,16 +301,29 @@
         </div>
 
         <div class="input-group">
-            <label for="password">비밀번호 *</label>
+            <label for="password">비밀번호 * <span>(8자 이상, 영문, 숫자, 특수문자를 포함)</span></label>
             <input type="password" id="password" name="password">
+            <label for="passwordCheck">비밀번호 확인 *</label>
+            <input type="password" id="passwordCheck" name="passwordCheck">
+
+
         </div>
 
+
         <div class="input-group">
-            <label for="email">이메일</label>
+            <label for="email">이메일 *</label>
             <div class="email-wrapper">
                 <input type="text" id="email-id" name="email1">
                 <span>@</span>
                 <input type="text" id="email-domain" name="email2">
+            </div>
+            <button type="button" id="btn-send-code" style="width: 120px; border-radius: 10px; cursor: pointer;">인증 요청</button>
+        </div>
+        <div class="input-group" id="auth-code-wrapper">
+            <label for="authCode">인증번호 * <span id="timer" style="color: #ff6b6b; font-weight: bold; margin-left: 10px;"></span></label>
+            <div class="email-wrapper">
+                <input type="text" id="authCode" name="authCode" placeholder="6자리 숫자 입력">
+                <button type="button" id="btn-verify-code" style="width: 120px; border-radius: 10px; cursor: pointer;">인증 확인</button>
             </div>
         </div>
 
