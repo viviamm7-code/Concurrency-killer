@@ -30,9 +30,7 @@ public class QueueController {
         if (memberId == null) {
             throw new IllegalStateException("로그인이 필요합니다.");
         }*/
-        RegisterResponseTO result = queueService.registerQueue(memberId, performanceId);
-        System.out.println(result.getMemberId());
-        return result;
+        return queueService.registerQueue(memberId, performanceId);
     }
 
     /**

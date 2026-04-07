@@ -115,9 +115,6 @@ async function requestTossPayment() {
             customerName: `회원 ${currentDraft.memberId}`
         });
 
-        //예매 완료 후 대기열 active큐에서 삭제
-        await deleteActiveUser();
-
         alert(`예매가 완료되었습니다.`);
         window.location.href = "/reservation";
     } catch (e) {
@@ -127,20 +124,6 @@ async function requestTossPayment() {
         console.error("토스 결제 요청 오류 =", e);
         alert(e.message || "결제 요청 중 오류가 발생했습니다.");
     }
-}
-
-//draft가 없어서 에러남 draft 조회하는 코드에서 변수를 밖으로 빼서 공통으로 써야함
-async function deleteActiveUser() {
-    const response = await fetch(
-        `/api/queue/inactive?memberId=${currentDraft.memberId}&performanceId=${currentDraft.performanceId}`,
-        { method: 'DELETE' }
-    );
-
-    if (!response.ok) {
-        throw new Error('active 유저 삭제 실패');
-    }
-
-    return await response.json();
 }
 
 async function loadReservationConfirm() {
