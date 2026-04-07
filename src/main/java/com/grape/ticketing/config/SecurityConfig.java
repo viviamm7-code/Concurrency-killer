@@ -44,7 +44,8 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
-                                "/webjars/**"
+                                "/webjars/**",
+                                "/api/queue/**"  //테스트용 -> 시연 영상 찍은 후에 지우기
                         ).permitAll()
 
                         .anyRequest().authenticated()

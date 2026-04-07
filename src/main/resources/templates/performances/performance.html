@@ -885,6 +885,25 @@
         document.getElementById('modalStartDate').textContent = getSelectedPerformanceDate();
     }
 
+    //대기열 등록 api 호출
+    async function registerQueue(performanceId, memberId) {
+        try {
+            const response = await fetch(`/api/queue/register?performanceId=${performanceId}&memberId=${memberId}`, {
+                method: 'POST'
+            });
+
+            if (!response.ok) {
+                throw new Error('대기열 등록 실패');
+            }
+
+            const result = await response.json();
+            return result;
+        } catch (error) {
+            console.error('대기열 등록 중 오류:', error);
+            throw error;
+        }
+    }
+
     document.getElementById('prevMonth').addEventListener('click', () => {
         currentMonth--;
         if (currentMonth < 0) {
@@ -972,6 +991,11 @@
             }
 
             window.location.href = `/seat?draftId=${draft.draftId}`;
+
+            //초안 생성 후, 대기열 등록
+            registerQueue(data.id, memberId, draft.draftId)
+            //window.location.href = `/seat?draftId=${draft.draftId}`;
+            window.location.href = `/waitingQueue?draftId=${draft.draftId}`;
         } catch (error) {
             console.error('예매 진행 실패:', error);
 
