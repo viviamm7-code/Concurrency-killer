@@ -1,10 +1,10 @@
 package com.grape.ticketing.web;
 
-import com.grape.ticketing.domain.member.Member;
 import com.grape.ticketing.dto.member.MemberTO;
 import com.grape.ticketing.service.LoginService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import com.grape.ticketing.service.MemberService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +19,7 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
+@Tag(name = "로그인 API")
 public class MemberController {
 
     private final LoginService loginService;
@@ -56,12 +57,12 @@ public class MemberController {
                 .header("content-type", "text/html; charset=utf-8")
                 .body(script);
     }
-/*    @RequestMapping("/login")
+    @RequestMapping("/login")
     public String login(){
         return "members/login";
-    }*/
-    @RequestMapping("/logout1")
-    public String logout1(HttpSession session){
+    }
+    @RequestMapping("/logout")
+    public String logout(HttpSession session){
         session.invalidate();
         return "redirect:/login";
     }
@@ -84,20 +85,18 @@ public class MemberController {
         return "ticketing";
     }
 
+    @Operation(summary = "세션 키값으로 로그인 상태 확인")
     @GetMapping("/api/auth/status")
     @ResponseBody
-    public Map<String, Object> getAuthStatus(Authentication authentication) {
+    public Map<String, Object> getAuthStatus(HttpSession session) {
         Map<String, Object> status = new HashMap<>();
 
-        boolean isLoggedIn =
-                authentication != null &&
-                authentication.isAuthenticated() &&
-                !(authentication instanceof AnonymousAuthenticationToken);
+        // 저장한 세션 키 값인 "loginMember"를 확인합니다.
+        Object loginMemberId = session.getAttribute("loginMember");
 
-
-        if (isLoggedIn) {
+        if (loginMemberId != null) {
             status.put("isLoggedIn", true);
-            status.put("memberId", authentication.getName());
+            status.put("memberId", loginMemberId);
         } else {
             status.put("isLoggedIn", false);
             status.put("memberId", null);
@@ -105,19 +104,10 @@ public class MemberController {
         return status;
     }
 
+    @Operation(summary = "로그인 상태 확인")
     @GetMapping("/api/auth/check")
     @ResponseBody
-    public Map<String, Object> checkLogin(Authentication authentication) {
-        Map<String, Object> status = new HashMap<>();
-
-        // 시큐리티 인증 객체가 있고, 익명 사용자인지 확인
-        boolean isLoggedIn = authentication != null &&
-                authentication.isAuthenticated() &&
-                !(authentication instanceof AnonymousAuthenticationToken);
-        status.put("isLoggedIn", isLoggedIn);
-        return status;
-    }
-/*    public boolean checkLogin(HttpSession session) {
+    public boolean checkLogin(HttpSession session) {
         return session.getAttribute("loginMember") != null;
-    }*/
+    }
 }

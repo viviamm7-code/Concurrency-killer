@@ -45,7 +45,7 @@ function renderDetail(draft) {
                     </div>
 
                     <div class="info-item">
-                        <div class="info-label">예매자</div>
+                        <div class="info-label">예매자 아이디</div>
                         <div class="info-value">${formatMemberLabel(draft.memberId)}</div>
                     </div>
 
@@ -114,6 +114,9 @@ async function requestTossPayment() {
             failUrl: window.location.origin + `/payments/toss/fail?draftId=${currentDraft.draftId}`,
             customerName: `회원 ${currentDraft.memberId}`
         });
+
+        alert(`예매가 완료되었습니다.`);
+        window.location.href = "/reservation";
     } catch (e) {
         if (confirmBtn) {
             confirmBtn.disabled = false;

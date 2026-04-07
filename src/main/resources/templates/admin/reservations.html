@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>예매 관리</title>
+    <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+<header>
+    <a href="/admin" class="btn-back">←</a>
+</header>
+
+<main class="wrap">
+    <section class="top-box">
+        <p class="sub-title">ADMIN RESERVATION MANAGEMENT</p>
+        <h1 class="main-title">예매 관리</h1>
+        <p class="desc">
+            전체 예매 내역을 조회하고 회원 아이디로 검색할 수 있습니다.
+        </p>
+    </section>
+
+    <section class="page-actions">
+        <div class="page-search-wrap">
+            <input
+                    type="text"
+                    id="reservationSearchInput"
+                    class="page-search-input"
+                    placeholder="회원 아이디 검색"
+            />
+        </div>
+
+        <div class="count-box">
+            총 <span id="reservationCount">0</span>건
+        </div>
+    </section>
+
+    <section class="page-table-wrap">
+        <table class="page-table">
+            <thead>
+            <tr>
+                <th style="width: 110px;">예매번호</th>
+                <th>회원 아이디</th>
+                <th>회원 이름</th>
+                <th>공연명</th>
+                <th>좌석</th>
+                <th>상태</th>
+            </tr>
+            </thead>
+            <tbody id="reservationTableBody"></tbody>
+        </table>
+    </section>
+
+    <div id="reservationEmptyBox" class="message-box small hidden">
+        조회된 예매 내역이 없습니다.
+    </div>
+
+    <div id="reservationErrorBox" class="message-box small hidden">
+        예매 정보를 불러오는 중 오류가 발생했습니다.
+    </div>
+</main>
+
+<script src="/js/admin-reservations.js"></script>
+</body>
+</html>

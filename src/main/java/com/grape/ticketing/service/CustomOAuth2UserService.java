@@ -24,7 +24,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-//네이버나 카카오 붙히면 사용
+// 네이버, 카카오 로그인 서비스
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final MemberRepository memberRepository;
@@ -35,57 +35,142 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = new DefaultOAuth2UserService().loadUser(userRequest);
+
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        String providerId = (String) attributes.get("sub");
-        String email = (String) attributes.get("email");
-        String name = (String) attributes.get("name");
+        if ("naver".equals(registrationId)) {
+            return processNaverUser(attributes);
+        }
+
+        if ("kakao".equals(registrationId)) {
+            return processKakaoUser(attributes);
+        }
+
+        throw new OAuth2AuthenticationException("지원하지 않는 OAuth2 로그인입니다. registrationId=" + registrationId);
+    }
+
+    private OAuth2User processNaverUser(Map<String, Object> attributes) {
+        Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+        if (response == null) {
+            throw new OAuth2AuthenticationException("네이버 사용자 정보(response)가 없습니다.");
+        }
+
+        String providerId = String.valueOf(response.get("id"));
+        String email = (String) response.get("email");
+        String name = (String) response.get("name");
 
         SocialAccount socialAccount = socialAccountRepository
-                .findByProviderAndProviderId(AuthProvider.GOOGLE, providerId)
-                .orElseGet(() -> createGoogleAccount(providerId, email, name));
+                .findByProviderAndProviderId(AuthProvider.NAVER, providerId)
+                .orElseGet(() -> createNaverAccount(providerId, email, name));
 
         Member member = socialAccount.getMember();
 
         Map<String, Object> customAttributes = new HashMap<>(attributes);
         customAttributes.put("memberId", member.getId());
+        customAttributes.put("email", member.getEmail());
 
         return new DefaultOAuth2User(
                 List.of(new SimpleGrantedAuthority(member.getRole())),
                 customAttributes,
-                "sub"
+                "response"
         );
     }
 
-    private SocialAccount createGoogleAccount(String providerId, String email, String name) {
-        System.out.println("createGoogleAccount 호출됨");
-        System.out.println("providerId = " + providerId);
-        System.out.println("email = " + email);
+    private OAuth2User processKakaoUser(Map<String, Object> attributes) {
+        String providerId = String.valueOf(attributes.get("id"));
 
-        String username = "google_" + providerId;
+        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+        Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
+
+        if (providerId == null || "null".equals(providerId)) {
+            throw new OAuth2AuthenticationException("카카오 사용자 정보(id)가 없습니다.");
+        }
+
+        String extractedEmail = null;
+        String extractedName = null;
+
+        if (kakaoAccount != null) {
+            extractedEmail = (String) kakaoAccount.get("email");
+        }
+
+        if (properties != null) {
+            extractedName = (String) properties.get("nickname");
+        }
+
+        final String email = extractedEmail;
+        final String name = extractedName;
+
+        SocialAccount socialAccount = socialAccountRepository
+                .findByProviderAndProviderId(AuthProvider.KAKAO, providerId)
+                .orElseGet(() -> createKakaoAccount(providerId, email, name));
+
+        Member member = socialAccount.getMember();
+
+        Map<String, Object> customAttributes = new HashMap<>(attributes);
+        customAttributes.put("memberId", member.getId());
+        customAttributes.put("email", member.getEmail());
+
+        return new DefaultOAuth2User(
+                List.of(new SimpleGrantedAuthority(member.getRole())),
+                customAttributes,
+                "id"
+        );
+    }
+
+    private SocialAccount createNaverAccount(String providerId, String email, String name) {
+        String safeEmail = (email != null && !email.isBlank())
+                ? email
+                : "naver_" + providerId + "@social.local";
+
+        String username = "naver_" + providerId;
         String encodedPassword = passwordEncoder.encode(UUID.randomUUID().toString());
 
         Member member = new Member(
-                name,
-                email,
+                name != null ? name : "naver_user",
+                safeEmail,
                 username,
                 encodedPassword,
                 "ROLE_USER"
         );
 
-        memberRepository.save(member);
-        System.out.println("member 저장 완료 id = " + member.getId());
+        Member savedMember = memberRepository.save(member);
 
         SocialAccount socialAccount = SocialAccount.builder()
-                .provider(AuthProvider.GOOGLE)
+                .provider(AuthProvider.NAVER)
                 .providerId(providerId)
-                .email(email)
-                .member(member)
+                .email(safeEmail)
+                .member(savedMember)
                 .build();
 
-        SocialAccount saved = socialAccountRepository.save(socialAccount);
-        System.out.println("socialAccount 저장 완료 id = " + saved.getId());
+        return socialAccountRepository.save(socialAccount);
+    }
 
-        return saved;
+    private SocialAccount createKakaoAccount(String providerId, String email, String name) {
+        String safeEmail = (email != null && !email.isBlank())
+                ? email
+                : "kakao_" + providerId + "@social.local";
+
+        String username = "kakao_" + providerId;
+        String encodedPassword = passwordEncoder.encode(UUID.randomUUID().toString());
+
+        Member member = new Member(
+                name != null ? name : "kakao_user",
+                safeEmail,
+                username,
+                encodedPassword,
+                "ROLE_USER"
+        );
+
+        Member savedMember = memberRepository.save(member);
+
+        SocialAccount socialAccount = SocialAccount.builder()
+                .provider(AuthProvider.KAKAO)
+                .providerId(providerId)
+                .email(safeEmail)
+                .member(savedMember)
+                .build();
+
+        return socialAccountRepository.save(socialAccount);
     }
 }

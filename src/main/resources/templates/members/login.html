@@ -105,67 +105,121 @@
       cursor: pointer;
     }
 
-
-
-
-    .login-actions {
-      position: absolute;
-      top: 385px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      gap: 18px;
+    .login-panel {
+        position: absolute;
+        top: 0px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        display: flex;
+        justify-content: center;
     }
 
-    .google-login-btn {
-      width: 280px;
-      height: 52px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      background: #ffffff;
-      color: #3c4043;
-      border: 1px solid #dadce0;
-      border-radius: 14px;
-      text-decoration: none;
-      font-size: 15px;
-      font-weight: 600;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-      transition: all 0.2s ease;
+    .login-form {
+        width: 520px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
     }
 
-    .google-login-btn:hover {
-      background: #f8f9fa;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
-      transform: translateY(-1px);
+    .login-form input {
+        width: 260px;
+        height: 46px;
+        border-radius: 12px;
+        border: none;
+        padding: 0 14px;
+        margin-bottom: 16px;
+        margin-left: 80px;
+        font-size: 16px;
     }
 
-    .google-login-btn:active {
-      transform: translateY(0);
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    .login-submit-btn {
+        position: absolute;
+        top: 2px;
+        left: 350px;
+        width: 120px;
+        height: 108px;
+        margin-top: 0;
+        background: linear-gradient(to right, #DD534B, #E87836);
+        border: none;
+        color: white;
+        font-weight: bold;
+        border-radius: 12px;
+        font-size: 20px;
     }
 
-    .google-icon {
-      width: 22px;
-      height: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .login-submit-btn:hover {
+        border: solid 1px #1a1d20;
+        cursor: pointer;
+    }
+
+    .social-login-row {
+        width: 100%;
+        margin-top: 28px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .social-circle-btn {
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .social-circle-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.24);
+    }
+
+    .google-circle-btn {
+        background: #ffffff;
+        border: 1px solid #dadce0;
+    }
+
+    .kakao-circle-btn {
+        background: #FEE500;
+        border: 1px solid #FEE500;
+    }
+
+    .naver-circle-btn {
+        background: #03C75A;
+        border: 1px solid #03C75A;
+    }
+
+    .naver-circle-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #03C75A;
+        font-weight: 900;
+        font-size: 18px;
+        line-height: 28px;
+        text-align: center;
     }
 
     #nologin {
-      color: #cfd6e4;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 14px;
-      white-space: nowrap;
+        margin-top: 18px;
+        width: 100%;
+        text-align: center;
+        color: #cfd6e4;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
     }
 
     #nologin:hover {
-      color: white;
-      text-decoration: underline;
+        color: white;
+        text-decoration: underline;
     }
     #toJoin{
         position: absolute;
@@ -179,28 +233,38 @@
 </head>
 <body>
 <div class="loginBox">
-  <h1>포도알 사수 작전</h1>
+    <h1>포도알 사수 작전</h1>
+    <div class="login-panel">
+        <form action="/members/login" method="post" name="lfrm" class="login-form">
+            <input type="text" id="username" name="username" placeholder="아이디를 입력하세요"/>
+            <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요"/>
+            <button id="lbtn" type="button" class="login-submit-btn">로그인</button>
 
-  <form action="/members/login" method="post" name="lfrm">
-    <input type="text" id="username" name="username" placeholder="username"/> <br/><br/>
-    <input type="password" id="password" name="password" placeholder="PW"/> <br/>
-    <button id="lbtn">로그인</button>
-  </form>
-  <div class="login-actions">
-      <a href="/oauth2/authorization/google" class="google-login-btn">
-          <span class="google-icon">
-              <svg width="20" height="20" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <path fill="#EA4335" d="M9 7.364v3.709h5.182c-.227 1.191-.909 2.2-1.936 2.882l3.127 2.427c1.818-1.673 2.864-4.136 2.864-7.073 0-.673-.061-1.318-.173-1.945H9z"/>
-                  <path fill="#34A853" d="M3.645 10.713 2.94 13.09 0.611 13.14A8.998 8.998 0 0 0 9 18c2.455 0 4.514-.809 6.018-2.182l-3.127-2.427c-.864.582-1.968.927-2.891.927-2.223 0-4.109-1.5-4.782-3.605z"/>
-                  <path fill="#4A90E2" d="M0.611 4.86A8.998 8.998 0 0 0 0 9c0 1.45.345 2.818.958 4.14l3.687-2.427A5.385 5.385 0 0 1 4.218 9c0-.596.1-1.173.427-1.713z"/>
-                  <path fill="#FBBC05" d="M9 3.682c1.336 0 2.536.459 3.482 1.364l2.609-2.609C13.509.964 11.455 0 9 0A8.998 8.998 0 0 0 .611 4.86l3.607 2.427C4.891 5.182 6.777 3.682 9 3.682z"/>
-              </svg>
-          </span>
-          <span>Google로 로그인</span>
-      </a>
+            <div class="social-login-row">
+                <a href="/oauth2/authorization/google" class="social-circle-btn google-circle-btn" aria-label="Google 로그인">
+                    <svg width="26" height="26" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path fill="#EA4335" d="M9 7.364v3.709h5.182c-.227 1.191-.909 2.2-1.936 2.882l3.127 2.427c1.818-1.673 2.864-4.136 2.864-7.073 0-.673-.061-1.318-.173-1.945H9z"/>
+                        <path fill="#34A853" d="M3.645 10.713 2.94 13.09 0.611 13.14A8.998 8.998 0 0 0 9 18c2.455 0 4.514-.809 6.018-2.182l-3.127-2.427c-.864.582-1.968.927-2.891.927-2.223 0-4.109-1.5-4.782-3.605z"/>
+                        <path fill="#4A90E2" d="M0.611 4.86A8.998 8.998 0 0 0 0 9c0 1.45.345 2.818.958 4.14l3.687-2.427A5.385 5.385 0 0 1 4.218 9c0-.596.1-1.173.427-1.713z"/>
+                        <path fill="#FBBC05" d="M9 3.682c1.336 0 2.536.459 3.482 1.364l2.609-2.609C13.509.964 11.455 0 9 0A8.998 8.998 0 0 0 .611 4.86l3.607 2.427C4.891 5.182 6.777 3.682 9 3.682z"/>
+                    </svg>
+                </a>
 
-      <a id="nologin" href="/performance-list">비회원으로 접속하기</a>
-      <a id="toJoin" href="/join">회원가입 하기</a>
+                <a href="/oauth2/authorization/kakao" class="social-circle-btn kakao-circle-btn" aria-label="카카오 로그인">
+                    <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path fill="#191600" d="M12 3C6.477 3 2 6.477 2 10.765c0 2.77 1.86 5.198 4.658 6.568l-1.178 4.31c-.104.381.326.684.662.467l5.15-3.304c.235.022.472.033.708.033 5.523 0 10-3.477 10-7.765S17.523 3 12 3z"/>
+                    </svg>
+                </a>
+
+                <a href="/oauth2/authorization/naver" class="social-circle-btn naver-circle-btn" aria-label="네이버 로그인">
+                    <span class="naver-circle-icon">N</span>
+                </a>
+            </div>
+
+            <a id="nologin" href="/performance-list">비회원으로 접속하기</a>
+            <a id="toJoin" href="/join">회원가입 하기</a>
+        </form>
+    </div>
   </div>
 </div>
 </body>

@@ -1,7 +1,6 @@
 package com.grape.ticketing.domain.member;
 
 import com.grape.ticketing.domain.BaseEntitiy;
-import com.grape.ticketing.domain.Payment;
 import com.grape.ticketing.domain.Reservation;
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,7 +31,7 @@ public class Member extends BaseEntitiy implements UserDetails {
     private String password;
     private String role;
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Reservation> reservations = new ArrayList<>();
 
     @Override
@@ -62,6 +61,7 @@ public class Member extends BaseEntitiy implements UserDetails {
     @Override public boolean isEnabled() { return true; }
 
     @Builder
+
     public Member(String name, String email, String username, String password, String role) {
         this.name = name;
         this.email = email;
