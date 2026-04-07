@@ -64,7 +64,7 @@ Concurrency-Killer은 동시성을 고려한 온라인 뮤지컬 티켓팅 프�
 - 예매 시스템의 사용자 UX 고려
 - 여러 요인을 고려한 단위 및 통합 테스트 (prometheus + grafana cloud + K6) 
 - 각종 API를 연동해 편리한 서비스 제공
-- OpenAPI Swagger를 통한 자동화 API 문서화
+- OpenAPI Swagger를 통한 API 문서 자동화
 
 ## ☁️ git 브랜치 전략
 - main 브랜치: 서비스에 배포될 코드를 관리하는 브랜치
