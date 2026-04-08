@@ -37,6 +37,7 @@ public class SecurityConfig {
                                 "/performances/**",
                                 "/actuator",
                                 "/actuator/**",
+                                "/reservation-drafts/**", //지우기
                                 "/error")
                         .permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
