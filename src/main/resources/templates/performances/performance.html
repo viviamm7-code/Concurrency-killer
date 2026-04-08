@@ -459,7 +459,7 @@
 <body>
 
 <header>
-    <button class="btn-back" onclick="history.back()">←</button>
+    <button class="btn-back" onclick="goToList()">←</button>
     <div id="loginButton">
         <script src="/js/common.js" defer></script>
     </div>
@@ -573,6 +573,11 @@
 
     let kakaoMap = null;
     let kakaoMarker = null;
+
+    //뒤로가기(공연 목록화면)
+    function goToList() {
+        location.href = `/performance-list`;
+    }
 
     async function loadKakaoSdk() {
         if (window.kakao && window.kakao.maps) {
