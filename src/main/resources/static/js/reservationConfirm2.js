@@ -11,6 +11,17 @@ const tossPayments = TossPayments(clientKey);
 const customerKey = `member_${Date.now()}`;
 const payment = tossPayments.payment({ customerKey });
 
+//뒤로가기(좌석 화면)
+function goToSeat() {
+    const draftId = getDraftIdFromQuery();
+
+    if (!draftId) {
+        alert("draftId가 없습니다.");
+        return;
+    }
+    location.href = `/seat?draftId=${draftId}`;
+}
+
 function getDraftIdFromQuery() {
     const params = new URLSearchParams(window.location.search);
     return params.get("draftId");
