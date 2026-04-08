@@ -61,6 +61,11 @@
         }
     }
 
+    //뒤로가기(공연 상세화면)
+    function goToDetail() {
+        location.href = `/performances/${performanceId}`;
+    }
+
     function syncSelectedSeatButtons() {
         selectedSeats.forEach((seat, seatNumber) => {
             const button = document.querySelector(`.seat[data-seat-number="${seatNumber}"]`);
