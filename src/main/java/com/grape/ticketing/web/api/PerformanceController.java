@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/performances")
+@RequestMapping("api/performances")
 @RequiredArgsConstructor
 @Tag(name = "공연 페이지 API")
 public class PerformanceController {

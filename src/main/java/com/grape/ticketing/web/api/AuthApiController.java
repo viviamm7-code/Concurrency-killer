@@ -21,7 +21,7 @@ public class AuthApiController {
     private final MemberRepository memberRepository;
 
     @Operation(summary = "현재 로그인한 사용자 정보를 조회하는 인증 확인")
-    @GetMapping("/api/me")
+    @GetMapping("api/me")
     public MeResponse getMe(HttpSession session) {
         Object loginMember = session.getAttribute("loginMember");
 

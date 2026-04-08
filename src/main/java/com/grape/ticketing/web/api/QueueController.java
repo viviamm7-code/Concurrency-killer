@@ -14,7 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/queue")
+@RequestMapping("api/queue")
 @RequiredArgsConstructor
 public class QueueController {
 

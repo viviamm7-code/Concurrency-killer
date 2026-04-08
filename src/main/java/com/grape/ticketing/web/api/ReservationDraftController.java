@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 @Tag(name = "Redis 정보 저장")
 @RestController
-@RequestMapping("/reservation-drafts")
+@RequestMapping("reservation-drafts")
 @RequiredArgsConstructor
 @Tag(name = "Redis 사용 API")
 public class ReservationDraftController {

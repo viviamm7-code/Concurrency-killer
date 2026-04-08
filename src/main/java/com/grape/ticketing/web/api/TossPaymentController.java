@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/payments/toss")
+@RequestMapping("payments/toss")
 @Tag(name = "TossPayment 결제 API")
 public class TossPaymentController {
 

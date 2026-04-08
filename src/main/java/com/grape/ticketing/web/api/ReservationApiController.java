@@ -22,7 +22,7 @@ public class ReservationApiController {
     private final ReservationService reservationService;
 
     @Operation(summary = "내 예매 목록 조회")
-    @GetMapping("/api/reservation")
+    @GetMapping("api/reservation")
     public List<ReservationDto> reservationList(@AuthenticationPrincipal Member member) {
 //        System.out.println("session.getId() = " + session.getId());
 //        System.out.println(session.getAttribute("loginMember"));
@@ -30,27 +30,27 @@ public class ReservationApiController {
     }
 
     @Operation(summary = "내 예매 상세 목록 조회")
-    @GetMapping("/api/reservation/{reservationId}/detail")
+    @GetMapping("api/reservation/{reservationId}/detail")
     public ReservationDetailDto detailReservation(@PathVariable Long reservationId,
                                                   @AuthenticationPrincipal Member member) {
         return reservationService.getDetailReservation(member.getId(), reservationId);
     }
 
     @Operation(summary = "내 예매 환불")
-    @PostMapping("/api/reservation/{reservationId}/cancel")
+    @PostMapping("api/reservation/{reservationId}/cancel")
     public ReservationCancelDto cancelReservation(@PathVariable Long reservationId,
                                                   @AuthenticationPrincipal Member member) {
         return reservationService.cancelReservation(member.getId(), reservationId);
     }
 
     @Operation(summary = "내 예매 환불 미리보기")
-    @GetMapping("/api/reservation/{reservationId}/cancel-preview")
+    @GetMapping("api/reservation/{reservationId}/cancel-preview")
     public ReservationCancelDto cancelPreview(@PathVariable Long reservationId,
                                               @AuthenticationPrincipal Member member) {
         return reservationService.getCancelPreview(member.getId(), reservationId);
     }
 
-    @GetMapping("/api/reservation/{reservationId}/confirm")
+    @GetMapping("api/reservation/{reservationId}/confirm")
     public ReservationDetailDto reservationConfirm(@PathVariable Long reservationId,
                                                    @AuthenticationPrincipal Member member) {
         return reservationService.getDetailReservation(member.getId(), reservationId);

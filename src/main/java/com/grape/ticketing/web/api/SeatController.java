@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/performances")
+@RequestMapping("performances")
 @Tag(name = "좌석 API")
 public class SeatController {
 

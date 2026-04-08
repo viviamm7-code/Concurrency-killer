@@ -11,7 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/performances")
+@RequestMapping("performances")
 @RequiredArgsConstructor
 //예매하는 과정에 필요한 로직들 관리하는 컨트롤러
 @Tag(name = "예매 로직 관리 API")

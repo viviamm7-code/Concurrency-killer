@@ -19,7 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/mypage")
+@RequestMapping("api/mypage")
 @Tag(name = "내 정보 API")
 public class MyPageApiController {
 
