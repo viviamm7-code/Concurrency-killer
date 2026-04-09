@@ -230,7 +230,7 @@
         <!-- 자동 갱신 카운트다운 -->
         <div class="refresh-row" id="refresh-btn">
             <span class="refresh-icon">&#10227;</span>
-            <span id="refresh-label">30초 후 자동 갱신</span>
+            <span id="refresh-label">5초 후 자동 갱신</span>
         </div>
 
     </div>
@@ -272,7 +272,7 @@
         // 대기 정보 업데이트
         myNumEl.textContent      = data.rank
         progFill.style.width     = data.percent + '%';
-        pctText.textContent      = data.percent + '%';
+        pctText.textContent      = data.percent.toFixed(0) + '%';
 
         // 500명 미만이면 안내 메시지 색상 변경
         if (data.rank < 500) {

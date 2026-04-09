@@ -138,7 +138,7 @@ public class QueueService {
             } catch (Exception e) {
                 emitter.completeWithError(e);  //에러 발생 시 종료. onError에서 task 정리됨
             }
-        }, 0, 15, TimeUnit.SECONDS);  //15초마다 전송
+        }, 0, 5, TimeUnit.SECONDS);  //5초마다 갱신
 
         // task 정리
         Runnable cleanup = () -> task.cancel(true);  //task 끝내는 작업
@@ -178,12 +178,35 @@ public class QueueService {
 
         Long rank = queueRedisService.getRank(waitingQueueKey, userId);
         Status status = queueRedisService.getStatus(userQueueKey);
+
         Map<Object, Object> userInfo = queueRedisService.getUserInfo(userQueueKey);
-        int initialRank = (int) userInfo.get("initialRank");
-        double percent = 0;
-        if (initialRank != 0 && rank != null) {
-            percent = (double) (initialRank - rank) / initialRank * 100;
+
+
+        // 1. userInfo 맵 자체가 비어있는지 확인
+        if (userInfo == null || userInfo.isEmpty()) {
+            // 유저 정보가 없으면 기본값으로 처리하거나 예외 발생
+            return WaitingInfo.builder()
+                    .title(draft.getPerformanceTitle()) // 추가
+                    .venue(draft.getPerformanceVenue()) // 추가
+                    .date(draft.getPerformanceDate())   // 추가
+                    .price(draft.getPerformancePrice().toString()) // 추가
+                    .status(Status.WAITING) // 혹은 에러 상태
+                    .rank(rank)
+                    .percent(0)
+                    .build();
         }
+
+        Object initialRankObj = userInfo.get("initialRank");
+        // 원본 : int initialRank = (int) userInfo.get("initialRank");
+        int initialRank = (initialRankObj != null) ? Integer.parseInt(initialRankObj.toString()) : 0;
+        double percent = 0;
+        if (initialRank > 0 && rank != null && rank > 0) {
+            percent = (double) (initialRank - rank) / initialRank * 100;
+            if (percent < 0) percent = 0; // 역전 현상 방지
+        }
+        /* 원본 : if (initialRank != 0 && rank != null) {
+            percent = (double) (initialRank - rank) / initialRank * 100;
+        }*/
 
         return WaitingInfo.builder()
                 .title(draft.getPerformanceTitle())

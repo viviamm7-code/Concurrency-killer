@@ -47,9 +47,19 @@ public class QueueRedisService {
     }
 
     //상태 조회
+    /*
+    * 성률 : 데이터가 없으면 기본값(예: WAITING)을 주거나 에러를 방지함
+    * */
     public Status getStatus(String userQueueKey) {
-        return Status.valueOf(redisTemplate.opsForHash().get(userQueueKey, "status").toString());
+        Object status = redisTemplate.opsForHash().get(userQueueKey, "status");
+        if (status == null) {
+            return Status.WAITING; // 혹은 적절한 기본 상태
+        }
+        return Status.valueOf(status.toString());
     }
+    /* 원본 : public Status getStatus(String userQueueKey) {
+        return Status.valueOf(redisTemplate.opsForHash().get(userQueueKey, "status").toString());
+    }*/
 
     //유저 모든 정보 조회
     public Map<Object, Object> getUserInfo(String userQueueKey) {
