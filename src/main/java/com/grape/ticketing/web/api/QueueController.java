@@ -4,6 +4,8 @@ import com.grape.ticketing.dto.queue.InactiveResponseTO;
 import com.grape.ticketing.dto.queue.RegisterResponseTO;
 import com.grape.ticketing.dto.queue.StatusResponseTO;
 import com.grape.ticketing.service.QueueService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -16,6 +18,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("api/queue")
 @RequiredArgsConstructor
+@Tag(name = "대기열 큐 API")
 public class QueueController {
 
     private final QueueService queueService;
@@ -24,6 +27,7 @@ public class QueueController {
      * 대기열 등록 api
      * 공연 상세 조회에서 예매하기 클릭 시 호출
      */
+    @Operation(summary = "대기열 등록")
     @PostMapping("/register")
     public RegisterResponseTO registerWaitingQueue(/*HttpSession session,*/@RequestParam Long memberId, @RequestParam Long performanceId) {
         /*Long memberId = (Long) session.getAttribute("loginMember");
@@ -37,6 +41,7 @@ public class QueueController {
      * 상태 조회 api
      * 클라이언트가 현재 자신이 입장 가능한 상태인지 조회하는 api
      */
+    @Operation(summary = "대기열 상태 조회")
     @GetMapping("/status")
     public StatusResponseTO getStatus(/*HttpSession session,*/@RequestParam Long memberId, @RequestParam Long performanceId) {
          /*Long memberId = (Long) session.getAttribute("loginMember");
@@ -49,6 +54,7 @@ public class QueueController {
     /**
      * SSE로 대기인원 조회하는 api
      */
+    @Operation(summary = "SSE로 대기인원 조회")
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter stream(HttpSession session, @RequestParam UUID draftId) {
         Long memberId = (Long) session.getAttribute("loginMember");
@@ -61,6 +67,7 @@ public class QueueController {
     /**
      * active 유저와 사용자 정보 삭제하는 api(예매 완료 시 호출)
      */
+    @Operation(summary = "active 유저와 사용자 정보 삭제(예매 완료 시 호출)")
     @DeleteMapping("/inactive")
     public InactiveResponseTO deleteActiveUser(HttpSession session, @RequestParam Long performanceId) {
         Long memberId = (Long) session.getAttribute("loginMember");
