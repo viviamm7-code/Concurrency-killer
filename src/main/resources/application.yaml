@@ -25,21 +25,11 @@ spring:
           google:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             scope:
               - openid
               - profile
               - email
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: tjtjdfbf@gmail.com
-    password: ${MAIL_PW} #qnml xsuq qsjv ftkv qnmlxsuqqsjvftkv
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
 
           naver:
             client-name: Naver
@@ -76,6 +66,18 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: tjtjdfbf@gmail.com
+    password: ${MAIL_PW}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 toss:
   client-key: ${TOSS_CLIENT_KEY}
   secret-key: ${TOSS_SECRET_KEY}
@@ -87,9 +89,5 @@ kakao:
 logging:
   level:
     org.springframework.security: TRACE
-    org:
-      hibernate:
-        SQL: debug
-        type:
-          descriptor:
-            sql: trace
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace
