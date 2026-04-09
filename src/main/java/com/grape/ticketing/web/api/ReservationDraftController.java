@@ -9,6 +9,7 @@ import com.grape.ticketing.exception.SeatHoldConflictException;
 import com.grape.ticketing.service.ReservationDraftRedisService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,9 +40,15 @@ public class ReservationDraftController {
     @PostMapping
     public ReservationDraftResponse createDraft(
             @RequestBody ReservationDraftCreateRequest request,
-            @AuthenticationPrincipal Member member
+            HttpSession session
     ) {
-        return reservationDraftRedisService.createDraft(member.getId(), request);
+        Long memberId = (Long) session.getAttribute("loginMember");
+
+        if (memberId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
+        }
+
+        return reservationDraftRedisService.createDraft(memberId, request);
     }
 
     @Operation(summary = "임시 예매 정보 조회")
