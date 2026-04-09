@@ -77,7 +77,7 @@ public class SecurityConfig {
                         .successHandler((request, response, authentication) -> {
                             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
-                            String email = (String) oAuth2User.getAttributes().get("email");
+                            String email = extractEmail(oAuth2User);
 
                             if (email == null) {
                                 throw new IllegalStateException("소셜 로그인 email이 없습니다.");
