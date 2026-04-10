@@ -27,7 +27,7 @@ public class PerformanceService {
                 performance.getStartedAt() == null ? "" : performance.getStartedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
                 performance.getPerformanceName(),
                 performance.getPrice(),
-                performance.getVenue(),
+                performance.getVenue().getVenueName(),
                 remainingSeatLimit == null ? 0 : remainingSeatLimit.intValue(),
                 "/performances/" + performance.getId()
         );}

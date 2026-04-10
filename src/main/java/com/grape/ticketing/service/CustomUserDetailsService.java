@@ -1,16 +1,15 @@
 package com.grape.ticketing.service;
 
+import com.grape.ticketing.domain.member.CustomUserDetails;
 import com.grape.ticketing.domain.member.Member;
 import com.grape.ticketing.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+//일반 로그인용
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
@@ -20,10 +19,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("유저 없음"));
 
-        return User.builder()
-                .username(member.getUsername())
-                .password(member.getPassword())
-                .authorities(member.getRole()) // ROLE_USER
-                .build();
+        return member;
     }
 }

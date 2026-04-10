@@ -11,6 +11,17 @@ const tossPayments = TossPayments(clientKey);
 const customerKey = `member_${Date.now()}`;
 const payment = tossPayments.payment({ customerKey });
 
+//뒤로가기(좌석 화면)
+function goToSeat() {
+    const draftId = getDraftIdFromQuery();
+
+    if (!draftId) {
+        alert("draftId가 없습니다.");
+        return;
+    }
+    location.href = `/seat?draftId=${draftId}`;
+}
+
 function getDraftIdFromQuery() {
     const params = new URLSearchParams(window.location.search);
     return params.get("draftId");
@@ -45,7 +56,7 @@ function renderDetail(draft) {
                     </div>
 
                     <div class="info-item">
-                        <div class="info-label">예매자</div>
+                        <div class="info-label">예매자 아이디</div>
                         <div class="info-value">${formatMemberLabel(draft.memberId)}</div>
                     </div>
 
@@ -114,6 +125,9 @@ async function requestTossPayment() {
             failUrl: window.location.origin + `/payments/toss/fail?draftId=${currentDraft.draftId}`,
             customerName: `회원 ${currentDraft.memberId}`
         });
+
+        alert(`예매가 완료되었습니다.`);
+        window.location.href = "/reservation";
     } catch (e) {
         if (confirmBtn) {
             confirmBtn.disabled = false;

@@ -29,7 +29,7 @@ public class Reservation extends BaseEntitiy{
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;
 
-    @OneToMany(mappedBy = "reservation")
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ReservationSeat> reservationSeats = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

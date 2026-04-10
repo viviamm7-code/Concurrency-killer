@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대기실 - 빌리 엘리어트</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(160deg, #12141e 0%, #0f1117 60%, #1a1025 100%);
+            color: #e8e6f0;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── 콘텐츠 영역 ── */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px;
+            gap: 32px;
+        }
+
+        /* ── 공연 정보 띠 ── */
+        .show-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #181a28;
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+            padding: 16px 24px;
+            width: 100%;
+            max-width: 560px;
+        }
+
+        .show-text h2 { font-size: 16px; font-weight: 600; color: #e8e6f0; margin-bottom: 4px; }
+        .show-text p  { font-size: 12px; color: #7a7898; }
+
+        /* ── 대기 카드 ── */
+        .wait-card {
+            background: #181a28;
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 20px;
+            padding: 40px 32px;
+            width: 100%;
+            max-width: 560px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 28px;
+        }
+
+        /* ── 스피너 ── */
+        .spinner-wrap {
+            position: relative;
+            width: 120px; height: 120px;
+        }
+
+        .spinner-svg {
+            width: 120px; height: 120px;
+            animation: spin 2.4s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .spinner-inner {
+            position: absolute;
+            inset: 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .spinner-icon { font-size: 28px; }
+
+        /* ── 숫자 블록 ── */
+        .wait-nums {
+            display: flex;
+            justify-content: center;
+            grid-template-columns: 1fr 1px 1fr;
+            width: 100%;
+            text-align: center;
+        }
+
+        .num-block { padding: 8px 16px; }
+        .num-block .label { font-size: 12px; color: #7a7898; margin-bottom: 6px; }
+        .num-block .value { font-size: 32px; font-weight: 700; color: #e8e6f0; }
+        .num-block .value span { font-size: 14px; font-weight: 400; color: #9992b8; margin-left: 2px; }
+
+        .divider-v { background: rgba(255,255,255,0.08); margin: 8px 0; }
+
+        /* ── 진행률 바 ── */
+        .progress-wrap { width: 100%; }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #7a7898;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            width: 100%; height: 6px;
+            background: #1e2030;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f07020, #f08c30);
+            border-radius: 99px;
+            transition: width 1s ease;
+        }
+
+        /* ── 안내 메시지 ── */
+        .info-msg {
+            background: rgba(240,112,32,0.08);
+            border: 1px solid rgba(240,112,32,0.2);
+            border-radius: 10px;
+            padding: 14px 18px;
+            font-size: 13px;
+            color: #c8905a;
+            text-align: center;
+            line-height: 1.6;
+            width: 100%;
+            transition: all 0.4s ease;
+        }
+
+        /* ── 예매 버튼 (비활성) ── */
+        .wait-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(90deg, #f07020, #e05818);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: default;
+            opacity: 0.7;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── 자동 갱신 행 ── */
+        .refresh-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #55527a;
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s;
+        }
+        .refresh-row:hover { color: #9992b8; }
+        .refresh-icon { font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<!-- 메인 콘텐츠 -->
+<div class="content">
+
+    <!-- 공연 정보 -->
+    <div class="show-info">
+        <div class="show-text">
+            <h2></h2>
+            <p>&nbsp;·&nbsp; 0000-00-00 &nbsp;·&nbsp; 0원</p>
+        </div>
+    </div>
+
+    <!-- 대기 카드 -->
+    <div class="wait-card">
+
+        <!-- 회전 스피너 -->
+        <div class="spinner-wrap">
+            <svg class="spinner-svg" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="52"
+                        fill="none" stroke="#1e2030" stroke-width="8"/>
+                <circle cx="60" cy="60" r="52"
+                        fill="none" stroke="#f07020" stroke-width="8"
+                        stroke-linecap="round"
+                        stroke-dasharray="80 246"
+                        stroke-dashoffset="0"/>
+            </svg>
+            <div class="spinner-inner">
+                <span class="spinner-icon">🎟</span>
+            </div>
+        </div>
+
+        <!-- 대기 순번 / 예상 시간 -->
+        <div class="wait-nums">
+            <div class="num-block">
+                <div class="label">내 대기 순번</div>
+                <div class="value" id="my-num">0</div>
+            </div>
+            <!--<div class="divider-v"></div>
+            <div class="num-block">
+                <div class="label">예상 대기 시간</div>
+                <div class="value" id="wait-time">0<span>분</span></div>
+            </div>-->
+        </div>
+
+        <!-- 진행률 바 -->
+        <div class="progress-wrap">
+            <div class="progress-label">
+                <span>접속 진행률</span>
+                <span id="pct-text">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="prog-fill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- 안내 메시지 -->
+        <div class="info-msg" id="info-msg">
+            잠시만 기다려 주세요.<br>순서가 되면 자동으로 예매 페이지로 이동합니다.
+        </div>
+
+        <!-- 예매 버튼 (대기 중 비활성) -->
+        <button class="wait-btn">예매 대기 중...</button>
+
+        <!-- 자동 갱신 카운트다운 -->
+        <div class="refresh-row" id="refresh-btn">
+            <span class="refresh-icon">&#10227;</span>
+            <span id="refresh-label">5초 후 자동 갱신</span>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    //파라미터 받기
+    const params = new URLSearchParams(window.location.search);
+    const draftId = params.get('draftId');
+
+    const TOTAL = 0;
+    let myNum = TOTAL;
+    let refreshCountdown = 30;
+
+    const myNumEl     = document.getElementById('my-num');
+    const progFill    = document.getElementById('prog-fill');
+    const pctText     = document.getElementById('pct-text');
+    const infoMsg     = document.getElementById('info-msg');
+    const refreshLabel = document.getElementById('refresh-label');
+
+    const sse = new EventSource(`/api/queue/stream?draftId=${draftId}`);
+
+    sse.addEventListener('waiting-info', (e) => {
+        const data = JSON.parse(e.data);
+        console.log('status:', data.status, typeof data.status);
+
+        // ACTIVE면 좌석 페이지로 이동
+        if (data.status === 'ACTIVE') {
+            sse.close();
+            window.location.href = `/seat?draftId=${draftId}`;
+            return;
+        }
+
+        // 공연 정보 업데이트
+        document.querySelector('.show-text h2').textContent = data.title;
+        document.querySelector('.show-text p').textContent =
+            `${data.venue} · ${data.date} · ${data.price}원`;
+
+        // 대기 정보 업데이트
+        myNumEl.textContent      = data.rank
+        progFill.style.width     = data.percent + '%';
+        pctText.textContent      = data.percent.toFixed(0) + '%';
+
+        // 500명 미만이면 안내 메시지 색상 변경
+        if (data.rank < 500) {
+            infoMsg.textContent       = '거의 다 왔어요! 잠시 후 예매 페이지로 이동합니다.';
+            infoMsg.style.color       = '#7ac87a';
+            infoMsg.style.borderColor = 'rgba(100,200,100,0.3)';
+            infoMsg.style.background  = 'rgba(100,200,100,0.07)';
+        }
+    });
+
+    sse.onerror = () => {
+        refreshLabel.textContent = '연결이 끊겼습니다. 재연결 중...';
+        // EventSource는 기본적으로 자동 재연결 시도함
+    };
+</script>
+</body>
+</html>

@@ -40,10 +40,19 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
+
+
+
 	//mapper
 	implementation 'org.mapstruct:mapstruct:1.6.3'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+	//Spring-security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// 이메일 발송을 위한 스타터
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {

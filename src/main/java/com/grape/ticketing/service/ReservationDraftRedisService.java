@@ -49,11 +49,12 @@ public class ReservationDraftRedisService {
     private final ReservationRepository reservationRepository;
     private final ReservationSeatRepository reservationSeatRepository;
     private final SeatRepository seatRepository;
+    private final QueueRedisService queueRedisService;
 
-    public ReservationDraftResponse createDraft(ReservationDraftCreateRequest request) {
+    public ReservationDraftResponse createDraft(Long memberId, ReservationDraftCreateRequest request) {
         ReservationDraftCacheDto draft = new ReservationDraftCacheDto();
         draft.setDraftId(UUID.randomUUID());
-        draft.setMemberId(request.getMemberId());
+        draft.setMemberId(memberId);
         draft.setPerformanceId(request.getPerformanceId());
         draft.setPerformanceDate(request.getPerformanceDate());
         draft.setPerformanceTitle(request.getPerformanceTitle());
@@ -116,6 +117,10 @@ public class ReservationDraftRedisService {
     public ReservationConfirmResponse confirmDraft(UUID draftId) {
         ReservationDraftCacheDto draft = getDraftEntity(draftId);
 
+        // 로그 추가
+        System.out.println("DEBUG: PerformanceId = " + draft.getPerformanceId());
+        System.out.println("DEBUG: MemberId = " + draft.getMemberId());
+
         Member member = memberRepository.findById(draft.getMemberId())
                 .orElseThrow(() -> new IllegalArgumentException("회원이 없습니다."));
         Performance performance = performanceRepository.findById(draft.getPerformanceId())
@@ -154,6 +159,7 @@ public class ReservationDraftRedisService {
         }
 
         releaseSeatHolds(draft.getDraftId(), draft.getPerformanceId(), selectedSeats);
+        deleteActiveUser(draft.getMemberId(), draft.getPerformanceId());  //예매 확정이므로 대기열 입장 허용 사용자 삭제
         redisTemplate.delete(generateKey(draftId));
 //        log.info("Draft confirmed and removed. draftId={}, reservationId={}", draftId, savedReservation.getId());
         return new ReservationConfirmResponse(savedReservation.getId(), "최종 예매가 완료되었습니다.");
@@ -337,5 +343,25 @@ public class ReservationDraftRedisService {
         draft.setAmount(amount);
 
         redisTemplate.opsForValue().set(key, draft);
+    }
+
+    /**
+     * 개요: 대기열 관련 함수들! redis에서 active큐에서 입장 허용된 유저와 유저 정보를 삭제하는 메서드
+     * 인자값: 멤버id, 공연id
+     * 반환값: 없음
+     */
+    public void deleteActiveUser(Long memberId, Long performanceId) {
+        String activeKey = getActiveKey(performanceId);
+        String userQueueKey = getUserQueueKey(performanceId, memberId);
+        queueRedisService.removeActiveUser(activeKey, memberId);
+        queueRedisService.removeUserInfo(userQueueKey);
+    }
+
+    private String getActiveKey(Long performanceId) {
+        return "queue:active:" + performanceId;
+    }
+
+    private String getUserQueueKey(Long performanceId, Long memberId) {
+        return "queue:user:" + performanceId + ":" + memberId;
     }
 }

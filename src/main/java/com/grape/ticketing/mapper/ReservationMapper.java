@@ -15,7 +15,7 @@ public interface ReservationMapper {
 
     @Mapping(target = "reservationId", source = "id")
     @Mapping(target = "performanceName", source = "performance.performanceName")
-    @Mapping(target = "venue", source = "performance.venue")
+    @Mapping(target = "venue", source = "performance.venue.venueName")
     @Mapping(target = "imageUrl", source = "performance.imageUrl")
     @Mapping(target = "reservedAt", source = "reservedAt")
     @Mapping(target = "reservedDate", source = "reservedDate")
@@ -30,7 +30,7 @@ public interface ReservationMapper {
     @Mapping(target = "reservationId", source = "id")
     @Mapping(target = "reservationName", source = "member.username")
     @Mapping(target = "performanceName", source = "performance.performanceName")
-    @Mapping(target = "venue", source = "performance.venue")
+    @Mapping(target = "venue", source = "performance.venue.venueName")
     @Mapping(target = "reservedAt", source = "reservedAt")
     @Mapping(target = "reservedDate", source = "reservedDate")
     @Mapping(target = "startedAt", source = "startedAt")
