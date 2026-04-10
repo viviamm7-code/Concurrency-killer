@@ -89,5 +89,6 @@ Concurrency-Killer은 동시성을 고려한 온라인 뮤지컬 티켓팅 프�
 - [Notion](https://www.notion.so/Project-8e5bd34f43e6834097670153af124ece)
 
 #### 협업 문서
-- [Trello](https://trello.com/b/xRzx4FIM/%ED%8B%B0%EC%BC%93%ED%8C%85)
+- [Trello1](https://trello.com/b/xRzx4FIM/%ED%8B%B0%EC%BC%93%ED%8C%85)
+- [Trello2](https://trello.com/b/jVXhTGSw/%ED%8B%B0%EC%BC%93%ED%8C%852)
 
