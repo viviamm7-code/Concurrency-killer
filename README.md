@@ -72,10 +72,16 @@ Concurrency-Killer은 동시성을 고려한 온라인 뮤지컬 티켓팅 프�
 - 새로운 기능을 개발할때마다 feature/TK[태스크 넘버]-[기능 설명] 브랜치에서 생성 후 작업
 
 ## ☁️ 시연 영상
+1차 프로젝트 :
 - 시나리오 1 : <a href="https://youtu.be/qJN7NWEaD3o">기본 예매</a>
 - 시나리오 2 : <a href="https://youtu.be/6wcqGtdElQw">예매 취소</a>
 - 시나리오 3 : <a href="https://youtu.be/MjMEg_p_3Rc">내 예매 필터링</a>
 - 시나리오 4 : <a href="https://youtu.be/TQd6w_Ithjs">동시성 문제 해결</a>
+2차 프로젝트 :
+- 시나리오 5 : <a href="https://youtu.be/xbHfR-yul48">대기열</a>
+- 시나리오 6 : <a href="https://youtu.be/w_Sd11NYsLI">회원 가입과 내 정보</a>
+- 시나리오 7 : <a href="https://youtu.be/fROqw3g986g">관리자</a>
+- 시나리오 8 : <a href="https://youtu.be/qlSmHTl87tU">외부 API 기능</a>
 
 ## ☁️ Wiki
 위키 페이지는 분량상 README에 담지 못한 본 프로젝트의 기획 문서와 설계 문서를 포함하고 있습니다.
