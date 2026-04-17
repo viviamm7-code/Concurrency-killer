@@ -15,16 +15,4 @@ public class LoginService {
                 .filter(member -> member.getPassword().equals(password))
                 .orElse(null);
     }
-
-    // 테스트용 더미 로직
-//    public Member login(String username, String password) {
-//        if ("test".equals(username) && "1234".equals(password)) {
-//            Member testMember = new Member();
-//            testMember.setUsername("test");
-//            testMember.setPassword("1234");
-//            return testMember;
-//        }
-//        return null;
-//    }
-
 }

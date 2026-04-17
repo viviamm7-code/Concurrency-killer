@@ -3,7 +3,6 @@ package com.grape.ticketing.service;
 import com.grape.ticketing.domain.*;
 import com.grape.ticketing.domain.status.ReservationStatus;
 import com.grape.ticketing.domain.status.SeatStatus;
-import com.grape.ticketing.dto.*;
 import com.grape.ticketing.dto.reservation.CancelPolicyResultDto;
 import com.grape.ticketing.dto.reservation.ReservationCancelDto;
 import com.grape.ticketing.dto.reservation.ReservationDetailDto;
@@ -12,11 +11,10 @@ import com.grape.ticketing.mapper.ReservationCancelMapper;
 import com.grape.ticketing.mapper.ReservationMapper;
 import com.grape.ticketing.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -30,8 +28,6 @@ public class ReservationService {
     private final ReservationCancelMapper reservationCancelMapper;
     private final ReservationCancelPolicyService reservationCancelPolicyService;
     private final SeatRepository seatRepository;
-    private final MemberRepository memberRepository;
-    private final PerformanceRepository performanceRepository;
 
     public long getReservedSeatCount(Long memberId, Long performanceId) {
         long reservedSeatCnt = reservationSeatRepository.countReservedSeatsByMemberIdAndPerformanceId(memberId, performanceId);
@@ -101,9 +97,9 @@ public class ReservationService {
     @Transactional
     public void completeExpiredReservations() {
         List<Reservation> reservations =
-                reservationRepository.findByReservationStatusAndPerformance_StartedAtBefore(
+                reservationRepository.findAllByReservationStatusAndReservedDateBefore(
                         ReservationStatus.RESERVED,
-                        LocalDateTime.now()
+                        new Date()
                 );
 
         for (Reservation reservation : reservations) {
@@ -115,8 +111,15 @@ public class ReservationService {
                 seat.setSeatStatus(SeatStatus.AVAILABLE);
             }
 
-            seatRepository.saveAll(seats);
             reservation.setReservationStatus(ReservationStatus.COMPLETED);
+
         }
+
+        seatRepository.saveAll(
+                reservations.stream()
+                        .flatMap(r -> r.getReservationSeats().stream())
+                        .map(ReservationSeat::getSeat)
+                        .toList()
+        );
     }
 }

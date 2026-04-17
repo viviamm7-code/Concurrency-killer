@@ -49,11 +49,12 @@ public class ReservationDraftRedisService {
     private final ReservationRepository reservationRepository;
     private final ReservationSeatRepository reservationSeatRepository;
     private final SeatRepository seatRepository;
+    private final QueueRedisService queueRedisService;
 
     public ReservationDraftResponse createDraft(ReservationDraftCreateRequest request) {
         ReservationDraftCacheDto draft = new ReservationDraftCacheDto();
         draft.setDraftId(UUID.randomUUID());
-        draft.setMemberId(request.getMemberId());
+        draft.setMemberId(request.getMemberId()); //memberId로 바꾸기
         draft.setPerformanceId(request.getPerformanceId());
         draft.setPerformanceDate(request.getPerformanceDate());
         draft.setPerformanceTitle(request.getPerformanceTitle());
@@ -76,6 +77,8 @@ public class ReservationDraftRedisService {
         log.info("Draft loaded. draftId={}, selectedSeats={}, totalPrice={}", draftId, draft.getSelectedSeats(), draft.getTotalPrice());
         return toResponse(draft);
     }
+
+
 
     public ReservationDraftResponse updateDraft(UUID draftId, ReservationDraftUpdateRequest request) {
         ReservationDraftCacheDto draft = getDraftEntity(draftId);
@@ -109,10 +112,14 @@ public class ReservationDraftRedisService {
         return (ReservationDraftCacheDto) value;
     }
 
-    //reservation, reservation_seat, seat 테이블을 동시에 업데이트 되어야하기때문에 @Transactional 사용
+    //reservation, reservation_seat, seat, payment 테이블을 동시에 업데이트 되어야하기때문에 @Transactional 사용
     @Transactional
     public ReservationConfirmResponse confirmDraft(UUID draftId) {
         ReservationDraftCacheDto draft = getDraftEntity(draftId);
+
+        // 로그 추가
+        System.out.println("DEBUG: PerformanceId = " + draft.getPerformanceId());
+        System.out.println("DEBUG: MemberId = " + draft.getMemberId());
 
         Member member = memberRepository.findById(draft.getMemberId())
                 .orElseThrow(() -> new IllegalArgumentException("회원이 없습니다."));
@@ -136,7 +143,6 @@ public class ReservationDraftRedisService {
         reservation.setReservedDate(draft.getReservedDate());
         Reservation savedReservation = reservationRepository.save(reservation);
 
-
         // 예매 좌석 데이터 저장
         for (String seatNumber : selectedSeats) {
             Seat seat = seatRepository.findByPerformanceIdAndSeatNumber(draft.getPerformanceId(), seatNumber)
@@ -153,6 +159,7 @@ public class ReservationDraftRedisService {
         }
 
         releaseSeatHolds(draft.getDraftId(), draft.getPerformanceId(), selectedSeats);
+        deleteActiveUser(draft.getMemberId(), draft.getPerformanceId());  //예매 확정이므로 대기열 입장 허용 사용자 삭제
         redisTemplate.delete(generateKey(draftId));
 //        log.info("Draft confirmed and removed. draftId={}, reservationId={}", draftId, savedReservation.getId());
         return new ReservationConfirmResponse(savedReservation.getId(), "최종 예매가 완료되었습니다.");
@@ -174,6 +181,7 @@ public class ReservationDraftRedisService {
 
         return toResponse(draft);
     }
+
     private void synchronizeSeatHolds(ReservationDraftCacheDto draft, List<String> requestedSeats) {
         List<String> currentSeats = draft.getSelectedSeats() == null
                 ? new ArrayList<>()
@@ -258,7 +266,7 @@ public class ReservationDraftRedisService {
 
         Boolean acquired = redisTemplate.opsForValue().setIfAbsent(key, draftId.toString(), SEAT_HOLD_TTL);
         if (!Boolean.TRUE.equals(acquired)) {
-            throw new IllegalStateException("다른 사용자가 이미 선점한 좌석입니다: " + seatNumber);
+            throw new SeatHoldConflictException(List.of(seatNumber));
         }
     }
 
@@ -320,5 +328,40 @@ public class ReservationDraftRedisService {
                 draft.isConfirmed(),
                 draft.getReservedDate()
         );
+    }
+
+    public void savePaymentInfo(UUID draftId, String paymentKey, Long amount) {
+        String key = "reservation:draft:" + draftId;
+
+        ReservationDraftCacheDto draft = (ReservationDraftCacheDto) redisTemplate.opsForValue().get(key);
+
+        if (draft == null) {
+            throw new IllegalArgumentException("임시 예매 정보가 없습니다.");
+        }
+
+        draft.setPaymentKey(paymentKey);
+        draft.setAmount(amount);
+
+        redisTemplate.opsForValue().set(key, draft);
+    }
+
+    /**
+     * 개요: 대기열 관련 함수들! redis에서 active큐에서 입장 허용된 유저와 유저 정보를 삭제하는 메서드
+     * 인자값: 멤버id, 공연id
+     * 반환값: 없음
+     */
+    public void deleteActiveUser(Long memberId, Long performanceId) {
+        String activeKey = getActiveKey(performanceId);
+        String userQueueKey = getUserQueueKey(performanceId, memberId);
+        queueRedisService.removeActiveUser(activeKey, memberId);
+        queueRedisService.removeUserInfo(userQueueKey);
+    }
+
+    private String getActiveKey(Long performanceId) {
+        return "queue:active:" + performanceId;
+    }
+
+    private String getUserQueueKey(Long performanceId, Long memberId) {
+        return "queue:user:" + performanceId + ":" + memberId;
     }
 }

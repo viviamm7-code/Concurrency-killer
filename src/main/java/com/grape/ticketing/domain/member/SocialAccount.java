@@ -1,6 +1,5 @@
 package com.grape.ticketing.domain.member;
 
-import com.grape.ticketing.domain.member.AuthProvider;
 import jakarta.persistence.*;
 import lombok.*;
 

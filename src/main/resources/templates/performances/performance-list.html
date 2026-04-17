@@ -38,7 +38,7 @@
         }
 
         .top-box {
-            margin-bottom: 32px;
+            margin-bottom: 16px;
         }
 
         .sub-title {
@@ -201,18 +201,79 @@
             font-size: 16px;
             opacity: 0.85;
         }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #loginButton {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #loginButton form {
+            margin: 0;
+        }
+
+        .search-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .search-input {
+            width: 420px;
+            max-width: 100%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            border: 1.5px solid rgba(244, 114, 182, 0.35);
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            outline: none;
+            font-size: 15px;
+            text-align: center;
+            transform: translateY(-100px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+            backdrop-filter: blur(10px);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .search-input::placeholder {
+            color: #cbd5e1;
+        }
+
+        .search-input:focus {
+            border-color: rgba(236, 72, 153, 0.9);
+            background: rgba(255, 255, 255, 0.16);
+            box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.12),
+            0 10px 28px rgba(0, 0, 0, 0.22);
+        }
     </style>
 </head>
 <body>
 <header>
-    <div></div>  <!-- 왼쪽 빈 공간 (뒤로가기 버튼 없으므로) -->
-    <div id="loginButton"></div>
+    <div></div>
+    <div class="header-actions">
+        <div id="loginButton"></div>
+    </div>
 </header>
 <div class="wrap">
     <div class="top-box">
         <div class="sub-title">MY TICKETS</div>
         <div class="main-title">뮤지컬 공연</div>
         <div class="desc">설레는 순간이 시작될 뮤지컬 공연을 만나보세요.</div>
+    </div>
+
+    <div class="search-wrap">
+        <input
+                type="text"
+                id="performanceSearchInput"
+                class="search-input"
+                placeholder="공연명 검색"
+        />
     </div>
 
     <div class="toolbar">
@@ -226,6 +287,18 @@
 </div>
 
 <script>
+    let allPerformances = [];
+
+    fetch('/api/me', { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+            const adminBtn = document.getElementById('adminPageBtn');
+            if (adminBtn && data && data.role === 'ROLE_ADMIN') {
+                adminBtn.style.display = 'inline-flex';
+            }
+        })
+        .catch(err => console.error(err));
+
     function formatDateTime(dateTimeStr) {
         if (!dateTimeStr) return "-";
 
@@ -243,59 +316,93 @@
         const imageUrl = performance.imageUrl || "";
 
         return `
-  <div class="card" onclick="goToDetail(${performance.id})" style="cursor:pointer;">
+            <div class="card" onclick="goToDetail(${performance.id})" style="cursor:pointer;">
+                <div class="poster-wrap">
+                    <img class="poster" src="${imageUrl}" alt="${escapeHtml(performance.performanceName ?? "-")}" />
+                    <div class="overlay"></div>
 
-    <div class="poster-wrap">
-      <img class="poster" src="${imageUrl}" alt="${performance.performanceName}" />
-
-      <div class="overlay"></div>
-
-      <div class="poster-text">
-        <div class="title">${performance.performanceName ?? "-"}</div>
-        <div class="sub">
-          ${performance.venue ?? "-"}<br/>
-          ${formatDateTime(performance.startDate)} ~ ${formatDateTime(performance.endDate)}
-        </div>
-      </div>
-    </div>
-
-  </div>
-`;
+                    <div class="poster-text">
+                        <div class="title">${escapeHtml(performance.performanceName ?? "-")}</div>
+                        <div class="sub">
+                            ${escapeHtml(performance.venue ?? "-")}<br/>
+                            ${formatDateTime(performance.startDate)} ~ ${formatDateTime(performance.endDate)}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
     function goToDetail(performanceId) {
         location.href = `/performances/${performanceId}`;
     }
 
-    async function loadReservations() {
+    function renderPerformances(data) {
         const content = document.getElementById("content");
         const count = document.getElementById("count");
+
+        count.textContent = data.length;
+
+        if (!data || data.length === 0) {
+            content.innerHTML = `<div class="message-box">공연이 없습니다.</div>`;
+            return;
+        }
+
+        content.innerHTML = `
+            <div class="card-grid">
+                ${data.map(item => createCard(item)).join("")}
+            </div>
+        `;
+    }
+
+    function filterPerformances() {
+        const keyword = document.getElementById("performanceSearchInput").value.trim().toLowerCase();
+
+        const filtered = allPerformances.filter(performance =>
+            (performance.performanceName || "").toLowerCase().includes(keyword)
+        );
+
+        renderPerformances(filtered);
+    }
+
+    async function loadPerformances() {
+        const content = document.getElementById("content");
 
         content.innerHTML = `<div class="message-box">공연을 불러오는 중입니다...</div>`;
 
         try {
-            const response = await fetch("/api/performances");
-            const data = await response.json();
+            const response = await fetch("/api/performances", {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json"
+                }
+            });
 
-            count.textContent = data.length;
-
-            if (!data || data.length === 0) {
-                content.innerHTML = `<div class="message-box">공연이 없습니다.</div>`;
-                return;
+            if (!response.ok) {
+                throw new Error("공연 목록 조회 실패");
             }
 
-            content.innerHTML = `
-          <div class="card-grid">
-            ${data.map(item => createCard(item)).join("")}
-          </div>
-        `;
+            const data = await response.json();
+            allPerformances = data;
+            renderPerformances(allPerformances);
         } catch (error) {
             console.error(error);
             content.innerHTML = `<div class="message-box">공연을 불러오지 못했습니다.</div>`;
         }
     }
 
-    loadReservations();
+    function escapeHtml(value) {
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#39;");
+    }
+
+    document.getElementById("performanceSearchInput").addEventListener("input", filterPerformances);
+
+    loadPerformances();
 </script>
 </body>
 </html>
